@@ -40,7 +40,7 @@ class ProductivityController
         $ok = $request->ok;
         $ng = $request->ng;
         $sum = $ok + $ng;
-        $data =  ProductReport::where('IsDelete',0)
+        $data = ProductReport::where('IsDelete',0)
         ->where('Order_ID',$order_id)
         ->first();
         // dd($data);

@@ -140,12 +140,13 @@ Route::group(['middleware' => 'language'], function()
 				Route::get('/destroy', 'WarehouseSystem\ImportController@destroy')->name('warehousesystem.import.destroy');
 				Route::get('/cancel', 'WarehouseSystem\ImportController@cancel')->name('warehousesystem.import.cancel');
 				Route::post('/add-stock', 'WarehouseSystem\ImportController@add_stock')->name('warehousesystem.import.detail.add_stock');
-				Route::get('/inventory', 'WarehouseSystem\ImportController@inventory')->name('warehousesystem.import.detail.inventory');
 			});
 		});
 		Route::prefix('/Stock')->group(function()
 		{
 			Route::get('/', 'MasterData\MasterWarehouseController@location')->name('warehousesystem.import.location');
+			Route::get('/list', 'WarehouseSystem\ImportController@inventory')->name('warehousesystem.import.detail.inventory');
+
 		});
 
 		Route::prefix('/retype')->group(function()

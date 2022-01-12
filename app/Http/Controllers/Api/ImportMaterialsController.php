@@ -23,21 +23,10 @@ class ImportMaterialsController extends Controller
 
 	public function get_data_input_pallet(Request $request)
 	{
-		// $request->Pallet_ID = 'E1211135A';
-		// $request->Pallet_ID = 'E1211111135A';
-
-		if (empty($request->Pallet_ID)) {
-			return response()->json([
-				'success' => false,
-				'data' => ['message' => __('Pallet') . ' ' . __("Can't be empty")]
-			],400);
-		}
-
 		$command_import = ImportDetail::where('IsDelete', 0)
 		->where('Pallet_ID', $request->Pallet_ID)
-            // ->where('Pallet_ID', 'abc')
 		->where('Status', 0)
-		->with('materials', 'location')
+		->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
 		->get();
 
 		if ($command_import->count() == 0) {
@@ -46,7 +35,6 @@ class ImportMaterialsController extends Controller
 				'data' 		=> ['message' => __('Pallet_ID') . ' ' . __('In the completed / canceled import command')]
 			],400);
 		}
-
 
 		if (count($command_import) > 0) {
 			$val = [];
@@ -70,9 +58,6 @@ class ImportMaterialsController extends Controller
 
 	public function import_packing_list(Request $request)
 	{
-		// $request->Pallet_ID = 'E1211135A';
-		// $request->Warehouse_Detail_ID = 'KĐ2-1-1';
-
 		if (empty($request->Pallet_ID)) 
 		{
 			return response()->json([
@@ -88,7 +73,7 @@ class ImportMaterialsController extends Controller
 			],400);
 		}
 
-		$data =  ImportDetail::where('IsDelete', 0)
+		$data = ImportDetail::where('IsDelete', 0)
 		->where('Pallet_ID', $request->Pallet_ID)
 		->where('Status', 0)
 		->with('materials')
@@ -96,7 +81,6 @@ class ImportMaterialsController extends Controller
 
 		$location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->Warehouse_Detail_ID)->first();
         $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID', $location->Warehouse_ID)->first();
-        
 
 		if (!$location) {
 			return response()->json([
@@ -154,11 +138,6 @@ class ImportMaterialsController extends Controller
 
 	public function get_data_update_location(Request $request)
 	{
-		// $request->Type = 1;
-		// $request->Type = 2;
-		// $label_3 = 2101044831;
-		// $request->Pallet_ID = 'E1211135A';
-		
 		// box
 		if ($request->Type == 1) 
 		{
@@ -172,10 +151,8 @@ class ImportMaterialsController extends Controller
 
 				if($label_3 != '')
 				{
-					$data1 = ImportDetail::where('IsDelete',0)->orderBy('ID','desc')
-					->where('Inventory','>',0)
-					->where('Status','>',0)
-					->where('Box_ID',$label_3)
+					$data1 = ImportDetail::where('IsDelete',0)->where('Inventory','>',0)->where('Status','>',0)->where('Box_ID',$label_3)
+					->orderBy('ID','desc')
 					->first();
 					if($data1)
 					{
@@ -217,16 +194,9 @@ class ImportMaterialsController extends Controller
 		// pallet
 		else if ($request->Type == 2)
 		{
-			$data =  ImportDetail::where('IsDelete', 0)
-			->where('Status', '>', 0)
-			->where('Pallet_ID', $request->Pallet_ID)
-			->where('Inventory', '>', 0)
-			->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
-			->get();
-			// return response()->json([
-			// 		'success' => true,
-			// 		'data' => $data
-			// 	],200);
+			$data =  ImportDetail::where('IsDelete', 0)->where('Status', '>', 0)->where('Pallet_ID', $request->Pallet_ID)->where('Inventory', '>', 0)
+			->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')->get();
+
 			if (count($data) > 0) 
 			{
 				$val = [];
@@ -256,11 +226,6 @@ class ImportMaterialsController extends Controller
 
 	public function update_location(Request $request)
 	{
-		// $request->Type = 2;
-		// $request->Box_ID = 210104483;
-		// $request->Pallet_ID = 'E1211135A';
-		// $request->Warehouse_Detail_ID = 'KĐ2-1-2';
-
 		if (empty($request->Warehouse_Detail_ID)) {
 			return response()->json([
 				'success' => false,
@@ -273,7 +238,6 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
-                // 'data' => $location
 			],400);
 		}
 
@@ -291,13 +255,8 @@ class ImportMaterialsController extends Controller
 			->where('Box_ID', $request->Box_ID)
 			->where('Status', '>', 0)
 			->where('Inventory', '>', 0)
-			// ->with(['materials', 'location'])
 			->orderBy('ID', 'desc')
 			->first();
-
-			// return response()->json([
-			// 	'data' =>$data
-			// ]);
 
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data->Warehouse_Detail_ID)->first();
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
@@ -382,9 +341,7 @@ class ImportMaterialsController extends Controller
 			->where('Status', '>', 0)
 			->where('Pallet_ID', $request->Pallet_ID)
 			->where('Inventory', '>', 0)
-			->with('materials', 'location')
 			->get();
-
 				
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data[0]->Warehouse_Detail_ID)->first();
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
@@ -467,7 +424,7 @@ class ImportMaterialsController extends Controller
 		$arr_label = explode('[1D]',$label);
 		if(count($arr_label) >12)
 		{
-			$label_1 =$arr_label[12];
+			$label_1 = $arr_label[12];
 			$label_2 = str_replace('Z','',$label_1);
 			$label_3 = str_replace('[1E][04]','',$label_2);
 
@@ -485,8 +442,8 @@ class ImportMaterialsController extends Controller
 							'success' => true,
 							'data'	  => [
 								'Box_ID'	=> $label_3,
-								'Quantity'	=>floatval($data1->Quantity),
-								'Location'=>$data1->location ? $data1->location->ID : '',
+								'Quantity'	=> floatval($data1->Quantity),
+								'Location'	=> $data1->location ? $data1->location->ID : '',
 							]
 						],200);
 					}
@@ -527,11 +484,6 @@ class ImportMaterialsController extends Controller
 	{      
 		$detail = $request->detail;
 		$dem = 0;
-		// $location = 'KĐ2-1-1';
-		// $detail = [
-        	
-  //       ];
-
 		$location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
 
 		if (empty($detail)) {
@@ -570,7 +522,7 @@ class ImportMaterialsController extends Controller
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
-					'data' => ['message' => __('Location') .' '.__('Retype'). ' ' . __("Not in warehouse export")]
+					'data' => ['message' => $value['Box_ID'] .' '.__('Retype'). ' ' . __("Not in warehouse export")]
 				],400);
 			}
 

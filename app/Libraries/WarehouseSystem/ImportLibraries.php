@@ -423,10 +423,8 @@ class ImportLibraries
 		})
         
         ->where('Type',1)
+        ->orderBy('ID','DESC')
         ->paginate(10);
-        // dd($data);
-        
-       
     }
 
 

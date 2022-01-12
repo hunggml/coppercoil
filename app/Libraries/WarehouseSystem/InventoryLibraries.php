@@ -15,8 +15,10 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\MasterWarehouse;
+use App\Models\MasterData\MasterWarehouseDetail;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class InventoryLibraries
 {
@@ -344,28 +346,51 @@ class InventoryLibraries
             $data = ImportDetail::where('IsDelete',0)->whereIn('Materials_ID',$request->Materials)
             ->where('Inventory','>',0)
             ->get();
-                foreach($data as $value)
-                {
-                    $arr1 = [
-                        'Warehouse_System_ID'   => $value->Warehouse_Detail_ID,
-                        'Pallet_System_ID'      => $value->Pallet_ID,
-                        'Materials_System_ID'   => $value->Materials_ID,
-                        'Box_System_ID'         => $value->Box_ID,
-                        'Quantity_System'       => $value->Quantity,
-                        'Time_Import_System'    => $value->Time_Import,
-                        'Status'                => 0,
-                        'Type'                  => 0,
-                        'User_Created'          => Auth::user()->id,
-                        'User_Updated'          => Auth::user()->id,
-                        'IsDelete'              => 0
-                    ];
-                    array_push($arr,$arr1);
-                }   
+            $mat = MasterMaterials::where('IsDelete',0)->whereIn('ID',$request->Materials)->get('Symbols')->toArray();
+            $mat = Arr::flatten($mat);
+            $mat = implode('|',$mat);
+
+            foreach($data as $value)
+            {
+                $arr1 = [
+                    'Warehouse_System_ID'   => $value->Warehouse_Detail_ID,
+                    'Pallet_System_ID'      => $value->Pallet_ID,
+                    'Materials_System_ID'   => $value->Materials_ID,
+                    'Box_System_ID'         => $value->Box_ID,
+                    'Quantity_System'       => $value->Quantity,
+                    'Time_Import_System'    => $value->Time_Import,
+                    'Status'                => 0,
+                    'Type'                  => 1,
+                    'User_Created'          => Auth::user()->id,
+                    'User_Updated'          => Auth::user()->id,
+                    'IsDelete'              => 0
+                ];
+                array_push($arr,$arr1);
+            }
+            
+              $command = CommandInventory::create([
+                  'Name'             => $request->Name,
+                  'Status'           => 0,
+                  'Detail'           => $mat,
+                  'Type'             => 1,
+                  'User_Created'     => Auth::user()->id,
+                  'User_Updated'     => Auth::user()->id,
+                  'IsDelete'         => 0
+              ]);
+              foreach($arr as $value)
+              {
+                  $value['Command_Inventories_ID'] =  $command->ID;
+                  InventoryMaterials::create($value);
+              }
+              return  __('Success'); 
         }
         else if($request->Warehouse)
         {
             $ware = MasterWarehouse::where('IsDelete',0)->whereIn('ID',$request->Warehouse)
             ->get();
+            $ware2 = MasterWarehouse::where('IsDelete',0)->whereIn('ID',$request->Warehouse)->get('Symbols')->toArray();
+            $ware2 = Arr::flatten($ware2);
+            $ware2 = implode('|',$ware2);
             foreach($ware as $value)
             {
                 if($value->detail)
@@ -385,7 +410,7 @@ class InventoryLibraries
                                 'Quantity_System'       => $value->Quantity,
                                 'Time_Import_System'    => $value->Time_Import,
                                 'Status'                => 0,
-                                'Type'                  => 0,
+                                'Type'                  => 2,
                                 'User_Created'          => Auth::user()->id,
                                 'User_Updated'          => Auth::user()->id,
                                 'IsDelete'              => 0
@@ -395,49 +420,78 @@ class InventoryLibraries
                     } 
                 }
             }
+            if(count($arr) > 0)
+            {
+                  $command = CommandInventory::create([
+                      'Name'             => $request->Name,
+                      'Status'           => 0,
+                      'Type'             => 2,
+                      'Detail'           => $ware2,
+                      'User_Created'     => Auth::user()->id,
+                      'User_Updated'     => Auth::user()->id,
+                      'IsDelete'         => 0
+                  ]);
+                  foreach($arr as $value)
+                  {
+                      $value['Command_Inventories_ID'] =  $command->ID;
+                      InventoryMaterials::create($value);
+                  }
+                  return  __('Success');
+            }
+            else
+            {
+                return __('Dont').' '.__('Success');
+            }
         }
         elseif($request->Location)
         {
             $data = ImportDetail::where('IsDelete',0)->whereIn('Warehouse_Detail_ID',$request->Location)
             ->where('Inventory','>',0)
             ->get(); 
+            $location = MasterWarehouseDetail::where('IsDelete',0)->whereIn('ID',$request->Location)->get('Symbols')->toArray();
+            $location = Arr::flatten($location);
+            $location = implode('|',$location);
+            // dd($location);
             foreach($data as $value)
             {
                 $arr1 = [
-                    'Warehouse_System_ID'=>$value->Warehouse_Detail_ID,
-                    'Pallet_System_ID'=>$value->Pallet_ID,
-                    'Materials_System_ID'=>$value->Materials_ID,
-                    'Box_System_ID'=>$value->Box_ID,
-                    'Quantity_System'=>$value->Quantity,
-                    'Time_Import_System'=>$value->Time_Import,
-                    'Status'           => 0,
-                    'Type'             => 0,
-                    'User_Created'     => Auth::user()->id,
-                    'User_Updated'     => Auth::user()->id,
-                    'IsDelete'         => 0
+                    'Warehouse_System_ID'   =>$value->Warehouse_Detail_ID,
+                    'Pallet_System_ID'      =>$value->Pallet_ID,
+                    'Materials_System_ID'   =>$value->Materials_ID,
+                    'Box_System_ID'         =>$value->Box_ID,
+                    'Quantity_System'       =>$value->Quantity,
+                    'Time_Import_System'    =>$value->Time_Import,
+                    'Status'                => 0,
+                    'Type'                  => 3,
+                    'User_Created'          => Auth::user()->id,
+                    'User_Updated'          => Auth::user()->id,
+                    'IsDelete'              => 0
                 ];
                 array_push($arr,$arr1);
             }
+            if(count($arr) > 0)
+            {
+                  $command = CommandInventory::create([
+                      'Name'             => $request->Name,
+                      'Status'           => 0,
+                      'Type'             => 3,
+                      'Detail'           => $location,
+                      'User_Created'     => Auth::user()->id,
+                      'User_Updated'     => Auth::user()->id,
+                      'IsDelete'         => 0
+                  ]);
+                  foreach($arr as $value)
+                  {
+                      $value['Command_Inventories_ID'] =  $command->ID;
+                      InventoryMaterials::create($value);
+                  }
+                  return  __('Success');
+            }
+            else
+            {
+               return __('Dont').' '.__('Success');
+            }
         }
-        if(count($arr) > 0)
-        {
-              $command = CommandInventory::create([
-                  'Name'             => $request->Name,
-                  'Status'           => 0,
-                  'User_Created'     => Auth::user()->id,
-                  'User_Updated'     => Auth::user()->id,
-                  'IsDelete'         => 0
-              ]);
-              foreach($arr as $value)
-              {
-                  $value['Command_Inventories_ID'] =  $command->ID;
-                  InventoryMaterials::create($value);
-              }
-              return  __('Success');
-        }
-        else
-        {
-           return __('Dont Success');
-        }
+        
     }    
 }      

@@ -19,7 +19,9 @@ class CommandInventory extends Model
 	protected $fillable   = [
   	'Name'
   	,'Status'
-  	,'Note'
+  	,'Detail'
+    ,'Note'
+    ,'Type'
   	,'Time_Created'
   	,'User_Created'
   	,'Time_Updated'

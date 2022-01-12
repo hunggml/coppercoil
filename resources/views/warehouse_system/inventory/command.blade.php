@@ -89,7 +89,7 @@
 		                	<thead>
 		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Name')}} {{ __('Command') }}</th>
-								<th>{{__('Trạng Thái')}}</th>
+								<th>{{__('Status')}}</th>
 		                		<th>{{__('Note')}}</th>
 		                		<th>{{__('User Created')}}</th>
 		                		<th>{{__('Time Created')}}</th>
@@ -131,7 +131,7 @@
 								@endforeach
 		                	</tbody>
 		                </table>
-						
+						{{ $data->links() }}
 	                </div>
 	            </div>
 	        </div>

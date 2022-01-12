@@ -309,6 +309,7 @@
 	"Not in warehouse export" : "Không thuộc kho xuất",
 	"Not in location" : "Không thuộc vị trí",
 	"Was" : "Đã",
+	"In" : "Trong",
 	"Bigger":"Lớn hơn",
 	"Request" : "Yêu cầu",
 	"Must be" : "Phải là",
@@ -317,5 +318,6 @@
 	"Real" : "Thực",
 	"Create Command Export Success" : "Tạo Lệnh Xuất Thành Công",
 	"Sum ng and ok is larger than the order code" : "Tổng NG và OK lớn hơn số lượng mã Order",
-	"Dont Scan" : "Chưa Scan"
+	"Dont Scan" : "Chưa Scan",
+	"username or password not correct" : "Tài khoản hoặc mật khẩu không chính xác"
 }

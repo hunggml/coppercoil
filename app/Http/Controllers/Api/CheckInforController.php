@@ -50,33 +50,26 @@ class CheckInforController
             // thông tin box
             $label = $request->Box_ID;
             $arr_label = explode('[1D]', $label);
+            
             if (count($arr_label) > 12) {
-                if ($arr_label[12]) {
-                    $label_1 = $arr_label[12];
-                    $label_2 = str_replace('Z', '', $label_1);
-                    $label_3 = str_replace('[1E][04]', '', $label_2);
+                $label_1 = $arr_label[12];
+                $label_2 = str_replace('Z', '', $label_1);
+                $label_3 = str_replace('[1E][04]', '', $label_2);
 
-                    if ($label_3 != '') {
-                        $data1 = ImportDetail::where('IsDelete', 0)->orderBy('Time_Created', 'desc')
-                        ->where('Box_ID', $label_3)
-                        ->first();
-                        if ($data1) {
-                            return response()->json([
-                                'success' => true,
-                                'data'      => [
-                                    'Box_ID'    => $label_3,
-                                    'Quantity'  => floatval($data1->Quantity),
-                                    'Materials' =>$data1->materials ? $data1->materials->Symbols : '',
-                                    'Location'  =>$data1->location ? $data1->location->Symbols : '',                                
-                                ]
-                            ], 200);
-                        } 
-                        else {
-                            return response()->json([
-                                'success' => false,
-                                'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-                            ], 400);
-                        }
+                if ($label_3 != '') {
+                    $data1 = ImportDetail::where('IsDelete', 0)->orderBy('Time_Created', 'desc')
+                    ->where('Box_ID', $label_3)
+                    ->first();
+                    if ($data1) {
+                        return response()->json([
+                            'success' => true,
+                            'data'      => [
+                                'Box_ID'    => $label_3,
+                                'Quantity'  => floatval($data1->Quantity),
+                                'Materials' =>$data1->materials ? $data1->materials->Symbols : '',
+                                'Location'  =>$data1->location ? $data1->location->Symbols : '',                                
+                            ]
+                        ], 200);
                     } 
                     else {
                         return response()->json([
@@ -136,11 +129,9 @@ class CheckInforController
                                 'Quantity' => number_format($value3->sum('Inventory'), 2, '.', ''),
                                 'Count' => count($value3)
                             ];
-                            // $value3[0]['Inventory'] = number_format($value3->sum('Inventory'), 2, '.', '');
                             array_push($arr, $arr1);
                         }
                     }
-                    // $value['inventory_nl'] = $arr;
                 }
                 return response()->json([
                     'success' => true,

@@ -32,20 +32,16 @@ class AuthController extends Controller
 				'api_token' => Hash::make(Str::random(60)),
 			]);
 
-			// $seconds = 5000;
-			// Cache::put('token', Auth::user()->api_token , $seconds);
-
 			return response()->json([
 				'success' => true,
 				'data' => ['api_token' => Auth::user()->api_token]
 			],200);
-
 		}
 		else
 		{
 			return response()->json([
 				'success' => false,
-				'data' => ['message' => __('Login').' '.__('Fail')]
+				'data' => ['message' => __('username or password not correct')]
 			],400);
 		}
 	}	
