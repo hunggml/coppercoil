@@ -15,6 +15,7 @@ use App\Models\WarehouseSystem\ExportDetail;
 use App\Models\MasterData\MasterWarehouseDetail;
 use App\Models\MasterData\MasterWarehouse;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class InventoriesController extends Controller
 {
@@ -23,54 +24,65 @@ class InventoriesController extends Controller
     ) {
         $this->inventory = $InventoryLibraries;
     }
+
     public function command_inventory(Request $request)
     {
-        $data = CommandInventory::where('IsDelete', 0)->where('Status', 0)->get();
-        $arr = [];
-        foreach ($data as $value) {
-            $details = $value->Detail;
-            $details = explode("|",$details);
-            if ($value->Type == 2) 
-            {
-                $warehouse = MasterWarehouse::where('IsDelete',0)->whereIn('Symbols',$details)->get('ID');
-                $arr_w = [];
-                foreach($warehouse as $value2)
-                {
-                    array_push($arr_w,$value2->ID);
-                }
-                $warehouse1 = MasterWarehouseDetail::where('IsDelete',0)->whereIn('Warehouse_ID',$arr_w)->get('Symbols');
+        $data = [];
+        $commandList = CommandInventory::where('IsDelete', 0)
+                                       ->where('Status', 0)
+                                       ->get();
+
+        foreach($commandList as $command) {
+            $warehouse = [];
+            $material  = [];
+            
+            switch ($command->Type) {
+                case 1:
+                    $material  = explode("|", $command->Detail);
+                    $warehouse = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete',0)
+                                                      ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                                      ->select('Master_Warehouse_Detail.ID', 'Master_Warehouse_Detail.Symbols', 'Master_Warehouse.Name as Master_Warehouse_Name')
+                                                      ->get()
+                                                      ->groupBy('Master_Warehouse_Name')
+                                                      ->toArray();
+                    break;
+                    
+                case 2:
+                    $warehouse = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete',0)
+                                                      ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                                      ->select('Master_Warehouse_Detail.ID', 'Master_Warehouse_Detail.Symbols', 'Master_Warehouse.Name as Master_Warehouse_Name')
+                                                      ->whereIn('Master_Warehouse.Symbols', explode("|", $command->Detail))
+                                                      ->get()
+                                                      ->groupBy('Master_Warehouse_Name')
+                                                      ->toArray();
+                    break;
+                    
+                case 3:
+                    $warehouse = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete', 0)
+                                                      ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                                      ->select('Master_Warehouse_Detail.ID', 'Master_Warehouse_Detail.Symbols', 'Master_Warehouse.Name as Master_Warehouse_Name')
+                                                      ->whereIn('Master_Warehouse_Detail.Symbols', explode("|", $command->Detail))
+                                                      ->get()
+                                                      ->groupBy('Master_Warehouse_Name')
+                                                      ->toArray();
+                    break;
             }
-            elseif($value->Type == 1)
-            {
-                $warehouse1 = MasterWarehouseDetail::where('IsDelete',0)->get('Symbols');
-            }
-            else
-            {
-                $warehouse1 = MasterWarehouseDetail::where('IsDelete',0)->whereIn('Symbols',$details)->get('Symbols');  
-                $details = [];
-            }
-            $obj = [
-                'ID'            => $value->ID,
-                'Name'          => $value->Name,
-                "User_Created"  => $value->user_created ? $value->user_created->name : "",
-                "Time_Created"  => date_format($value->Time_Created,"Y-m-d H:i:s"),
-                "Type"          => $value->Type,
-                "detail"        => $details,
-                "location"      => $warehouse1
-            ];
-            array_push($arr, $obj);
+
+            array_push($data, [
+                'ID'            => $command->ID,
+                'Name'          => $command->Name,
+                "User_Created"  => $command->user_created ? $command->user_created->name : "",
+                "Time_Created"  => date_format($command->Time_Created,"Y-m-d H:i:s"),
+                "Type"          => $command->Type,
+                'Marterial'     => $material,
+                'Warehouse'     => $warehouse
+            ]);
         }
-        if (count($arr) > 0) {
-            return response()->json([
-                'success' => true,
-                'data'      => $arr
-            ], 200);
-        } else {
-            return response()->json([
-                'success' => true,
-                'data'      => []
-            ], 200);
-        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ], 200);
     }
 
     public function detail_inven(Request $request)
@@ -196,7 +208,6 @@ class InventoriesController extends Controller
             ->where('Box_System_ID', $value['Box_ID'])
             ->first();
             // dd($data);
-
 	        if ($data) 
 	        {
 	            if ($data->Quantity_System != $value['Quantity']) {

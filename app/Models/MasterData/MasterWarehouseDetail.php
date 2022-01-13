@@ -65,4 +65,8 @@ class MasterWarehouseDetail extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterGroupMaterials', 'ID', 'Group_Materials_ID')->whereIsdelete(0);
   }
+
+  public function warehouse() {
+    return $this->belongsTo('App\Models\MasterData\MasterWarehouse', 'Warehouse_ID', 'ID');
+  }
 }

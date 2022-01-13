@@ -171,7 +171,7 @@
                                     <br>
                                     <span style="word-spacing: normal;">Từ Kho {{$go}} Đến Kho {{$to}}</span>
                                     <br>
-                                    <span style="word-spacing: normal;">{{$quan ? $quan : $count}} {{$quan ? 'Kg' : 'Thùng'}}</span>
+                                    <span style="word-spacing: normal;">{{$quan ? floatval($quan) : $count}} {{$quan ? 'Kg' : 'Thùng'}}</span>
                                     <br>
                                 </div>
                                 </td>

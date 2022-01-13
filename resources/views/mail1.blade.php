@@ -233,7 +233,7 @@ foreach($import as $value1)
                                     <br>
                                     <span style="word-spacing: normal;">{{$value->go ? $value->go->Symbols : ''}} Đến {{$value->to ? $value->to->Symbols :''}} </span>
                                     <br>
-                                    <span style="word-spacing: normal;">{{$value->Count ? $value->Count : $value->Quantity }} {{$value->Count ? 'box' : 'kg' }}</span>
+                                    <span style="word-spacing: normal;">{{$value->Count ? $value->Count : floatval($value->Quantity) }} {{$value->Count ? 'box' : 'kg' }}</span>
                                     <br>
                                 </div>
                                 </td>
