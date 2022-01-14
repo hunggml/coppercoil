@@ -427,6 +427,7 @@ class ExportLibraries
                                     'Status'=>1,
                                     'User_Updated'     => Auth::user()->id
                                 ]);
+                                
                                 ImportDetail::where('IsDelete',0)
                                 ->where('ID',$data1->ID)
                                 ->update([

@@ -20,7 +20,6 @@ class CheckInforController
         if ($type == 0) {
             // thông tin pallet
             $data =  ImportDetail::where('IsDelete', 0)
-            ->where('Status', '>', 0)
             ->where('Pallet_ID', $request->Pallet_ID)
             ->where('Inventory', '>', 0)
             ->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
@@ -66,8 +65,8 @@ class CheckInforController
                             'data'      => [
                                 'Box_ID'    => $label_3,
                                 'Quantity'  => floatval($data1->Quantity),
-                                'Materials' =>$data1->materials ? $data1->materials->Symbols : '',
-                                'Location'  =>$data1->location ? $data1->location->Symbols : '',                                
+                                'Materials' => $data1->materials ? $data1->materials->Symbols : '',
+                                'Location'  => $data1->location ? $data1->location->Symbols : '',                                
                             ]
                         ], 200);
                     } 
@@ -98,19 +97,6 @@ class CheckInforController
             ->when($location, function ($q, $location) {
                 return $q->where('Symbols', $location);
             })
-            ->with([
-                'inventory.materials',
-                'group_materials',
-                'inventory',
-                'inventory_null.user_created:id,name,username',
-                'inventory_null',
-                'inventory.user_created:id,name,username',
-                'inventory.user_updated:id,name,username',
-            ])
-            ->withCount([
-                'inventory_null',
-                'inventory1'
-            ])
             ->get();
             if (count($datas) > 0) {
                 foreach ($datas as $value) {

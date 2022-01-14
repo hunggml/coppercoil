@@ -101,7 +101,7 @@ class InventoryLibraries
         
         return InventoryMaterials::where('IsDelete',0)
         ->where('Command_Inventories_ID',$request->ID)
-        ->orderBy('Time_Created','desc')
+        ->orderBy('Warehouse_System_ID','asc')
         ->get();
     }
     public function detail_inven($request)

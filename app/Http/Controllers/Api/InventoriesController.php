@@ -14,6 +14,7 @@ use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\WarehouseSystem\ExportDetail;
 use App\Models\MasterData\MasterWarehouseDetail;
 use App\Models\MasterData\MasterWarehouse;
+use App\Models\MasterData\MasterMaterials;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
@@ -49,12 +50,12 @@ class InventoriesController extends Controller
                     
                 case 2:
                     $warehouse = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete',0)
-                                                      ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
-                                                      ->select('Master_Warehouse_Detail.ID', 'Master_Warehouse_Detail.Symbols', 'Master_Warehouse.Name as Master_Warehouse_Name')
-                                                      ->whereIn('Master_Warehouse.Symbols', explode("|", $command->Detail))
-                                                      ->get()
-                                                      ->groupBy('Master_Warehouse_Name')
-                                                      ->toArray();
+                                                        ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                                        ->select('Master_Warehouse_Detail.ID', 'Master_Warehouse_Detail.Symbols', 'Master_Warehouse.Name as Master_Warehouse_Name')
+                                                        ->whereIn('Master_Warehouse.Symbols', explode("|", $command->Detail))
+                                                        ->get()
+                                                        ->groupBy('Master_Warehouse_Name')
+                                                        ->toArray();
                     break;
                     
                 case 3:
@@ -80,8 +81,8 @@ class InventoriesController extends Controller
         }
 
         return response()->json([
-            'success' => true,
-            'data' => $data
+            'success'   => true,
+            'data'      => $data
         ], 200);
     }
 
@@ -109,7 +110,7 @@ class InventoriesController extends Controller
                 ])
             ], 200);
         } 
-        else 
+        else
         {
             return response()->json([
                 'success' => false,
@@ -124,37 +125,31 @@ class InventoriesController extends Controller
         $arr_label = explode('[1D]', $label);
 
         if (count($arr_label) > 12) {
-            if ($arr_label[12]) {
-                $label_1 = $arr_label[12];
-                $label_2 = str_replace('Z', '', $label_1);
-                $label_3 = str_replace('[1E][04]', '', $label_2);
+            $label_1 = $arr_label[12];
+            $label_2 = str_replace('Z', '', $label_1);
+            $label_3 = str_replace('[1E][04]', '', $label_2);
 
-                if ($label_3 != '') {
-                    $data = ImportDetail::where('IsDelete', 0)
-                    ->where('Box_ID', $label_3)
-                    ->orderBy('ID', 'desc')
-                    ->first();
-                    if ($data) 
-                    {
-                    	return response()->json([
-                    		'success'=>true,
-                    		'data'=>[
-                    			'Box_ID' => $label_3,
-                    			'Quantity'=> $data->Quantity
-                    		]
-                    	],200);
-                    }
-                    else
-                    {
-                    	return response()->json([
-	                        'success' => false,
-	                        'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist').' '.__('In').' '.__('System')]
-	                    ], 400);
-                    }
-                } else {
-                    return response()->json([
+            if ($label_3 != '') {
+                $data = ImportDetail::where('IsDelete', 0)
+                                    ->where('Box_ID', $label_3)
+                                    ->orderBy('ID', 'desc')
+                                    ->first();
+                if ($data) 
+                {
+                	return response()->json([
+                		'success'=>true,
+                		'data'=>[
+                			'Box_ID' => $label_3,
+                			'Quantity'=> $data->Quantity,
+                            'Materials' => $data->materials ? $data->materials->Symbols : ""
+                		]
+                	],200);
+                }
+                else
+                {
+                	return response()->json([
                         'success' => false,
-                        'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+                        'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist').' '.__('In').' '.__('System')]
                     ], 400);
                 }
             } else {
@@ -162,7 +157,7 @@ class InventoriesController extends Controller
                     'success' => false,
                     'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
                 ], 400);
-            }
+            }  
         } 
         else 
         {
@@ -175,7 +170,12 @@ class InventoriesController extends Controller
 
     public function update_inventory(Request $request)
     {
-        $location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
+        $detail = $request->detail;
+        $pallet = $request->Pallet_ID;
+        $dem = 0;
+        $location = MasterWarehouseDetail::where('IsDelete', 0)
+                                        ->where('Symbols', $request->location)
+                                        ->first();
 
         if (empty($request->location)) {
             return response()->json([
@@ -187,7 +187,6 @@ class InventoriesController extends Controller
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
-                // 'data' => $location
             ], 400);
         }
         if (empty($detail)) {
@@ -200,18 +199,20 @@ class InventoriesController extends Controller
         foreach($detail as $key => $value)
         {
         	$data = InventoryMaterials::where('IsDelete', 0)
-            ->where('Command_Inventories_ID', $request->command_id)
-            ->where('Warehouse_System_ID', $location->ID)
-            ->when($pallet,function($query,$pallet){
-            	return $query->where('Pallet_System_ID',$request->Pallet_ID);
-            })
-            ->where('Box_System_ID', $value['Box_ID'])
-            ->first();
-            // dd($data);
+                                        ->where('Command_Inventories_ID', $request->command_id)
+                                        ->where('Warehouse_System_ID', $location->ID)
+                                        ->when($pallet,function($query,$pallet){
+                                    	   return $query->where('Pallet_System_ID',$pallet);
+                                        })
+                                        ->where('Box_System_ID', $value['Box_ID'])
+                                        ->first();
+            $material = MasterMaterials::where('IsDelete',0)
+                                        ->where('Symbols',$value['material'])
+                                        ->first();
+
 	        if ($data) 
 	        {
-	            if ($data->Quantity_System != $value['Quantity']) {
-	                // dd('run1');
+	            if ($data->Quantity_System != $value->Quantity) {
 	                $dataUpdate = [
 	                    'Box_ID'           => $value['Box_ID'],
 	                    'Quantity'         => $value['Quantity'],
@@ -223,7 +224,6 @@ class InventoriesController extends Controller
 	            } 
 	            else 
 	            {
-	                // dd('run2');
 	                $dataUpdate = [
 	                    'Box_ID'           => $value['Box_ID'],
 	                    'Quantity'         => $value['Quantity'],
@@ -233,57 +233,102 @@ class InventoriesController extends Controller
 	                    'IsDelete'         => 0
 	                ];
 	            }
-	            // dd($dataUpdate);
 	            InventoryMaterials::where('ID', $data->ID)->update($dataUpdate);
 	        } 
 	        else 
 	        {
-	            $value1  =  ImportDetail::where('IsDelete', 0)
-	                ->where('Box_ID', $value['Box_ID'])
-	                ->orderBy('ID', 'desc')
-	                ->first();
+                $data = InventoryMaterials::where('IsDelete', 0)
+                                        ->where('Command_Inventories_ID', $request->command_id)
+                                        ->where('Warehouse_System_ID', $location->ID)
+                                        ->when($pallet,function($query,$pallet){
+                                           return $query->where('Pallet_System_ID',$pallet);
+                                        })
+                                        ->where('Box_ID', $value['Box_ID'])
+                                        ->first();
+                if ($data) 
+                {
+                    $arr1 = [
+                        'Quantity' => $value['Quantity'],
+                    ];
+                    InventoryMaterials::where('ID',$data->ID)->update($arr1);
+                }
+                else
+                {
+                    $value1  =  ImportDetail::where('IsDelete', 0)
+                                       ->where('Box_ID', $value['Box_ID'])
+                                       ->orderBy('ID', 'desc')
+                                       ->first();
 
-	            if ($value1) {
-	                $arr1 = [
-	                    'Command_Inventories_ID'=> $request->command_id,
-	                    'Warehouse_System_ID'   => $location->ID,
-	                    'Pallet_System_ID'      => $request->Pallet_ID,
-	                    'Box_ID'           		=> $value['Box_ID'],
-	                    'Quantity'         		=> $value['Quantity'],
-	                    'Status'                => 2,
-	                    'Type'                  => 0,
-	                    // 'User_Created'          => Auth::user()->id,
-	                    // 'User_Updated'          => Auth::user()->id,
-	                    'IsDelete'              => 0
-	                ];
-	                InventoryMaterials::create($arr1);
-	            } 
-	    
+                    if ($value1) {
+                        $arr1 = [
+                            'Command_Inventories_ID'=> $request->command_id,
+                            'Warehouse_System_ID'   => $location->ID,
+                            'Pallet_System_ID'      => $request->Pallet_ID,
+                            'Box_ID'                => $value['Box_ID'],
+                            'Quantity'              => $value['Quantity'],
+                            'Status'                => 2,
+                            'Type'                  => 0,
+                            // 'User_Created'          => Auth::user()->id,
+                            // 'User_Updated'          => Auth::user()->id,
+                            'IsDelete'              => 0
+                        ];
+                        InventoryMaterials::create($arr1);
+                    } 
+                    else
+                    {
+                        $arr2 = [
+                            'Command_Inventories_ID'=> $request->command_id,
+                            'Warehouse_System_ID'   => $location->ID,
+                            'Pallet_System_ID'      => $request->Pallet_ID,
+                            'Materials_System_ID'   => $material->ID,
+                            'Time_Import_System'    => Carbon::now(),
+                            'Box_ID'                => $value['Box_ID'],
+                            'Quantity'              => $value['Quantity'],
+                            'Status'                => 2,
+                            'Type'                  => 0,
+                            // 'User_Created'          => Auth::user()->id,
+                            // 'User_Updated'          => Auth::user()->id,
+                            'IsDelete'              => 0
+                        ];
+                        InventoryMaterials::create($arr2);
+                    }
+                }
+	            
 	        }
+            $dem++;
 
         }
-        return response()->json([
-            'success' => true,
-            'data' => ['message' => __('Inventory') . ' ' . __('Success')]
-        ], 200); 
+
+        if ($dem > 0) 
+        {
+           return response()->json([
+                'success' => true,
+                'data' => ['message' => __('Inventory') . ' ' . __('Success')]
+            ], 200); 
+        }
+        else
+        {
+            return response()->json([
+                'success' => true,
+                'data' => ['message' => __('Inventory') . ' ' . __('Fail')]
+            ], 400); 
+        }
     }
 
     public function success(Request $request)
     {
-    	// $request->command_id = 39;
         $data =  InventoryMaterials::where('IsDelete', 0)
-            ->where('Command_Inventories_ID', $request->command_id)
-            ->get();
-        // dd($data);
+                                    ->where('Command_Inventories_ID', $request->command_id)
+                                    ->get();
         if ($data) {
             foreach ($data as $value) 
             {
                 if ($value->Status == 1) 
                 {
                     $value1  =  ImportDetail::where('IsDelete', 0)
-                        ->where('Box_ID', $value->Box_System_ID)
-                        ->orderBy('Time_Created', 'desc')
-                        ->first();
+                                            ->where('Box_ID', $value->Box_System_ID)
+                                            ->orderBy('Time_Created', 'desc')
+                                            ->first();
                     if ($value1) {
                         $arr1 = [
                             'Export_ID' 			=> '',
@@ -328,9 +373,9 @@ class InventoriesController extends Controller
                 elseif ($value->Status == 2) 
                 {
                     $value1  =  ImportDetail::where('IsDelete', 0)
-                        ->where('Box_ID', $value->Box_ID)
-                        ->orderBy('Time_Created', 'desc')
-                        ->first();
+                                            ->where('Box_ID', $value->Box_ID)
+                                            ->orderBy('Time_Created', 'desc')
+                                            ->first();
                     if ($value1) {
                         $arr = [
                             'Materials_ID'        => $value1->Materials_ID,
@@ -350,6 +395,24 @@ class InventoriesController extends Controller
                         ];
                         ImportDetail::create($arr);
                     }
+                    else
+                    {
+                        $arr = [
+                            'Materials_ID'        => $value->Materials_System_ID,
+                            'Box_ID'              => $value->Box_ID,
+                            'Time_Import'         => Carbon::now(),
+                            'Pallet_ID'           => $value->Pallet_System_ID,
+                            'Quantity'            => $value->Quantity,
+                            'Inventory'           => $value->Quantity,
+                            'Warehouse_Detail_ID' => $value->Warehouse_System_ID,
+                            'Status'              => 1,
+                            'Type'                => 2,
+                            // 'User_Created'        => Auth::user()->id,
+                            // 'User_Updated'        => Auth::user()->id,
+                            'IsDelete'            => 0
+                        ];
+                        ImportDetail::create($arr);
+                    }
                 } 
                 elseif ($value->Status == 0) 
                 {
@@ -357,7 +420,6 @@ class InventoriesController extends Controller
                         ->where('Box_ID', $value->Box_System_ID)
                         ->orderBy('Time_Created', 'desc')
                         ->first();
-                    // dd($value1);
                     if ($value1) 
                     {
                         ImportDetail::where('ID', $value1->ID)->update([
@@ -366,28 +428,29 @@ class InventoriesController extends Controller
                         ]);
 
                         $arr1 = [
-                            'Export_ID' => '',
-                            'Pallet_ID' =>  $value->Pallet_System_ID,
-                            'Box_ID'    =>  $value->Box_System_ID,
-                            'Materials_ID' =>    $value->Materials_System_ID,
+                            'Export_ID'           => '',
+                            'Pallet_ID'           => $value->Pallet_System_ID,
+                            'Box_ID'              => $value->Box_System_ID,
+                            'Materials_ID'        => $value->Materials_System_ID,
                             'Warehouse_Detail_ID' => $value->Warehouse_System_ID,
-                            'Quantity'  =>  $value->Quantity_System,
-                            'Status'    =>  1,
-                            'Type'      =>  1,
-                            'Time_Export' => Carbon::now(),
-                            // 'User_Created'     => Auth::user()->id,
-                            // 'User_Updated'     => Auth::user()->id,
-                            'IsDelete'         => 0
+                            'Quantity'            => $value->Quantity_System,
+                            'Status'              => 1,
+                            'Type'                => 1,
+                            'Time_Export'         => Carbon::now(),
+                            // 'User_Created'         => Auth::user()->id,
+                            // 'User_Updated'         => Auth::user()->id,
+                            'IsDelete'            => 0
                         ];
                         ExportDetail::Create($arr1);
                     }
                 }
             }
             CommandInventory::where('ID', $request->command_id)
-                ->update([
-                    'Status' => 1,
-                    // 'User_Updated'        => Auth::user()->id,
-                ]);
+                            ->update([
+                                'Status' => 1,
+                                // 'User_Updated'        => Auth::user()->id,
+                            ]);
+
             return response()->json([
                 'success' => true,
                 'data' => ['message' => __('Success').' '.__('Command').' '.__('Inventory')]

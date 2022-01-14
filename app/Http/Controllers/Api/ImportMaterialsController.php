@@ -24,10 +24,10 @@ class ImportMaterialsController extends Controller
 	public function get_data_input_pallet(Request $request)
 	{
 		$command_import = ImportDetail::where('IsDelete', 0)
-		->where('Pallet_ID', $request->Pallet_ID)
-		->where('Status', 0)
-		->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
-		->get();
+									->where('Pallet_ID', $request->Pallet_ID)
+									->where('Status', 0)
+									->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
+									->get();
 
 		if ($command_import->count() == 0) {
 			return response()->json([
@@ -39,10 +39,7 @@ class ImportMaterialsController extends Controller
 		if (count($command_import) > 0) {
 			$val = [];
 			$val['Pallet_ID'] 		= $command_import[0]->Pallet_ID;
-			$val['Status']    		= $command_import[0]->Status;
 			$val['Materials'] 		= $command_import[0]->materials ? $command_import[0]->materials->Symbols : '';
-			$val['Materials_ID'] 	= $command_import[0]->materials ? $command_import[0]->materials->ID : '';
-			$val['Wire_Type'] 		= $command_import[0]->materials ? $command_import[0]->materials->Wire_Type : '';
 			$val['Spec']			= $command_import[0]->materials ? $command_import[0]->materials->Spec   : '';
 			$val['Quantity'] 		= number_format(collect($command_import)->sum('Quantity'), 2, '.', '');
 			$val['Count'] 			= count($command_import);
@@ -53,7 +50,6 @@ class ImportMaterialsController extends Controller
 				'data' => $val
 			],200);
 		}
-
 	}
 
 	public function import_packing_list(Request $request)
@@ -68,36 +64,43 @@ class ImportMaterialsController extends Controller
 
 		if (empty($request->Warehouse_Detail_ID)) {
 			return response()->json([
-				'success' => false,
-				'data' => ['message' => __('Location') . ' ' . __("Can't be empty")]
+				'success' 	=> false,
+				'data' 		=> ['message' => __('Location') . ' ' . __("Can't be empty")]
 			],400);
 		}
 
 		$data = ImportDetail::where('IsDelete', 0)
-		->where('Pallet_ID', $request->Pallet_ID)
-		->where('Status', 0)
-		->with('materials')
-		->get();
+							->where('Pallet_ID', $request->Pallet_ID)
+							->where('Status', 0)
+							->with('materials')
+							->get();
 
-		$location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->Warehouse_Detail_ID)->first();
-        $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID', $location->Warehouse_ID)->first();
+		$location = MasterWarehouseDetail::where('IsDelete', 0)
+										->where('Symbols', $request->Warehouse_Detail_ID)
+										->first();
+
+        $warehouse = MasterWarehouse::where('IsDelete', 0)
+							        ->where('ID', $location->Warehouse_ID)
+							        ->first();
 
 		if (!$location) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Location') . ' ' . __('Does Not Exist')]
-                // 'data' => $location
 			],400);
 		}
 
 		foreach($data as $value)
 		{
-        	$mat = MasterMaterials::where('IsDelete', 0)->where('ID', $value->materials->ID)
-			->with([
-				'group',
-				'unit'
-			])->first();
-			$groupMat = GroupMaterials::where('IsDelete',0)->where('Group_ID',$warehouse->Group_Materials_ID)->where('Materials_ID',$mat->ID)->first();
+        	$mat = MasterMaterials::where('IsDelete', 0)
+					        	->where('ID', $value->materials->ID)
+								->first();
+
+			$groupMat = GroupMaterials::where('IsDelete',0)
+								->where('Group_ID',$warehouse->Group_Materials_ID)
+								->where('Materials_ID',$mat->ID)
+								->first();
+
 			if ($mat) 
 			{
 				if (count($mat->group) == 0 || !$groupMat) {
@@ -151,9 +154,11 @@ class ImportMaterialsController extends Controller
 
 				if($label_3 != '')
 				{
-					$data1 = ImportDetail::where('IsDelete',0)->where('Inventory','>',0)->where('Status','>',0)->where('Box_ID',$label_3)
-					->orderBy('ID','desc')
-					->first();
+					$data1 = ImportDetail::where('IsDelete',0)
+										->where('Inventory','>',0)
+										->where('Box_ID',$label_3)
+										->orderBy('ID','desc')
+										->first();
 					if($data1)
 					{
 						return response()->json([
@@ -194,8 +199,11 @@ class ImportMaterialsController extends Controller
 		// pallet
 		else if ($request->Type == 2)
 		{
-			$data =  ImportDetail::where('IsDelete', 0)->where('Status', '>', 0)->where('Pallet_ID', $request->Pallet_ID)->where('Inventory', '>', 0)
-			->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')->get();
+			$data =  ImportDetail::where('IsDelete', 0)
+								->where('Pallet_ID', $request->Pallet_ID)
+								->where('Inventory', '>', 0)
+								->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
+								->get();
 
 			if (count($data) > 0) 
 			{
@@ -221,7 +229,6 @@ class ImportMaterialsController extends Controller
 				],400);
 			}
 		}
-
 	}
 
 	public function update_location(Request $request)
@@ -233,14 +240,16 @@ class ImportMaterialsController extends Controller
 			],400);
 		}
 
-		$location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->Warehouse_Detail_ID)->first();
+		$location = MasterWarehouseDetail::where('IsDelete', 0)
+										->where('Symbols', $request->Warehouse_Detail_ID)
+										->first();
+
 		if (!$location) {
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
 			],400);
 		}
-
 		// box
 		if ($request->Type == 1)
 		{
@@ -252,13 +261,15 @@ class ImportMaterialsController extends Controller
 			}
 
 			$data =  ImportDetail::where('IsDelete', 0)
-			->where('Box_ID', $request->Box_ID)
-			->where('Status', '>', 0)
-			->where('Inventory', '>', 0)
-			->orderBy('ID', 'desc')
-			->first();
+								->where('Box_ID', $request->Box_ID)
+								->where('Inventory', '>', 0)
+								->orderBy('ID', 'desc')
+								->first();
 
-			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data->Warehouse_Detail_ID)->first();
+			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
+												->where('ID', $data->Warehouse_Detail_ID)
+												->first();
+
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
@@ -338,12 +349,14 @@ class ImportMaterialsController extends Controller
 			}
 
 			$data =  ImportDetail::where('IsDelete', 0)
-			->where('Status', '>', 0)
-			->where('Pallet_ID', $request->Pallet_ID)
-			->where('Inventory', '>', 0)
-			->get();
+								->where('Pallet_ID', $request->Pallet_ID)
+								->where('Inventory', '>', 0)
+								->get();
 				
-			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data[0]->Warehouse_Detail_ID)->first();
+			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
+												->where('ID', $data[0]->Warehouse_Detail_ID)
+												->first();
+
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
@@ -560,4 +573,5 @@ class ImportMaterialsController extends Controller
 			],400);
 		}  
 	}
+	
 }

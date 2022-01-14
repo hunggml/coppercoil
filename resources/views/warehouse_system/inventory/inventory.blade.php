@@ -2,148 +2,148 @@
 
 @section('content')
 
-	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
-	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
-	@endif
+@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
+@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
+@endif
 
-	<div class="container-fluid">
-	    <div class="row justify-content-center">
-	        <div class="col-md-12">
-	            <div class="card">
-	                <div class="card-header">
-	                	<span class="text-bold" style="font-size: 23px">
-	                		 {{ __('Inventory') }} {{ __('Detail') }}
-	                	</span>
-	                	<div class="card-tools">
-							@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
-                            @if($command->Status != 1)
-                   			<button class="btn btn-success" style="width: 180px" data-toggle="modal" data-target=".modal-inventory">
-                               {{__('Inventory')}}
-                        	</button>
-                        	@endif
-                            @endif
-                        	@if(session()->has('table'))
-			          			@if(session()->get('table') && count(session()->get('danger')) >0 )
-				                	<button type="button" class="btn btn-danger btn-detail-error">
-					                	{{__('Detail')}} {{__('Error')}}
-					                </button>
-			                	@endif
-			                @endif
-	                	</div>
-	                </div>
-	                <div class="card-body">
-	                	<form action="{{ route('warehousesystem.inventory') }}" method="get">
-	                		@csrf
-	                		<div class="row">
-		                		<div class="form-group col-md-2">
-		                        	<label>{{__('Choose')}} {{__('Name')}} {{ __('Command') }}</label>
-		                        	<select class="custom-select select2" name="name">
-		                          		<option value="">
-		                          			{{__('Choose')}} {{__('Name')}}
-		                          		</option>
-										
-		                        	</select>
-	                      		</div>
-	                      		<div class="form-group col-md-2">
-		                        	<label>{{ __('From') }}</label>
-		                        	<input type="date" value="{{$request->from}}" class="form-control datetime"  name="from"  >
-	                      		</div>
-
-                                <div class="form-group col-md-2">
-		                        	<label>{{ __('To') }}</label>
-		                        	<input type="date" value="{{$request->to}}" class="form-control datetime"  name="to"  >
-	                      		</div>
-	                      		<div class="col-md-2" style="margin-top: 33px">
-	                      			<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
-	                      		</div>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                	<span class="text-bold" style="font-size: 23px">
+                		 {{ __('Inventory') }} {{ __('Detail') }}
+                	</span>
+                	<div class="card-tools">
+						@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
+                        @if($command->Status != 1)
+               			<button class="btn btn-success" style="width: 180px" data-toggle="modal" data-target=".modal-inventory">
+                           {{__('Inventory')}}
+                    	</button>
+                    	@endif
+                        @endif
+                    	@if(session()->has('table'))
+		          			@if(session()->get('table') && count(session()->get('danger')) >0 )
+			                	<button type="button" class="btn btn-danger btn-detail-error">
+				                	{{__('Detail')}} {{__('Error')}}
+				                </button>
+		                	@endif
+		                @endif
+                	</div>
+                </div>
+                <div class="card-body">
+                	<form action="{{ route('warehousesystem.inventory') }}" method="get">
+                		@csrf
+                		<div class="row">
+	                		<div class="form-group col-md-2">
+	                        	<label>{{__('Choose')}} {{__('Name')}} {{ __('Command') }}</label>
+	                        	<select class="custom-select select2" name="name">
+	                          		<option value="">
+	                          			{{__('Choose')}} {{__('Name')}}
+	                          		</option>
+									
+	                        	</select>
+                      		</div>
+                      		<div class="form-group col-md-2">
+	                        	<label>{{ __('From') }}</label>
+	                        	<input type="date" value="{{$request->from}}" class="form-control datetime"  name="from"  >
                       		</div>
 
-	                	</form>
-		                @if(session()->has('success'))
-							<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-								<strong>{{session()->get('success')}}</strong>
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-						@endif
-						@if(session()->has('danger'))
-							@foreach(session('danger') as $value)
-							<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-								<strong>{{$value}}</strong>
-								<br>
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							@endforeach
-						@endif
-		            	</br>
-		                <table class="table table-striped table-hover"  width="100%">
-		                	<thead>
-		                		<th>{{__('ID')}}</th>
-		                		<th>{{__('Location')}}</th>
-                                <th>{{__('Type')}}</th>
-                                <th>{{__('Pallet')}} ( {{__('Box')}}) {{__('System')}} </th>
-                                <th>{{__('Roll Number')}} {{__('System')}}</th>
-                                <th>{{__('Quantity')}} {{__('System')}}</th>
-								<th>{{__('Pallet')}} ( {{__('Box')}}) {{__('Reality')}}</th>
-                                <th>{{__('Roll Number')}} {{__('Reality')}}</th>
-                                <th>{{__('Quantity')}} {{__('Reality')}}</th>
-                                <th>{{__('Action')}}</th>
-		                	</thead>
-		                	<tbody>
-								<?php $dem = 1 ?>
-		                		@foreach($data->GroupBy('Pallet_System_ID') as $key => $value)
-                                @if($key == '')
-                                @foreach($value as $value1)
-                                <tr>
-                                    <td>{{$dem}}</td>
-                                    <td>{{$value1->location ? $value1->location->Symbols: ''}}</td>
-                                    <td>{{__('Not In Pallet')}}</td>
-                                    <td>{{$value1->Box_System_ID}}</td>
-                                    <td>1</td>
-                                    <td>{{floatval($value1->Quantity_System)}}</td>
-                                    <td>{{$value1->Box_ID}}</td>
-                                    <td>1</td>
-                                    <td>{{floatval($value1->Quantity)}}</td>
-                                    <td>
-                                        <button class="btn btn-info btn-detail" id="btn-end-{{$value1->ID}}" data-toggle="modal" data-target=".bd-example-modal-lg">
-                                            {{__('Detail')}}
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php $dem++ ?>
+                            <div class="form-group col-md-2">
+	                        	<label>{{ __('To') }}</label>
+	                        	<input type="date" value="{{$request->to}}" class="form-control datetime"  name="to"  >
+                      		</div>
+                      		<div class="col-md-2" style="margin-top: 33px">
+                      			<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
+                      		</div>
+                  		</div>
 
-                                @endforeach
-                                @else
-                                <?php $value1 = $value[0]; ?>
-                                <tr>
-                                    <td>{{$dem}}</td>
-                                    <td>{{$value1->location ? $value1->location->Symbols : ''}}</td>
-                                    <td>{{__('In Pallet')}}</td>
-                                    <td>{{$value1->Pallet_System_ID}}</td>
-                                    <td>{{count($value)}}</td>
-                                    <td>{{floatval(collect($value)->sum('Quantity_System'))}}</td>
-                                    <td></td>
-                                    <td>{{count($value)}}</td>
-                                    <td>{{floatval(collect($value)->sum('Quantity'))}}</td>
-                                    <td> 
-                                        <button class="btn btn-info btn-detail" id="btn-{{$value1->Pallet_System_ID}}-end" data-toggle="modal" data-target=".bd-example-modal-lg">
-                                            {{__('Detail')}}
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php $dem++ ?>
-                                @endif
-                                @endforeach
-		                	</tbody>
-		                </table>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+                	</form>
+	                @if(session()->has('success'))
+						<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+							<strong>{{session()->get('success')}}</strong>
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+					@endif
+					@if(session()->has('danger'))
+						@foreach(session('danger') as $value)
+						<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+							<strong>{{$value}}</strong>
+							<br>
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						@endforeach
+					@endif
+	            	</br>
+	                <table class="table table-striped table-hover"  width="100%">
+	                	<thead>
+	                		<th>{{__('ID')}}</th>
+	                		<th>{{__('Location')}}</th>
+                            <th>{{__('Type')}}</th>
+                            <th>{{__('Pallet')}} ( {{__('Box')}}) {{__('System')}} </th>
+                            <th>{{__('Roll Number')}} {{__('System')}}</th>
+                            <th>{{__('Quantity')}} {{__('System')}}</th>
+							<th>{{__('Pallet')}} ( {{__('Box')}}) {{__('Reality')}}</th>
+                            <th>{{__('Roll Number')}} {{__('Reality')}}</th>
+                            <th>{{__('Quantity')}} {{__('Reality')}}</th>
+                            <th>{{__('Action')}}</th>
+	                	</thead>
+	                	<tbody>
+							<?php $dem = 1 ?>
+	                		@foreach($data->GroupBy('Pallet_System_ID') as $key => $value)
+                            @if($key == '')
+                            @foreach($value as $value1)
+                            <tr>
+                                <td>{{$dem}}</td>
+                                <td>{{$value1->location ? $value1->location->Symbols: ''}}</td>
+                                <td>{{__('Not In Pallet')}}</td>
+                                <td>{{$value1->Box_System_ID}}</td>
+                                <td>1</td>
+                                <td>{{floatval($value1->Quantity_System)}}</td>
+                                <td>{{$value1->Box_ID}}</td>
+                                <td>1</td>
+                                <td>{{floatval($value1->Quantity)}}</td>
+                                <td>
+                                    <button class="btn btn-info btn-detail" id="btn-end-{{$value1->ID}}" data-toggle="modal" data-target=".bd-example-modal-lg">
+                                        {{__('Detail')}}
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php $dem++ ?>
+
+                            @endforeach
+                            @else
+                            <?php $value1 = $value[0]; ?>
+                            <tr>
+                                <td>{{$dem}}</td>
+                                <td>{{$value1->location ? $value1->location->Symbols : ''}}</td>
+                                <td>{{__('In Pallet')}}</td>
+                                <td>{{$value1->Pallet_System_ID}}</td>
+                                <td>{{count($value->where('Type','>',0))}}</td>
+                                <td>{{floatval(collect($value)->sum('Quantity_System'))}}</td>
+                                <td></td>
+                                <td>{{count($value->where('Status','<>',0))}}</td>
+                                <td>{{floatval(collect($value)->sum('Quantity'))}}</td>
+                                <td> 
+                                    <button class="btn btn-info btn-detail" id="btn-{{$value1->Pallet_System_ID}}-end" data-toggle="modal" data-target=".bd-example-modal-lg">
+                                        {{__('Detail')}}
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php $dem++ ?>
+                            @endif
+                            @endforeach
+	                	</tbody>
+	                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
