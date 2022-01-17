@@ -35,8 +35,8 @@ class ImportMaterialsController extends Controller
 				'data' 		=> ['message' => __('Pallet_ID') . ' ' . __('In the completed / canceled import command')]
 			],400);
 		}
-
-		if (count($command_import) > 0) {
+		else 
+		{
 			$val = [];
 			$val['Pallet_ID'] 		= $command_import[0]->Pallet_ID;
 			$val['Materials'] 		= $command_import[0]->materials ? $command_import[0]->materials->Symbols : '';
@@ -90,30 +90,27 @@ class ImportMaterialsController extends Controller
 			],400);
 		}
 
-		foreach($data as $value)
-		{
-        	$mat = MasterMaterials::where('IsDelete', 0)
-					        	->where('ID', $value->materials->ID)
-								->first();
-
-			$groupMat = GroupMaterials::where('IsDelete',0)
-								->where('Group_ID',$warehouse->Group_Materials_ID)
-								->where('Materials_ID',$mat->ID)
-								->first();
-
-			if ($mat) 
-			{
-				if (count($mat->group) == 0 || !$groupMat) {
-					return response()->json([
-						'success' 	=> false,
-						'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
-					],400);
-				}
-			}
-		}	
-		
 		if (count($data) > 0) {
 			foreach ($data as $value) {
+				$mat = MasterMaterials::where('IsDelete', 0)
+						        	->where('ID', $value->materials->ID)
+									->first();
+
+				$groupMat = GroupMaterials::where('IsDelete',0)
+									->where('Group_ID',$warehouse->Group_Materials_ID)
+									->where('Materials_ID',$mat->ID)
+									->first();
+
+				if ($mat) 
+				{
+					if (count($mat->group) == 0 || !$groupMat) {
+						return response()->json([
+							'success' 	=> false,
+							'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
+						],400);
+					}
+				}
+
 				$data =  ImportDetail::where('IsDelete', 0)
 				->where('ID', $value->ID)
 				->update([
@@ -523,10 +520,9 @@ class ImportMaterialsController extends Controller
 
 		foreach($detail as $value)
 		{
-			$dem++;
+			
 			$data =  ImportDetail::where('IsDelete',0)
 			->where('Box_ID',$value['Box_ID'])
-			->where('Status','>',0)
 			->where('Inventory',0)
 			->orderBy('ID','desc')
 			->first();
@@ -556,6 +552,7 @@ class ImportMaterialsController extends Controller
 				'IsDelete'         => 0 
 			];
 			ImportDetail::create($arr);
+			$dem++;
 		}
 
 		if($dem > 0)

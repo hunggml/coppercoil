@@ -29,7 +29,7 @@ Route::post('/export-add', 'Api\ExportMaterialsController@export_add');
 // Get Command Export
 Route::get('/command-export', 'Api\ExportMaterialsController@command_export');
 Route::post('/sucess-command-export', 'Api\ExportMaterialsController@sucess_command_export');
-Route::get('/command-export-detail', 'Api\ExportMaterialsController@command_export_detail');
+// Route::get('/command-export-detail', 'Api\ExportMaterialsController@command_export_detail');
 Route::get('/decryption-label', 'Api\ExportMaterialsController@decryption');
 Route::post('/export-materials', 'Api\ExportMaterialsController@export_materials');
 

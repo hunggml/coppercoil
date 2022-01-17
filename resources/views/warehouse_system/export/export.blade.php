@@ -394,7 +394,6 @@
 		{
 			let id = $(this).attr('id');
 			let name = $(this).parent().parent().children('td').first().text();
-
 			$('#modalRequestDel').modal();
 			$('#nameDel').text(name);
 			$('#ID').val(id.split('-')[1]);
@@ -491,7 +490,6 @@
                             	$('#idCan7').attr('max',b)
                             	console.log(a,b.split(' '),c)
                             })
-
                             $('#idCan7').on('input',function(){
                             	
                             	let a = $('#idCan6').val()
@@ -566,7 +564,6 @@ $('.btn-add').on('click',function(){
 		error: function() {
 		}
 	});
-
 })
 $('.btn-Transfer').on('click',function(){
 	let id = $(this).attr('id')
@@ -667,14 +664,12 @@ $('.btn-Transfer').on('click',function(){
 						</tr>
 						`)
 				})
-
 			}
 		},
 		error: function() {
 		}
 	});
 })
-
 $('.btn-save-transfer').on('click', function(){
 	let a = $('#Export_ID').val()
 	let c = $('.box-To').val()

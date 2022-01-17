@@ -319,5 +319,7 @@
 	"Create Command Export Success" : "Tạo Lệnh Xuất Thành Công",
 	"Sum ng and ok is larger than the order code" : "Tổng NG và OK lớn hơn số lượng mã Order",
 	"Dont Scan" : "Chưa Scan",
-	"username or password not correct" : "Tài khoản hoặc mật khẩu không chính xác"
+	"username or password not correct" : "Tài khoản hoặc mật khẩu không chính xác",
+	"Just need export" : "Chỉ cần xuất",
+	"Quantity has been exported, dont need export more" : "Đã xuất đủ khối lượng, không cần xuất thêm"
 }

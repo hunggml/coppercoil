@@ -373,6 +373,7 @@ class ExportLibraries
             ->where('Warehouse_Detail_ID',$location->ID)
             ->orderBy('ID','desc')
             ->first();
+
             $data1 =  ImportDetail::where('IsDelete',0)
             ->when($pallet, function($query, $pallet)
             {
@@ -381,7 +382,9 @@ class ExportLibraries
             ->where('Box_ID',$request->Box_ID)
             ->where('Warehouse_Detail_ID',$location->ID)
             ->orderBy('ID','desc')
+            ->where('Inventory','>',0)
             ->first();
+            // dd($data,$data1);
             if($data && $data1 )
             {
                 if($data1->Inventory > 0 || $data != 0 )
