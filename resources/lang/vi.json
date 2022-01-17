@@ -321,5 +321,6 @@
 	"Dont Scan" : "Chưa Scan",
 	"username or password not correct" : "Tài khoản hoặc mật khẩu không chính xác",
 	"Just need export" : "Chỉ cần xuất",
-	"Quantity has been exported, dont need export more" : "Đã xuất đủ khối lượng, không cần xuất thêm"
+	"Quantity has been exported, dont need export more" : "Đã xuất đủ khối lượng, không cần xuất thêm",
+	"Roll number has been exported, dont need export more" : "Đã xuất đủ số thùng, không cần xuất thêm"
 }

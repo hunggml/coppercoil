@@ -440,7 +440,7 @@ class ImportMaterialsController extends Controller
 
 			if($label_3 != '')
 			{
-				$data1 = ImportDetail::where('IsDelete',0)->orderBy('Time_Created','desc')
+				$data1 = ImportDetail::where('IsDelete',0)->orderBy('ID','desc')
 				->where('Box_ID',$label_3)
 				->where('Status','>',0)
 				->first();

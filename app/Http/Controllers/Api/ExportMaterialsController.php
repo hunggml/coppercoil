@@ -590,27 +590,34 @@ class ExportMaterialsController extends Controller
 
             if ($command->Count) 
             {
-                if (count($detail) > $command->Count) 
+                $boxs_export = count(collect($command->detail->where('Status',1)));
+                $boxs_need = $command->Count - $boxs_export;
+                // dd($boxs_need);
+
+                if ($boxs_need > count($detail)) 
                 {
-                    return response()->json([
-                        'success' => false,
-                        'data' => ['message' => __('Roll Number') . ' ' . __('Export') . ' ' . __('Bigger') . ' ' . __('Roll Number') . ' ' . __('Request')]
-                    ], 400);
-                }
-                
-                $data2 = $data1->where('Warehouse_Detail_ID', $location->ID)
+                    $data2 = $data1->where('Warehouse_Detail_ID', $location->ID)
                                 ->toQuery()
                                 ->update([
                                     'Status' => 1
                                 ]);
-                $data3 =  ImportDetail::where('IsDelete', 0)
-                                    ->whereIn('Box_ID', $arr)
-                                    ->where('Warehouse_Detail_ID', $location->ID)
-                                    ->orderBy('ID', 'desc')
-                                    ->update([
-                                        'Inventory'     => 0,
-                                        // 'User_Updated'  => Auth::user()->id
-                                    ]); 
+                    $data3 =  ImportDetail::where('IsDelete', 0)
+                                        ->whereIn('Box_ID', $arr)
+                                        ->where('Warehouse_Detail_ID', $location->ID)
+                                        ->orderBy('ID', 'desc')
+                                        ->update([
+                                            'Inventory'     => 0,
+                                            // 'User_Updated'  => Auth::user()->id
+                                        ]); 
+                }
+                else
+                {
+                    return response()->json([
+                       'success' => false,
+                        'data'      => ['message' => __('Just need export') . ' ' . $boxs_need . ' ' . __('Box')]
+                    ], 400);
+                }
+                
             }
             else
             {
@@ -654,16 +661,15 @@ class ExportMaterialsController extends Controller
                                 ],400);
                             }
                         }
-                        // dd(count($arr_box));
 
-                        $data2 = ExportDetail::where('IsDelete',0)
+                        $data4 = ExportDetail::where('IsDelete',0)
                                             ->where('Warehouse_Detail_ID', $location->ID)
                                             ->where('Export_ID',$command->ID)
                                             ->whereIn('Box_ID', $arr_box)
                                             ->update([
                                                 'Status' => 1
                                             ]);
-                        $data3 = ImportDetail::where('IsDelete', 0)
+                        $data5 = ImportDetail::where('IsDelete', 0)
                                             ->whereIn('Box_ID', $arr_box)
                                             ->where('Warehouse_Detail_ID', $location->ID)
                                             ->orderBy('ID', 'desc')

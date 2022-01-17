@@ -457,7 +457,7 @@ class ExportLibraries
             }
             else
             {
-                return __('Box Exported');
+                return __('Box') . ' ' . __('Was').' '.__('Export');
             }
                 // dd($data);
         }
