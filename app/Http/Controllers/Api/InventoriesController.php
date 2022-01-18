@@ -88,17 +88,44 @@ class InventoriesController extends Controller
 
     public function detail_inven(Request $request)
     {
-        $detail =  InventoryMaterials::where('Inventories_Materials.IsDelete', 0)
-        ->join('Master_Warehouse_Detail', 'Inventories_Materials.Warehouse_System_ID', '=', 'Master_Warehouse_Detail.ID')
-        ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
-        ->where('Command_Inventories_ID',$request->command_id)
-        ->select('Inventories_Materials.ID','Command_Inventories_ID','Warehouse_System_ID','Pallet_System_ID','Materials_System_ID','Box_System_ID','Quantity_System','Box_ID','Quantity','Inventories_Materials.Status','Inventories_Materials.Type','Master_Warehouse_Detail.Symbols as Warehouse_Detail_Symbol','Master_Warehouse.Symbols as Warehouse_Symbol')
-        ->get();
+        $arr_id_location = [];
+        $command = CommandInventory::where('IsDelete',0)->where('ID',$request->command_id)->first();
+        
+       
 
+
+        $detail =  InventoryMaterials::where('Inventories_Materials.IsDelete', 0)
+                                        ->join('Master_Warehouse_Detail', 'Inventories_Materials.Warehouse_System_ID', '=', 'Master_Warehouse_Detail.ID')
+                                        ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                        ->where('Command_Inventories_ID',$request->command_id)
+                                        ->select('Inventories_Materials.ID','Command_Inventories_ID','Warehouse_System_ID','Pallet_System_ID','Materials_System_ID','Box_System_ID','Quantity_System','Box_ID','Quantity','Inventories_Materials.Status','Inventories_Materials.Type','Master_Warehouse_Detail.Symbols as Warehouse_Detail_Symbol','Master_Warehouse.Symbols as Warehouse_Symbol')
+                                        ->get();
+
+        $detail2 =  InventoryMaterials::where('Inventories_Materials.IsDelete', 0)
+                                        ->where('Command_Inventories_ID',$request->command_id)
+                                        ->get('Warehouse_System_ID')->toArray();
+        $detail2 = Arr::flatten($detail2);
+        
+        $warehouse = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete',0)
+                                                        ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                                        ->select('Master_Warehouse_Detail.ID')
+                                                        ->whereIn('Master_Warehouse.Symbols', explode("|", $command->Detail))
+                                                        ->get();
+        $warehouse = $warehouse->whereNotIn('ID',$detail2);
+
+        $warehouse2 = MasterWarehouseDetail::where('Master_Warehouse_Detail.IsDelete',0)
+                                            ->join('Master_Warehouse', 'Master_Warehouse_Detail.Warehouse_ID', '=', 'Master_Warehouse.ID')
+                                            ->whereIn('Master_Warehouse_Detail.ID',$warehouse)
+                                            ->select('Master_Warehouse_Detail.Symbols as Warehouse_Detail_Symbol','Master_Warehouse.Symbols as Warehouse_Symbol')
+                                            ->get();
+        $detail3 = Arr::collapse([$detail,$warehouse2]);
+        // $detail3 = array_merge($detail,$warehouse2);
+        // dd($detail3);
+        $detail3 = collect($detail3);
         if (count($detail) > 0) {
             return response()->json([
                 'success' => true,
-                'data' => $detail->groupBy([
+                'data' => $detail3->groupBy([
                     'Warehouse_Symbol','Warehouse_Detail_Symbol',
                     function($item)
                     {
@@ -108,6 +135,9 @@ class InventoriesController extends Controller
                         return $item['Pallet_System_ID'];
                     }
                 ])
+                // 'data' => $detail
+                // 'data' => $detail3
+                // 'data' => $res
             ], 200);
         } 
         else

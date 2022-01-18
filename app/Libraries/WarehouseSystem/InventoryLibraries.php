@@ -386,8 +386,7 @@ class InventoryLibraries
         }
         else if($request->Warehouse)
         {
-            $ware = MasterWarehouse::where('IsDelete',0)->whereIn('ID',$request->Warehouse)
-            ->get();
+            $ware = MasterWarehouse::where('IsDelete',0)->whereIn('ID',$request->Warehouse)->get();
             $ware2 = MasterWarehouse::where('IsDelete',0)->whereIn('ID',$request->Warehouse)->get('Symbols')->toArray();
             $ware2 = Arr::flatten($ware2);
             $ware2 = implode('|',$ware2);
