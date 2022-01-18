@@ -56,7 +56,7 @@ class CheckInforController
                 $label_3 = str_replace('[1E][04]', '', $label_2);
 
                 if ($label_3 != '') {
-                    $data1 = ImportDetail::where('IsDelete', 0)->orderBy('Time_Created', 'desc')
+                    $data1 = ImportDetail::where('IsDelete', 0)->orderBy('ID', 'desc')
                     ->where('Box_ID', $label_3)
                     ->first();
                     if ($data1) {

@@ -523,11 +523,12 @@ class ImportMaterialsController extends Controller
 			
 			$data =  ImportDetail::where('IsDelete',0)
 			->where('Box_ID',$value['Box_ID'])
+			->where('Status','>',0)
 			->where('Inventory',0)
 			->orderBy('ID','desc')
 			->first();
 
-			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $value['Location'])->first();
+			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data->Warehouse_Detail_ID)->first();
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
