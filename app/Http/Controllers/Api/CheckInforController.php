@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\WarehouseSystem\ProductReport;
 use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\MasterData\MasterWarehouseDetail;
+use Illuminate\Support\Arr;
 
 class CheckInforController
 {
@@ -20,10 +21,10 @@ class CheckInforController
         if ($type == 0) {
             // thông tin pallet
             $data =  ImportDetail::where('IsDelete', 0)
-            ->where('Pallet_ID', $request->Pallet_ID)
-            ->where('Inventory', '>', 0)
-            ->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
-            ->get();
+                                ->where('Pallet_ID', $request->Pallet_ID)
+                                ->where('Inventory', '>', 0)
+                                ->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
+                                ->get();
             if (count($data) > 0) {
                 $val = [];
                 $val['Pallet_ID']   = $data[0]->Pallet_ID;
@@ -56,9 +57,10 @@ class CheckInforController
                 $label_3 = str_replace('[1E][04]', '', $label_2);
 
                 if ($label_3 != '') {
-                    $data1 = ImportDetail::where('IsDelete', 0)->orderBy('ID', 'desc')
-                    ->where('Box_ID', $label_3)
-                    ->first();
+                    $data1 = ImportDetail::where('IsDelete', 0)
+                                        ->orderBy('ID', 'desc')
+                                        ->where('Box_ID', $label_3)
+                                        ->first();
                     if ($data1) {
                         return response()->json([
                             'success' => true,
@@ -93,46 +95,40 @@ class CheckInforController
         } 
         elseif ($type == 2) {
             // thông tin vị trí
-            $datas = MasterWarehouseDetail::where('IsDelete', 0)
-            ->when($location, function ($q, $location) {
-                return $q->where('Symbols', $location);
-            })
-            ->get();
-            if (count($datas) > 0) {
-                foreach ($datas as $value) {
-                    if (count($value->inventory) < 0) {
-                        return response()->json([
-                            'success' => true,
-                            'data'    => []
-                        ], 200);
-                    }
-                    $arr = [];
-                    $value1 = $value->inventory;
-                    foreach ($value1->GroupBy('Pallet_ID') as $key => $value2) {
-                        foreach ($value2->GroupBy('Materials_ID') as $key => $value3) {
-                            $arr1 = [
-                                'Materials' => $value3[0]->materials ? $value3[0]->materials->Symbols : '',
-                                'Quantity' => number_format($value3->sum('Inventory'), 2, '.', ''),
-                                'Count' => count($value3)
-                            ];
-                            array_push($arr, $arr1);
-                        }
-                    }
+            $data = MasterWarehouseDetail::where('IsDelete',0)
+                                            ->where('Symbols',$location)
+                                            ->orderBy('ID','desc')
+                                            ->first();
+            if ($data) 
+            {
+                $arr = [];
+                $value = $data->inventory;
+                foreach ($value->GroupBy('Materials_ID') as $key => $value1) {
+                    $arr1 = [
+                        'Materials' => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
+                        'Quantity'  => number_format($value1->sum('Inventory'), 2, '.', ''),
+                        'Count'     => count($value1)
+                    ];
+                    array_push($arr, $arr1);
                 }
                 return response()->json([
                     'success' => true,
                     'data'    => $arr
                 ], 200);
-            } else {
+            }
+            else 
+            {
                 return response()->json([
                     'success' => false,
                     'data'    => ['message' => __('Location') . ' ' . __('Does Not Exist')]
                 ], 400);
             }
-        } else {
+        } 
+        else 
+        {
             return response()->json([
                 'success' => false,
-                'data'      => ['message' => __('Pallet') . ',' . __('Location') . ',' . __('Box') . ' ' . __('Does Not Exist')]
+                'data'    => ['message' => __('Pallet') . ',' . __('Location') . ',' . __('Box') . ' ' . __('Does Not Exist')]
             ], 400);
         }
     }

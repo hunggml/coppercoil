@@ -139,8 +139,6 @@ class InventoriesController extends Controller
                                             ->select('Master_Warehouse_Detail.Symbols as Warehouse_Detail_Symbol','Master_Warehouse.Symbols as Warehouse_Symbol')
                                             ->get();
         $detail3 = Arr::collapse([$detail2,$warehouse2]);
-        // $detail3 = array_merge($detail,$warehouse2);
-        // dd($detail3);
         $detail3 = collect($detail3);
         if (count($detail3) > 0) {
             return response()->json([
@@ -155,9 +153,6 @@ class InventoriesController extends Controller
                         return $item['Pallet_System_ID'];
                     }
                 ])
-                // 'data' => $warehouse
-                // 'data' => $detail3
-                // 'data' => $res
             ], 200);
         } 
         else

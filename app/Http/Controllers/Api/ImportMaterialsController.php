@@ -440,10 +440,11 @@ class ImportMaterialsController extends Controller
 
 			if($label_3 != '')
 			{
-				$data1 = ImportDetail::where('IsDelete',0)->orderBy('ID','desc')
-				->where('Box_ID',$label_3)
-				->where('Status','>',0)
-				->first();
+				$data1 = ImportDetail::where('IsDelete',0)
+									->where('Box_ID',$label_3)
+									->where('Status','>',0)
+									->orderBy('ID','desc')
+									->first();
 				if($data1)
 				{
 					if($data1->Inventory == 0)
@@ -494,7 +495,9 @@ class ImportMaterialsController extends Controller
 	{      
 		$detail = $request->detail;
 		$dem = 0;
-		$location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
+		$location = MasterWarehouseDetail::where('IsDelete', 0)
+										->where('Symbols', $request->location)
+										->first();
 
 		if (empty($detail)) {
             return response()->json([
@@ -518,17 +521,46 @@ class ImportMaterialsController extends Controller
 			],400);
 		}
 
+		// foreach($detail as $val)
+		// {
+		// 	$data =  ImportDetail::where('IsDelete',0)
+		// 	->where('Box_ID',$val['Box_ID'])
+		// 	->where('Status','>',0)
+		// 	->orderBy('ID','desc')
+		// 	->first();
+		// 	if ($data) 
+		// 	{
+		// 		if ($data->inventory != 0) 
+		// 		{
+		// 			return response()->json([
+		// 					'success' => false,
+		// 					'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
+		// 				],400);
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		return response()->json([
+		// 					'success' => false,
+		// 					'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
+		// 				],400);
+		// 	}
+		// }
+
 		foreach($detail as $value)
 		{
 			
 			$data =  ImportDetail::where('IsDelete',0)
-			->where('Box_ID',$value['Box_ID'])
-			->where('Status','>',0)
-			->where('Inventory',0)
-			->orderBy('ID','desc')
-			->first();
+								->where('Box_ID',$value['Box_ID'])
+								->where('Status','>',0)
+								->where('Inventory',0)
+								->orderBy('ID','desc')
+								->first();
 
-			$old_location = MasterWarehouseDetail::where('IsDelete', 0)->where('ID', $data->Warehouse_Detail_ID)->first();
+			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
+												->where('ID', $data->Warehouse_Detail_ID)
+												->first();
+
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,

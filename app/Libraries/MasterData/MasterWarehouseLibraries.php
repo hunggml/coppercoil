@@ -250,6 +250,37 @@ class MasterWarehouseLibraries
 		return $find;
 	}
 
+	// public function get_list_materials_in_warehouse($request)
+	// {
+	// 	$find = MasterWarehouse::where('IsDelete', 0)
+	// 	->where('ID', $request->Warehouse_ID)
+	// 	->first();
+	// 	$arr = [];
+	
+	// 	if($find->detail)
+	// 	{
+	// 		foreach($find->detail as $value)
+	// 		{
+				
+	// 			if($value->inventory)
+	// 			{
+	// 				foreach($value->inventory->GroupBy('Materials_ID') as $key => $value1)
+	// 				{
+						
+	// 					$arr1 = [
+	// 						'Materials_ID'=>$key,
+	// 						'Materials'=>$value1[0]->materials ? $value1[0]->materials->Symbols : '',
+	// 						'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+	// 						'Count' => Count($value1)
+	// 					];
+	// 					array_push($arr,$arr1);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return($arr);
+	// }
+
 	public function get_list_materials_in_warehouse($request)
 	{
 		$find = MasterWarehouse::where('IsDelete', 0)
@@ -264,17 +295,24 @@ class MasterWarehouseLibraries
 				
 				if($value->inventory)
 				{
-					foreach($value->inventory->GroupBy('Materials_ID') as $key => $value1)
-					{
-						
-						$arr1 = [
-							'Materials_ID'=>$key,
-							'Materials'=>$value1[0]->materials ? $value1[0]->materials->Symbols : '',
-							'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
-							'Count' => Count($value1)
-						];
-						array_push($arr,$arr1);
-					}
+					foreach ($value->inventory->GroupBy('Materials_ID') as $key => $value1) 
+                    {
+                        if (array_key_exists($key,$arr)) 
+                        {
+                            $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
+                            $coun = $arr[$key]['Count'] += Count($value1);
+                        }
+                        else
+                        {
+                          $arr1 = [
+                                'Materials_ID'  => $key,
+                                'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
+                                'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+                                'Count' => Count($value1)
+                            ]; 
+                            $arr[$key] = $arr1; 
+                        }
+                    }
 				}
 			}
 		}
