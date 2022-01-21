@@ -154,61 +154,12 @@ class InventoriesController extends Controller
                     }
                 ])
             ], 200);
-        } 
+        }
         else
         {
             return response()->json([
                 'success' => false,
                 'data'      => ["message"=>__('Command').' '.__('Inventory').' '.__('Does Not Exist')]
-            ], 400);
-        }
-    }
-
-    public function get_data_box_invent(Request $request)
-    {
-    	$label = $request->Box_ID;
-        $arr_label = explode('[1D]', $label);
-
-        if (count($arr_label) > 12) {
-            $label_1 = $arr_label[12];
-            $label_2 = str_replace('Z', '', $label_1);
-            $label_3 = str_replace('[1E][04]', '', $label_2);
-
-            if ($label_3 != '') {
-                $data = ImportDetail::where('IsDelete', 0)
-                                    ->where('Box_ID', $label_3)
-                                    ->orderBy('ID', 'desc')
-                                    ->first();
-                if ($data) 
-                {
-                	return response()->json([
-                		'success'=>true,
-                		'data'=>[
-                			'Box_ID' => $label_3,
-                			'Quantity'=> $data->Quantity,
-                            'Materials' => $data->materials ? $data->materials->Symbols : ""
-                		]
-                	],200);
-                }
-                else
-                {
-                	return response()->json([
-                        'success' => false,
-                        'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist').' '.__('In').' '.__('System')]
-                    ], 400);
-                }
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-                ], 400);
-            }  
-        } 
-        else 
-        {
-            return response()->json([
-                'success' => false,
-                'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
             ], 400);
         }
     }

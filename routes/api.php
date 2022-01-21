@@ -41,7 +41,6 @@ Route::post('/transfer-materials', 'Api\ExportMaterialsController@transfer_mater
 // Get List Command
 Route::get('/command-inventory', 'Api\InventoriesController@command_inventory');
 Route::get('/detail-inven', 'Api\InventoriesController@detail_inven');
-Route::get('/get-data-box-invent', 'Api\InventoriesController@get_data_box_invent');
 Route::post('/update-inventory', 'Api\InventoriesController@update_inventory');
 Route::post('/sucess-inventory', 'Api\InventoriesController@success');
 

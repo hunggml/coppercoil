@@ -50,6 +50,7 @@ class CheckInforController
             // thông tin box
             $label = $request->Box_ID;
             $arr_label = explode('[1D]', $label);
+            // return response()->json($arr_label);
             
             if (count($arr_label) > 12) {
                 $label_1 = $arr_label[12];
@@ -58,24 +59,34 @@ class CheckInforController
 
                 if ($label_3 != '') {
                     $data1 = ImportDetail::where('IsDelete', 0)
-                                        ->orderBy('ID', 'desc')
                                         ->where('Box_ID', $label_3)
+                                        ->where('Status', '>',0)
+                                        ->orderBy('ID', 'desc')
                                         ->first();
                     if ($data1) {
-                        return response()->json([
-                            'success' => true,
-                            'data'      => [
-                                'Box_ID'    => $label_3,
-                                'Quantity'  => floatval($data1->Quantity),
-                                'Materials' => $data1->materials ? $data1->materials->Symbols : '',
-                                'Location'  => $data1->location ? $data1->location->Symbols : '',                                
-                            ]
-                        ], 200);
+                        if ($data1->Inventory > 0) {
+                            return response()->json([
+                                'success' => true,
+                                'data'      => [
+                                    'Box_ID'    => $label_3,
+                                    'Quantity'  => floatval($data1->Quantity),
+                                    'Materials' => $data1->materials ? $data1->materials->Symbols : '',
+                                    'Location'  => $data1->location ? $data1->location->Symbols : '',                                
+                                ]
+                            ], 200);
+                        }
+                        else
+                        {
+                            return response()->json([
+                                'success' => false,
+                                'data'    => ['message' => __('Box') . ' ' . __('Was').' '.__('Export')]
+                            ], 400);
+                        }
                     } 
                     else {
                         return response()->json([
                             'success' => false,
-                            'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+                            'data'      => ['message' => __('Box') . ' ' . __('Dont import stock')]
                         ], 400);
                     }
                 } 

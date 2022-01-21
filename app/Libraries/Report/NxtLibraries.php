@@ -120,6 +120,7 @@ class NxtLibraries
                 ->get();
                 $ex2_count = collect($ex2)->count();
                 $ex2_quan = collect($ex2)->sum('Quantity');
+                
                 $value['first1'] = $first_quan > 0 ?  $first_quan : 0; 
                 $value['first'] = $first_count > 0 ?  $first_count : 0; 
                 $value['im1'] = $im1_count > 0 ?  $im1_count : 0; 

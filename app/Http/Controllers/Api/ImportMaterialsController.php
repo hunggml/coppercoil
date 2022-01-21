@@ -425,7 +425,7 @@ class ImportMaterialsController extends Controller
 				'data' => ['message' => __('Update') . ' ' . __('Location') . ' ' . __('Success')]
 			],200);
 			
-		}
+		} 
 	}
 
 	public  function decryption_box(Request $request)
@@ -517,7 +517,6 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
-                // 'data' => $location
 			],400);
 		}
 
@@ -528,7 +527,7 @@ class ImportMaterialsController extends Controller
 		// 	->where('Status','>',0)
 		// 	->orderBy('ID','desc')
 		// 	->first();
-		// 	if ($data) 
+		// 	if ($data)
 		// 	{
 		// 		if ($data->inventory != 0) 
 		// 		{
@@ -573,7 +572,7 @@ class ImportMaterialsController extends Controller
 				'Box_ID'           => $value['Box_ID'],
 				'Case_No'          => $data->Case_No,
 				'Lot_No'           => $data->Lot_No,
-				'Time_Import'      => $data->Time_Import, 
+				'Time_Import'      => $data->Time_Import,
 				'Pallet_ID'        => '',
 				'Quantity'         => $value['Quantity'],
 				'Inventory'        => $value['Quantity'],
