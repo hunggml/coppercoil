@@ -186,7 +186,7 @@
                 // table.clear().draw();
                 for (let dat of data.data)
                 {
-                    console.log(dat);
+                    // console.log(dat);
                     let a = '';
                     for(let label of dat.inventory_nl)
                     {
@@ -218,7 +218,11 @@
             {
 
                 $('.cill1').remove()
-                // console.log(data);
+                let dat2 =  data.data;
+                dat2.sort(function(a,b){
+                  return new Date(b.Time_Created) - new Date(a.Time_Created);
+                });
+                console.log(dat2);
                 let i = 1;
                 // table.clear().draw();
                 for (let dat of data.data)

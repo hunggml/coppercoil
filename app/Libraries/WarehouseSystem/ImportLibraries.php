@@ -178,30 +178,34 @@ class ImportLibraries
                     ->GroupBy('Pallet_ID') as $value2
                     )
                     {
-                        if(count($value2) == 1 )
+                        foreach($value2->GroupBy('Materials_ID') as $value3)
                         {
-                            $count2 =-1;
-                            $count =1;
-                            $count1 =-1;
-                        }
-                        else
-                        {
-                            $count2 = count($value2)+1;
-                            $count +=count($value2)+4;
-                            $count1 +=count($value2)+2;
-                        }
+                            if(count($value3) == 1 )
+                            {
+                                $count2 =-1;
+                                $count =1;
+                                $count1 =-1;
+                            }
+                            else
+                            {
+                                $count2 = count($value3)+1;
+                                $count +=count($value3)+4;
+                                $count1 +=count($value3)+2;
+                            }
 
-                        
-                        $arr4 = [
-                            'Pallet_ID' => $value2[0]->Pallet_ID,
-                            'Materials'=>$value2[0]->materials ? $value2[0]->materials->Symbols : '',
-                            'Inven' => $value2,
-                            'Time_Import' => $value2[0]->Time_Import,
-                            'Count'=>$count2
-                        ];
+                            
+                            $arr4 = [
+                                'Pallet_ID' => $value3[0]->Pallet_ID,
+                                'Materials'=>$value3[0]->materials ? $value3[0]->materials->Symbols : '',
+                                'Inven' => $value3,
+                                'Time_Import' => $value3[0]->Time_Import,
+                                'Time_Updated' => $value3[0]->Time_Updated,
+                                'Count'=>$count2
+                            ];
+                           
+                            array_push($arr5,$arr4);
+                        }
                        
-                       
-                        array_push($arr5,$arr4);
                     }
                     $arr2['Inven'] = $arr5;
                     // $count += 1;
@@ -501,7 +505,7 @@ class ImportLibraries
                 'Box_ID'           => $request->Box,
                 'Case_No'          => $val->Case_No,
                 'Lot_No'           => $val->Lot_No,
-                'Time_Import'      =>  $val->Time_Import, 
+                'Time_Import'      => $val->Time_Import, 
                 'Pallet_ID'        => '',
                 'Quantity'         => $request->Quantity,
                 'Inventory'        => $request->Quantity,

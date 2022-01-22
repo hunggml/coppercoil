@@ -110,211 +110,8 @@ class ExportMaterialsController extends Controller
         }
     }
 
-    public function export_add(Request $request)
-    {
-        if (empty($request->Go))
-        {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Warehouse') . ' ' . __("Export") . ' ' . __("Can't be empty")]
-            ], 400);
-        }
-
-        if (empty($request->To))
-        {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Warehouse') . ' ' . __("Import") . ' ' . __("Can't be empty")]
-            ], 400);
-        }
-
-        if (empty($request->Materials_ID))
-        {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Materials') . ' ' . __("Can't be empty")]
-            ], 400);
-        }
-
-        if (empty($request->Unit_ID)) 
-        {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Unit') . ' ' . __("Can't be empty")]
-            ], 400);
-        }
-
-        $warehouse = MasterWarehouse::where('IsDelete', 0)
-                                    ->where('ID', $request->To)
-                                    ->first();
-
-        $groupMat  = GroupMaterials::where('IsDelete',0)
-                                    ->where('Group_ID',$warehouse->Group_Materials_ID)
-                                    ->where('Materials_ID',$request->Materials_ID)
-                                    ->first();
-
-        $mat       = MasterMaterials::where('IsDelete', 0)
-                                    ->where('ID', $request->Materials_ID)
-                                    ->first();
-
-        $unit      = MasterUnit::where('IsDelete', 0)
-                                    ->where('ID', $request->Unit_ID)
-                                    ->first();
-
-        $find      = MasterWarehouse::where('IsDelete', 0)
-                                    ->where('ID', $request->Go)
-                                    ->first();
-        $arr       = [];
-
-        if ($mat) 
-        {
-            if (count($mat->group) == 0 || !$groupMat) {
-                return response()->json([
-                    'success'   => false,
-                    'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
-                ],400);
-            }
-        }
-
-        if ($find->detail) 
-        {
-            foreach ($find->detail as $value) 
-            {
-                if ($value->inventory) 
-                {
-                    foreach ($value->inventory->where('Materials_ID',$request->Materials_ID)->GroupBy('Materials_ID') as $key => $value1) 
-                    {
-                        if (array_key_exists($key,$arr)) 
-                        {
-                            $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
-                            $coun = $arr[$key]['Count'] += Count($value1);
-                        }
-                        else
-                        {
-                          $arr1 = [
-                                'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
-                                'Count' => Count($value1)
-                            ]; 
-                            $arr[$key] = $arr1; 
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($unit->Type == 2) 
-        {
-            if (empty($request->Count)) 
-            {
-                return response()->json([
-                    'success' => false,
-                    'data' => ['message' => __('Roll Number') . ' ' . __("Can't be empty")]
-                ], 400);
-            }
-
-            if (!is_numeric($request->Count) || $request->Count <= 0 || is_numeric($request->Count) && is_float($request->Count)) 
-            {
-                return response()->json([
-                    'success' => false,
-                    'data' => ['message' => __('Roll Number') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Origin') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
-                ], 400);
-            }
-
-            if ($request->Count > $arr[$key]['Count']) 
-            {
-            	return response()->json([
-            		'success'=> false,
-            		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
-            	],400);
-            } 
-        } 
-        else 
-        {
-            if (empty($request->Quantity)) 
-            {
-                return response()->json([
-                    'success' => false,
-                    'data' => ['message' => __('Quantity') . ' ' . __("Can't be empty")]
-                ], 400);
-            }
-            if (!is_numeric($request->Quantity) || $request->Quantity <= 0) 
-            {
-                return response()->json([
-                    'success' => false,
-                    'data' => ['message' => __('Quantity') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Real') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
-                ], 400);
-            }
-
-            if ($request->Quantity > $arr[$key]['Quantity']) 
-            {
-            	return response()->json([
-            		'success'=>false,
-            		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
-            	],400);
-            }
-        }
-
-        $data = ExportMaterials::create([
-            'Go'            => $request->Go,
-            'To'            => $request->To,
-            'Materials_ID'  => $request->Materials_ID,
-            'Quantity'      => $request->Quantity,
-            'Count'         => $request->Count,
-            'Type'          => 1,
-            'Status'        => 0,
-            // 'User_Created'  => Auth::user()->id,
-            // 'User_Updated'  => Auth::user()->id,
-            'IsDelete'      => 0
-        ]);
-        $num    = 1;
-        $mater  = $data->materials ? $data->materials->Symbols : '';
-        $Go     = $data->go ? $data->go->Symbols : '';
-        $To     = $data->to ? $data->to->Symbols : '';
-        if ($data->go && $data->to) 
-        {
-            if ($data->to->Accept == 0) 
-            {
-                if ($data->to->Email) 
-                {
-                    $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
-                }
-            } 
-            else 
-            {
-                if ($data->go->Accept == 0) 
-                {
-                    ExportMaterials::where('IsDelete', 0)
-                    ->where('ID', $data->ID)
-                    ->update([
-                        // 'User_Updated' => Auth::user()->id,
-                        'Status'       => 1
-                    ]);
-                } 
-                else 
-                {
-                    $this->accept((object)[
-                        'ID' => $data->ID
-                    ]);
-                }
-            }
-        }
-        return response()->json([
-            'success' => true,
-            'data' => ['message' => __('Create Command Export Success')]
-        ], 200);
-    }
-
     // public function export_add(Request $request)
     // {
-    //     $detail = $request->detail;
-
-    //     if (empty($request->detail)) 
-    //     {
-    //         return response()->json([
-    //             'success' => false,
-    //             'data' => ['message' => __('Dont Scan').' '.__('Box')]
-    //         ], 400);
-    //     }
     //     if (empty($request->Go))
     //     {
     //         return response()->json([
@@ -331,192 +128,395 @@ class ExportMaterialsController extends Controller
     //         ], 400);
     //     }
 
-    //     foreach($detail as $key => $value)
+    //     if (empty($request->Materials_ID))
     //     {
-    //         if (empty($value['Materials_ID']))
-    //         {
+    //         return response()->json([
+    //             'success' => false,
+    //             'data' => ['message' => __('Materials') . ' ' . __("Can't be empty")]
+    //         ], 400);
+    //     }
+
+    //     if (empty($request->Unit_ID)) 
+    //     {
+    //         return response()->json([
+    //             'success' => false,
+    //             'data' => ['message' => __('Unit') . ' ' . __("Can't be empty")]
+    //         ], 400);
+    //     }
+
+    //     $warehouse = MasterWarehouse::where('IsDelete', 0)
+    //                                 ->where('ID', $request->To)
+    //                                 ->first();
+
+    //     $groupMat  = GroupMaterials::where('IsDelete',0)
+    //                                 ->where('Group_ID',$warehouse->Group_Materials_ID)
+    //                                 ->where('Materials_ID',$request->Materials_ID)
+    //                                 ->first();
+
+    //     $mat       = MasterMaterials::where('IsDelete', 0)
+    //                                 ->where('ID', $request->Materials_ID)
+    //                                 ->first();
+
+    //     $unit      = MasterUnit::where('IsDelete', 0)
+    //                                 ->where('ID', $request->Unit_ID)
+    //                                 ->first();
+
+    //     $find      = MasterWarehouse::where('IsDelete', 0)
+    //                                 ->where('ID', $request->Go)
+    //                                 ->first();
+    //     $arr       = [];
+
+    //     if ($mat) 
+    //     {
+    //         if (count($mat->group) == 0 || !$groupMat) {
     //             return response()->json([
-    //                 'success' => false,
-    //                 'data' => ['message' => __('Materials') . ' ' . __("Can't be empty")]
-    //             ], 400);
+    //                 'success'   => false,
+    //                 'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
+    //             ],400);
     //         }
+    //     }
 
-    //         if (empty($value['Unit_ID'])) 
+    //     if ($find->detail) 
+    //     {
+    //         foreach ($find->detail as $value) 
     //         {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'data' => ['message' => __('Unit') . ' ' . __("Can't be empty")]
-    //             ], 400);
-    //         }
-
-    //         $warehouse = MasterWarehouse::where('IsDelete', 0)
-    //                                     ->where('ID', $request->To)
-    //                                     ->first();
-
-    //         $groupMat  = GroupMaterials::where('IsDelete',0)
-    //                                     ->where('Group_ID',$warehouse->Group_Materials_ID)
-    //                                     ->where('Materials_ID',$value['Materials_ID'])
-    //                                     ->first();
-
-    //         $mat       = MasterMaterials::where('IsDelete', 0)
-    //                                     ->where('ID', $value['Materials_ID'])
-    //                                     ->first();
-
-    //         $unit      = MasterUnit::where('IsDelete', 0)
-    //                                     ->where('ID', $value['Unit_ID'])
-    //                                     ->first();
-
-    //         $find      = MasterWarehouse::where('IsDelete', 0)
-    //                                     ->where('ID', $request->Go)
-    //                                     ->first();
-    //         $arr       = [];
-
-    //         if ($mat) 
-    //         {
-    //             if (count($mat->group) == 0 || !$groupMat) {
-    //                 return response()->json([
-    //                     'success'   => false,
-    //                     'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
-    //                 ],400);
-    //             }
-    //         }
-
-    //         if ($find->detail) 
-    //         {
-    //             foreach ($find->detail as $value2) 
+    //             if ($value->inventory) 
     //             {
-    //                 if ($value2->inventory) 
+    //                 foreach ($value->inventory->where('Materials_ID',$request->Materials_ID)->GroupBy('Materials_ID') as $key => $value1) 
     //                 {
-    //                     foreach ($value2->inventory->where('Materials_ID',$value['Materials_ID'])->GroupBy('Materials_ID') as $key => $value1) 
+    //                     if (array_key_exists($key,$arr)) 
     //                     {
-    //                         if (array_key_exists($key,$arr)) 
-    //                         {
-    //                             $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
-    //                             $coun = $arr[$key]['Count'] += Count($value1);
-    //                         }
-    //                         else
-    //                         {
-    //                           $arr1 = [
-    //                                 'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
-    //                                 'Count' => Count($value1)
-    //                             ]; 
-    //                             $arr[$key] = $arr1; 
-    //                         }
+    //                         $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
+    //                         $coun = $arr[$key]['Count'] += Count($value1);
+    //                     }
+    //                     else
+    //                     {
+    //                       $arr1 = [
+    //                             'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+    //                             'Count' => Count($value1)
+    //                         ]; 
+    //                         $arr[$key] = $arr1; 
     //                     }
     //                 }
     //             }
     //         }
+    //     }
 
-    //         if ($unit->Type == 2) 
+    //     if ($unit->Type == 2) 
+    //     {
+    //         if (empty($request->Count)) 
     //         {
-    //             if (empty($value['Count'])) 
-    //             {
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'data' => ['message' => __('Roll Number') . ' ' . __("Can't be empty")]
-    //                 ], 400);
-    //             }
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data' => ['message' => __('Roll Number') . ' ' . __("Can't be empty")]
+    //             ], 400);
+    //         }
 
-    //             if (!is_numeric($value['Count']) || $value['Count'] <= 0 || is_numeric($value['Count']) && is_float($value['Count'])) 
-    //             {
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'data' => ['message' => __('Roll Number') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Origin') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
-    //                 ], 400);
-    //             }
+    //         if (!is_numeric($request->Count) || $request->Count <= 0 || is_numeric($request->Count) && is_float($request->Count)) 
+    //         {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data' => ['message' => __('Roll Number') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Origin') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
+    //             ], 400);
+    //         }
 
-    //             if ($value['Count'] > $arr[$key]['Count']) 
+    //         if ($request->Count > $arr[$key]['Count']) 
+    //         {
+    //         	return response()->json([
+    //         		'success'=> false,
+    //         		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
+    //         	],400);
+    //         } 
+    //     } 
+    //     else 
+    //     {
+    //         if (empty($request->Quantity)) 
+    //         {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data' => ['message' => __('Quantity') . ' ' . __("Can't be empty")]
+    //             ], 400);
+    //         }
+    //         if (!is_numeric($request->Quantity) || $request->Quantity <= 0) 
+    //         {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data' => ['message' => __('Quantity') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Real') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
+    //             ], 400);
+    //         }
+
+    //         if ($request->Quantity > $arr[$key]['Quantity']) 
+    //         {
+    //         	return response()->json([
+    //         		'success'=>false,
+    //         		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
+    //         	],400);
+    //         }
+    //     }
+
+    //     $data = ExportMaterials::create([
+    //         'Go'            => $request->Go,
+    //         'To'            => $request->To,
+    //         'Materials_ID'  => $request->Materials_ID,
+    //         'Quantity'      => $request->Quantity,
+    //         'Count'         => $request->Count,
+    //         'Type'          => 1,
+    //         'Status'        => 0,
+    //         // 'User_Created'  => Auth::user()->id,
+    //         // 'User_Updated'  => Auth::user()->id,
+    //         'IsDelete'      => 0
+    //     ]);
+    //     $num    = 1;
+    //     $mater  = $data->materials ? $data->materials->Symbols : '';
+    //     $Go     = $data->go ? $data->go->Symbols : '';
+    //     $To     = $data->to ? $data->to->Symbols : '';
+    //     if ($data->go && $data->to) 
+    //     {
+    //         if ($data->to->Accept == 0) 
+    //         {
+    //             if ($data->to->Email) 
     //             {
-    //                 return response()->json([
-    //                     'success'=> false,
-    //                     'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
-    //                 ],400);
-    //             } 
+    //                 $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
+    //             }
     //         } 
     //         else 
     //         {
-    //             if (empty($value['Quantity'])) 
+    //             if ($data->go->Accept == 0) 
     //             {
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'data' => ['message' => __('Quantity') . ' ' . __("Can't be empty")]
-    //                 ], 400);
-    //             }
-    //             if (!is_numeric($value['Quantity']) || $value['Quantity'] <= 0) 
-    //             {
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'data' => ['message' => __('Quantity') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Real') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
-    //                 ], 400);
-    //             }
-
-    //             if ($value['Quantity'] > $arr[$key]['Quantity']) 
-    //             {
-    //                 return response()->json([
-    //                     'success'=>false,
-    //                     'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
-    //                 ],400);
-    //             }
-    //         }  
-    //     }
-
-    //     foreach($detail as $value1)
-    //     {
-    //         $unit      = MasterUnit::where('IsDelete', 0)
-    //                                     ->where('ID', $value1['Unit_ID'])
-    //                                     ->first();
-
-    //         $data = ExportMaterials::create([
-    //             'Go'            => $request->Go,
-    //             'To'            => $request->To,
-    //             'Materials_ID'  => $value1['Materials_ID'],
-    //             'Quantity'      => $unit->Type == 1 ? $value1['Quantity'] : null,
-    //             'Count'         => $unit->Type == 2 ? $value1['Count'] : null,
-    //             'Type'          => 1,
-    //             'Status'        => 0,
-    //             // 'User_Created'  => Auth::user()->id,
-    //             // 'User_Updated'  => Auth::user()->id,
-    //             'IsDelete'      => 0
-    //         ]);
-    //         $num    = 1;
-    //         $mater  = $data->materials ? $data->materials->Symbols : '';
-    //         $Go     = $data->go ? $data->go->Symbols : '';
-    //         $To     = $data->to ? $data->to->Symbols : '';
-    //         if ($data->go && $data->to) 
-    //         {
-    //             if ($data->to->Accept == 0) 
-    //             {
-    //                 if ($data->to->Email) 
-    //                 {
-    //                     $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
-    //                 }
+    //                 ExportMaterials::where('IsDelete', 0)
+    //                 ->where('ID', $data->ID)
+    //                 ->update([
+    //                     // 'User_Updated' => Auth::user()->id,
+    //                     'Status'       => 1
+    //                 ]);
     //             } 
     //             else 
     //             {
-    //                 if ($data->go->Accept == 0) 
-    //                 {
-    //                     ExportMaterials::where('IsDelete', 0)
-    //                     ->where('ID', $data->ID)
-    //                     ->update([
-    //                         // 'User_Updated' => Auth::user()->id,
-    //                         'Status'       => 1
-    //                     ]);
-    //                 } 
-    //                 else 
-    //                 {
-    //                     $this->accept((object)[
-    //                         'ID' => $data->ID
-    //                     ]);
-    //                 }
+    //                 $this->accept((object)[
+    //                     'ID' => $data->ID
+    //                 ]);
     //             }
     //         }
     //     }
-        
     //     return response()->json([
     //         'success' => true,
     //         'data' => ['message' => __('Create Command Export Success')]
     //     ], 200);
     // }
+
+    public function export_add(Request $request)
+    {
+        $detail = $request->detail;
+
+        if (empty($request->detail)) 
+        {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Dont Scan').' '.__('Box')]
+            ], 400);
+        }
+        if (empty($request->Go))
+        {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Warehouse') . ' ' . __("Export") . ' ' . __("Can't be empty")]
+            ], 400);
+        }
+
+        if (empty($request->To))
+        {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Warehouse') . ' ' . __("Import") . ' ' . __("Can't be empty")]
+            ], 400);
+        }
+
+        foreach($detail as $key => $value)
+        {
+            if (empty($value['Materials_ID']))
+            {
+                return response()->json([
+                    'success' => false,
+                    'data' => ['message' => __('Materials') . ' ' . __("Can't be empty")]
+                ], 400);
+            }
+
+            if (empty($value['Unit_ID'])) 
+            {
+                return response()->json([
+                    'success' => false,
+                    'data' => ['message' => __('Unit') . ' ' . __("Can't be empty")]
+                ], 400);
+            }
+
+            $warehouse = MasterWarehouse::where('IsDelete', 0)
+                                        ->where('ID', $request->To)
+                                        ->first();
+
+            $groupMat  = GroupMaterials::where('IsDelete',0)
+                                        ->where('Group_ID',$warehouse->Group_Materials_ID)
+                                        ->where('Materials_ID',$value['Materials_ID'])
+                                        ->first();
+
+            $mat       = MasterMaterials::where('IsDelete', 0)
+                                        ->where('ID', $value['Materials_ID'])
+                                        ->first();
+
+            $unit      = MasterUnit::where('IsDelete', 0)
+                                        ->where('ID', $value['Unit_ID'])
+                                        ->first();
+
+            $find      = MasterWarehouse::where('IsDelete', 0)
+                                        ->where('ID', $request->Go)
+                                        ->first();
+            $arr       = [];
+
+            if ($mat) 
+            {
+                if (count($mat->group) == 0 || !$groupMat) {
+                    return response()->json([
+                        'success'   => false,
+                        'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
+                    ],400);
+                }
+            }
+
+            if ($find->detail) 
+            {
+                foreach ($find->detail as $value2) 
+                {
+                    if ($value2->inventory) 
+                    {
+                        foreach ($value2->inventory->where('Materials_ID',$value['Materials_ID'])->GroupBy('Materials_ID') as $key => $value1) 
+                        {
+                            if (array_key_exists($key,$arr)) 
+                            {
+                                $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
+                                $coun = $arr[$key]['Count'] += Count($value1);
+                            }
+                            else
+                            {
+                              $arr1 = [
+                                    'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+                                    'Count' => Count($value1)
+                                ]; 
+                                $arr[$key] = $arr1; 
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($unit->Type == 2) 
+            {
+                if (empty($value['Count'])) 
+                {
+                    return response()->json([
+                        'success' => false,
+                        'data' => ['message' => __('Roll Number') . ' ' . __("Can't be empty")]
+                    ], 400);
+                }
+
+                if (!is_numeric($value['Count']) || $value['Count'] <= 0 || is_numeric($value['Count']) && is_float($value['Count'])) 
+                {
+                    return response()->json([
+                        'success' => false,
+                        'data' => ['message' => __('Roll Number') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Origin') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
+                    ], 400);
+                }
+
+                if ($value['Count'] > $arr[$key]['Count']) 
+                {
+                    return response()->json([
+                        'success'=> false,
+                        'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
+                    ],400);
+                } 
+            } 
+            else 
+            {
+                if (empty($value['Quantity'])) 
+                {
+                    return response()->json([
+                        'success' => false,
+                        'data' => ['message' => __('Quantity') . ' ' . __("Can't be empty")]
+                    ], 400);
+                }
+                if (!is_numeric($value['Quantity']) || $value['Quantity'] <= 0) 
+                {
+                    return response()->json([
+                        'success' => false,
+                        'data' => ['message' => __('Quantity') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Real') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
+                    ], 400);
+                }
+
+                if ($value['Quantity'] > $arr[$key]['Quantity']) 
+                {
+                    return response()->json([
+                        'success'=>false,
+                        'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
+                    ],400);
+                }
+            }  
+        }
+
+        foreach($detail as $value1)
+        {
+            $unit      = MasterUnit::where('IsDelete', 0)
+                                        ->where('ID', $value1['Unit_ID'])
+                                        ->first();
+
+            $data = ExportMaterials::create([
+                'Go'            => $request->Go,
+                'To'            => $request->To,
+                'Materials_ID'  => $value1['Materials_ID'],
+                'Quantity'      => $unit->Type == 1 ? $value1['Quantity'] : null,
+                'Count'         => $unit->Type == 2 ? $value1['Count'] : null,
+                'Type'          => 1,
+                'Status'        => 0,
+                // 'User_Created'  => Auth::user()->id,
+                // 'User_Updated'  => Auth::user()->id,
+                'IsDelete'      => 0
+            ]);
+            $num    = 1;
+            $mater  = $data->materials ? $data->materials->Symbols : '';
+            $Go     = $data->go ? $data->go->Symbols : '';
+            $To     = $data->to ? $data->to->Symbols : '';
+            if ($data->go && $data->to) 
+            {
+                if ($data->to->Accept == 0) 
+                {
+                    if ($data->to->Email) 
+                    {
+                        $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
+                    }
+                } 
+                else 
+                {
+                    if ($data->go->Accept == 0) 
+                    {
+                        ExportMaterials::where('IsDelete', 0)
+                        ->where('ID', $data->ID)
+                        ->update([
+                            // 'User_Updated' => Auth::user()->id,
+                            'Status'       => 1
+                        ]);
+                    } 
+                    else 
+                    {
+                        $this->accept((object)[
+                            'ID' => $data->ID
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => ['message' => __('Create Command Export Success')]
+        ], 200);
+    }
 
     public function accept($request)
     {
@@ -694,7 +694,7 @@ class ExportMaterialsController extends Controller
             ]);
             return response()->json([
                 'success' => true,
-                'data'    => ['message' => __('Success') . ' ' . __('Command') . ' ' . __('Success')]
+                'data'    => ['message' => __('Success') . ' ' . __('Command') . ' ' . __('Succes')]
             ], 200);
         } 
         else 
@@ -728,7 +728,7 @@ class ExportMaterialsController extends Controller
                     ->where('Box_ID',$label_3)
                     ->orderBy('ID','desc')
                     ->first();
-
+                    
                     if ($data1 && $data2) 
                     {
                         if ($data1->Status == 0 && $data2->Inventory > 0) 
@@ -753,7 +753,7 @@ class ExportMaterialsController extends Controller
                     {
                         return response()->json([
                             'success' => false,
-                            'data'    => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+                            'data'    => ['message' => __('Command').' '.__('Export').' '.__("Can't export box")]
                         ], 400);
                     }
                 }
@@ -833,8 +833,9 @@ class ExportMaterialsController extends Controller
                 $boxs_export = count(collect($command->detail->where('Status',1)));
                 $boxs_need = $command->Count - $boxs_export;
                 // dd($boxs_need);
+                // return response()->json($boxs_need);
 
-                if ($boxs_need > count($detail)) 
+                if ($boxs_need >= count($detail)) 
                 {
                     $data2 = ExportDetail::where('IsDelete',0)
                                         ->where('Export_ID',$command->ID)
@@ -869,7 +870,7 @@ class ExportMaterialsController extends Controller
 
                 if ($command->Quantity > $quan_export) 
                 {
-                    if ($quan_need > collect($detail)->sum('Quantity')) 
+                    if ($quan_need >= collect($detail)->sum('Quantity')) 
                     {
                         $data2 =  ExportDetail::where('IsDelete',0)
                                         ->where('Export_ID',$command->ID)
@@ -943,77 +944,87 @@ class ExportMaterialsController extends Controller
         ], 200);
     }
 
-    public function data_box_transfer(Request $request)
-    {
-        $label = $request->Box_ID;
-        $arr_label = explode('[1D]', $label);
-        $command_id = $request->command_id;
+    // public function data_box_transfer(Request $request)
+    // {
+    //     $label = $request->Box_ID;
+    //     $arr_label = explode('[1D]', $label);
+    //     $command_id = $request->command_id;
 
-        if (count($arr_label) > 12) {
-            $label_1 = $arr_label[12];
-            $label_2 = str_replace('Z', '', $label_1);
-            $label_3 = str_replace('[1E][04]', '', $label_2);
+    //     if (count($arr_label) > 12) {
+    //         $label_1 = $arr_label[12];
+    //         $label_2 = str_replace('Z', '', $label_1);
+    //         $label_3 = str_replace('[1E][04]', '', $label_2);
 
-            if ($label_3 != '') {
-                $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
-                ->first();
-                if ($data) {
-                    $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
-                    ->where('Box_ID', $label_3)
-                    ->where('Status', 1)
-                    ->where('Type', 0)
-                    ->first();
-                    if ($data1) {
-                        if ($data1->Transfer == 0) {
-                            return response()->json([
-                                'success' => true,
-                                'data' => [
-                                    'Box_ID'    => $label_3,
-                                    'Quantity'  => floatval($data1->Quantity),
-                                    // 'Location'=>$data1->location ? $data1->location->Symbols : '',
-                                ]
-                            ], 200);
-                        } else {
-                            return response()->json([
-                                'success' => false,
-                                'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
-                            ], 400);
-                        }
-                    }
-                    else 
-                    {
-                        return response()->json([
-                            'success' => false,
-                            'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
-                        ], 400);
-                    }
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
-                    ], 400);
-                }
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-                ], 400);
-            }
-        } 
-        else 
-        {
-            return response()->json([
-                'success' => false,
-                'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-            ], 400);
-        }
-    }
+    //         if ($label_3 != '') {
+    //             $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
+    //             ->first();
+    //             if ($data) {
+    //                 $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
+    //                 ->where('Box_ID', $label_3)
+    //                 ->where('Status', 1)
+    //                 ->where('Type', 0)
+    //                 ->first();
+    //                 if ($data1) {
+    //                     if ($data1->Transfer == 0) {
+    //                         return response()->json([
+    //                             'success' => true,
+    //                             'data' => [
+    //                                 'Box_ID'    => $label_3,
+    //                                 'Quantity'  => floatval($data1->Quantity),
+    //                                 // 'Location'=>$data1->location ? $data1->location->Symbols : '',
+    //                             ]
+    //                         ], 200);
+    //                     } else {
+    //                         return response()->json([
+    //                             'success' => false,
+    //                             'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
+    //                         ], 400);
+    //                     }
+    //                 }
+    //                 else 
+    //                 {
+    //                     return response()->json([
+    //                         'success' => false,
+    //                         'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
+    //                     ], 400);
+    //                 }
+    //             } else {
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
+    //                 ], 400);
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+    //             ], 400);
+    //         }
+    //     } 
+    //     else 
+    //     {
+    //         return response()->json([
+    //             'success' => false,
+    //             'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+    //         ], 400);
+    //     }
+    // }
 
     public function transfer_materials(Request $request)
     {
-        $label = $request->Box_ID;
+        $label = $request->detail;
         $dem = 0;
-        $location = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
+        $location  = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
+        $command   = ExportMaterials::where('IsDelete',0)->where('ID',$request->command_id)->first();
+        $warehouse = MasterWarehouse::where('IsDelete',0)->where('ID');
+
+        if ($command->To != $location->Warehouse_ID) 
+        {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Location').' '.__('Not in warehouse import')]
+            ], 400);
+        }
 
         if (empty($request->location)) {
             return response()->json([
@@ -1036,30 +1047,30 @@ class ExportMaterialsController extends Controller
             ], 400);
         }
 
-        // foreach($label as $val)
-        // {
-        //     $data1 = ExportDetail::where('IsDelete', 0)
-        //                         ->where('Export_ID', $request->command_id)
-        //                         ->where('Box_ID', $val['Box_ID'])
-        //                         ->where('Status', 1)
-        //                         ->where('Type', 0)
-        //                         ->first();
-        //     if ($data1) {
-        //         if ($data1->Transfer != 0) {
-        //             return response()->json([
-        //                 'success' => false,
-        //                 'data'      => ['message' => $val['Box_ID'] . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
-        //             ], 400);
-        //         }
-        //     }
-        //     else 
-        //     {
-        //         return response()->json([
-        //             'success' => false,
-        //             'data'      => ['message' => $val['Box_ID'] . ' ' . __('Not in command export')]
-        //         ], 400);
-        //     }
-        // }
+        foreach($label as $val)
+        {
+            $data1 = ExportDetail::where('IsDelete', 0)
+                                ->where('Export_ID', $request->command_id)
+                                ->where('Box_ID', $val['Box_ID'])
+                                ->where('Status', 1)
+                                ->where('Type', 0)
+                                ->first();
+            if ($data1) {
+                if ($data1->Transfer != 0) {
+                    return response()->json([
+                        'success' => false,
+                        'data'      => ['message' => $val['Box_ID'] . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
+                    ], 400);
+                }
+            }
+            else 
+            {
+                return response()->json([
+                    'success' => false,
+                    'data'      => ['message' => $val['Box_ID'] . ' ' . __('Not in command export')]
+                ], 400);
+            }
+        }
 
         foreach ($label as $value) 
         {
@@ -1094,7 +1105,7 @@ class ExportMaterialsController extends Controller
                     'Inventory'             => $data1->Quantity,
                     'Status'                => 1,
                     'Type'                  => 6,
-                    'Time_Import'           => $data2->Time_Import,
+                    'Time_Import'           => Carbon::now(),
                     // 'User_Created'           => Auth::user()->id,
                     // 'User_Updated'           => Auth::user()->id,
                     'IsDelete'              => 0

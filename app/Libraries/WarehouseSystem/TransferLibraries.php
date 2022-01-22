@@ -68,32 +68,32 @@ class TransferLibraries
                 $dataSave = ([
                     'Export_ID'        => $ex->Export_ID,
                     'Export_Detail_ID' => $ex->ID,
-                    'Box_ID' => $ex->Box_ID,
-                    'Materials_ID' => $ex->Materials_ID,
+                    'Box_ID'           => $ex->Box_ID,
+                    'Materials_ID'     => $ex->Materials_ID,
                     'Warehouse_Detail_ID_Go' => $ex->Warehouse_Detail_ID,
                     'Warehouse_Detail_ID_To' => $request->To,
-                    'Quantity' => $ex->Quantity,
-                    'Status' => 1,
+                    'Quantity'         => $ex->Quantity,
+                    'Status'           => 1,
                     'User_Created'     => Auth::user()->id,
                     'User_Updated'     => Auth::user()->id,
                     'IsDelete'         => 0
                 ]);
                 $dataSave1 = ([
-                    'Materials_ID' => $ex->Materials_ID,
-                    'Box_ID' => $ex->Box_ID,
-                    'Case_No' => $im->Case_No,
-                    'Lot_No' => $im->Lot_No,
-                    'Quantity' => $ex->Quantity,
-                    'Packing_Date' => $im->Packing_Date,
+                    'Materials_ID'    => $ex->Materials_ID,
+                    'Box_ID'          => $ex->Box_ID,
+                    'Case_No'         => $im->Case_No,
+                    'Lot_No'          => $im->Lot_No,
+                    'Quantity'        => $ex->Quantity,
+                    'Packing_Date'    => $im->Packing_Date,
                     'Warehouse_Detail_ID' => $request->To,
-                    'Quantity' => $ex->Quantity,
-                    'Inventory' => $ex->Quantity,
-                    'Status' => 1,
-                    'Type' => 6,
-                    'Time_Import' => $im->Time_Import,
-                    'User_Created'     => Auth::user()->id,
-                    'User_Updated'     => Auth::user()->id,
-                    'IsDelete'         => 0
+                    'Quantity'        => $ex->Quantity,
+                    'Inventory'       => $ex->Quantity,
+                    'Status'          => 1,
+                    'Type'            => 6,
+                    'Time_Import'     => Carbon::now(),
+                    'User_Created'    => Auth::user()->id,
+                    'User_Updated'    => Auth::user()->id,
+                    'IsDelete'        => 0
                 ]);
 
                 TransferMaterials::create($dataSave);
@@ -459,6 +459,7 @@ class TransferLibraries
                 array_push($arr, $value2);
             }
         }
+        // dd($arr);
         return $arr;
     }
 }

@@ -104,15 +104,16 @@
                                     <th rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value1['Symbols']}}</th>
                                     <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value2['Pallet_ID']}}</td>
                                     <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value2['Materials']}}</td>
-                                    <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{date_format(date_create($value2['Time_Import']),"d/m/Y")}}
-                                    </td>
+                                    <!-- <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{date_format(date_create($value2['Time_Import']),"d/m/Y")}}
+                                    </td> -->
                                 </tr>
                                 <?php $sum = 0;
                                 $dem = 0 ?>
                                   @foreach($value2['Inven'] as $value2)
                                   <tr>
-                                      <td>{{$value2->Box_ID}}</td>
-                                      <td>{{floatval($value2->Inventory)}}</td>
+                                    <td>{{date_format(date_create($value2->Time_Import),"d/m/Y")}}</td>
+                                    <td>{{$value2->Box_ID}}</td>
+                                    <td>{{floatval($value2->Inventory)}}</td>
                                       <?php $sum += $value2->Inventory;
                                       $dem++ ?>
                                       <?php $sum_t += $value2->Inventory;
@@ -120,8 +121,8 @@
                                   </tr>
                                   @endforeach
                                   <tr>
-                                      <td style="background-color: #ccffff;">{{__('Roll Number')}} : {{$dem}}</td>
-                                      <td style="background-color: #ccffff;">{{__('Quantity')}}(kg) : {{floatval($sum)}}</td>
+                                      <td colspan="2" style="background-color: #ccffff;">{{__('Roll Number')}} : {{$dem}}</td>
+                                      <td colspan="2" style="background-color: #ccffff;">{{__('Quantity')}}(kg) : {{floatval($sum)}}</td>
                                   </tr>
                                 @endforeach
 

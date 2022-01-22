@@ -522,14 +522,16 @@ class ImportMaterialsController extends Controller
 
 		// foreach($detail as $val)
 		// {
+		// 	// dd('1');
 		// 	$data =  ImportDetail::where('IsDelete',0)
 		// 	->where('Box_ID',$val['Box_ID'])
 		// 	->where('Status','>',0)
 		// 	->orderBy('ID','desc')
 		// 	->first();
+		// 	// return response()->json($data);
 		// 	if ($data)
 		// 	{
-		// 		if ($data->inventory != 0) 
+		// 		if ($data->Inventory != 0) 
 		// 		{
 		// 			return response()->json([
 		// 					'success' => false,
@@ -573,7 +575,6 @@ class ImportMaterialsController extends Controller
 				'Case_No'          => $data->Case_No,
 				'Lot_No'           => $data->Lot_No,
 				'Time_Import'      => $data->Time_Import,
-				'Pallet_ID'        => '',
 				'Quantity'         => $value['Quantity'],
 				'Inventory'        => $value['Quantity'],
 				'Warehouse_Detail_ID' => $location->ID,
