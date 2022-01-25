@@ -178,8 +178,8 @@
 								<td>{{$value->Type == 0 ? __('Software') : ($value->Type == 1 ? __('PDA') : __('System')  ) }}</td>
 								<td>{{$value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT')  ) }}-{{date_format(date_create($value->Time_Created),"YmdHis")}}</td>
 								<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
-								<td>{{$value->go ? $value->go->Symbols : '' }}</td>
-								<td>{{$value->to ? $value->to->Symbols : '' }}</td>
+								<td>{{$value->go ? $value->go->Name : '' }}</td>
+								<td>{{$value->to ? $value->to->Name : '' }}</td>
 								<td id="com_{{$value->ID}}">{{$value->Count ? $value->Count : floatval($value->Quantity) }}</td>
 								<?php $a = $value->Count ? $value->Count : $value->Quantity; ?>
 								<?php $b = $value->Count ? (count($value->detail->where('Status',1))) : floatval(collect($value->detail->where('Status',1))->sum('Quantity')); ?>

@@ -188,7 +188,7 @@ class ExportLibraries
             $Go = $data->go ? $data->go->Symbols : '';
             $To = $data->to ? $data->to->Symbols : '';
             
-            $this->send_mail->send_mail2($num1,$num2,$mater,$Go,$To,$command);
+            $this->send_mail->send_mail2($data->to->Email,$num1,$num2,$mater,$Go,$To,$command);
 
         }
         // dd($request);

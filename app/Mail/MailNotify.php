@@ -106,17 +106,16 @@ class MailNotify
             });
     }
 
-    public function send_mail2($num1,$num2,$mater,$Go,$To,$command)
+    public function send_mail2($email2,$num1,$num2,$mater,$Go,$To,$command)
     {
 
         $user =  User::where('IsDelete',0)->get();
         Mail::send('mail2',['num1' =>$num1,'num2'=>$num2,'mater'=>$mater,'go'=>$Go,'to'=>$To,'command'=>$command],
-            function($massage){
-                $massage->to('dvhungg1@gmail.com','hung')
+            function($massage) use ($email2){
+                $massage->to($email2,'hung')
                 ->from('hethongkhojkv@gmail.com','Admin')
                 ->setSubject('Mail Báo Cáo Chênh Lệch Chuyển Kho');
             });
-
 
 
 

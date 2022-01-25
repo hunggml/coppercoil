@@ -681,11 +681,12 @@ class ExportMaterialsController extends Controller
             $b = count(collect($data->detail)->where('Transfer', 1));
             if ($a > $b && $data->Go != $data->To) 
             {
-                $num    = $a - $b;
+                $num1   = $a;
+                $num2   = $b;
                 $mater  = $data->materials ? $data->materials->Symbols : '';
                 $Go     = $data->go ? $data->go->Symbols : '';
                 $To     = $data->to ? $data->to->Symbols : '';
-                $this->send_mail->send_mail2($num, $mater, $Go, $To);
+                $this->send_mail->send_mail2($data->to->Email,$num1,$num2, $mater, $Go, $To,$command_id);
             }
             ExportMaterials::where('IsDelete', 0)->where('ID', $data->ID)
             ->update([
@@ -843,7 +844,7 @@ class ExportMaterialsController extends Controller
                                         ->update([
                                             'Status' => 1
                                         ]);
-                    $data3 =  ImportDetail::where('IsDelete', 0)
+                    $data3 = ImportDetail::where('IsDelete', 0)
                                         ->whereIn('Box_ID', $arr)
                                         ->where('Inventory','>',0)
                                         ->orderBy('ID', 'desc')
@@ -872,7 +873,7 @@ class ExportMaterialsController extends Controller
                 {
                     if ($quan_need >= collect($detail)->sum('Quantity')) 
                     {
-                        $data2 =  ExportDetail::where('IsDelete',0)
+                        $data2 = ExportDetail::where('IsDelete',0)
                                         ->where('Export_ID',$command->ID)
                                         ->whereIn('Box_ID',$arr)
                                         ->update([
@@ -944,71 +945,71 @@ class ExportMaterialsController extends Controller
         ], 200);
     }
 
-    // public function data_box_transfer(Request $request)
-    // {
-    //     $label = $request->Box_ID;
-    //     $arr_label = explode('[1D]', $label);
-    //     $command_id = $request->command_id;
+    public function data_box_transfer(Request $request)
+    {
+        $label = $request->Box_ID;
+        $arr_label = explode('[1D]', $label);
+        $command_id = $request->command_id;
 
-    //     if (count($arr_label) > 12) {
-    //         $label_1 = $arr_label[12];
-    //         $label_2 = str_replace('Z', '', $label_1);
-    //         $label_3 = str_replace('[1E][04]', '', $label_2);
+        if (count($arr_label) > 12) {
+            $label_1 = $arr_label[12];
+            $label_2 = str_replace('Z', '', $label_1);
+            $label_3 = str_replace('[1E][04]', '', $label_2);
 
-    //         if ($label_3 != '') {
-    //             $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
-    //             ->first();
-    //             if ($data) {
-    //                 $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
-    //                 ->where('Box_ID', $label_3)
-    //                 ->where('Status', 1)
-    //                 ->where('Type', 0)
-    //                 ->first();
-    //                 if ($data1) {
-    //                     if ($data1->Transfer == 0) {
-    //                         return response()->json([
-    //                             'success' => true,
-    //                             'data' => [
-    //                                 'Box_ID'    => $label_3,
-    //                                 'Quantity'  => floatval($data1->Quantity),
-    //                                 // 'Location'=>$data1->location ? $data1->location->Symbols : '',
-    //                             ]
-    //                         ], 200);
-    //                     } else {
-    //                         return response()->json([
-    //                             'success' => false,
-    //                             'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
-    //                         ], 400);
-    //                     }
-    //                 }
-    //                 else 
-    //                 {
-    //                     return response()->json([
-    //                         'success' => false,
-    //                         'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
-    //                     ], 400);
-    //                 }
-    //             } else {
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
-    //                 ], 400);
-    //             }
-    //         } else {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-    //             ], 400);
-    //         }
-    //     } 
-    //     else 
-    //     {
-    //         return response()->json([
-    //             'success' => false,
-    //             'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-    //         ], 400);
-    //     }
-    // }
+            if ($label_3 != '') {
+                $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
+                ->first();
+                if ($data) {
+                    $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
+                    ->where('Box_ID', $label_3)
+                    ->where('Status', 1)
+                    ->where('Type', 0)
+                    ->first();
+                    if ($data1) {
+                        if ($data1->Transfer == 0) {
+                            return response()->json([
+                                'success' => true,
+                                'data' => [
+                                    'Box_ID'    => $label_3,
+                                    'Quantity'  => floatval($data1->Quantity),
+                                    // 'Location'=>$data1->location ? $data1->location->Symbols : '',
+                                ]
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'success' => false,
+                                'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
+                            ], 400);
+                        }
+                    }
+                    else 
+                    {
+                        return response()->json([
+                            'success' => false,
+                            'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
+                        ], 400);
+                    }
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
+                    ], 400);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+                ], 400);
+            }
+        } 
+        else 
+        {
+            return response()->json([
+                'success' => false,
+                'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
+    }
 
     public function transfer_materials(Request $request)
     {

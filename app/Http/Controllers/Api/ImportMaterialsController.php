@@ -520,33 +520,33 @@ class ImportMaterialsController extends Controller
 			],400);
 		}
 
-		// foreach($detail as $val)
-		// {
-		// 	// dd('1');
-		// 	$data =  ImportDetail::where('IsDelete',0)
-		// 	->where('Box_ID',$val['Box_ID'])
-		// 	->where('Status','>',0)
-		// 	->orderBy('ID','desc')
-		// 	->first();
-		// 	// return response()->json($data);
-		// 	if ($data)
-		// 	{
-		// 		if ($data->Inventory != 0) 
-		// 		{
-		// 			return response()->json([
-		// 					'success' => false,
-		// 					'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
-		// 				],400);
-		// 		}
-		// 	}
-		// 	else
-		// 	{
-		// 		return response()->json([
-		// 					'success' => false,
-		// 					'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-		// 				],400);
-		// 	}
-		// }
+		foreach($detail as $val)
+		{
+			// dd('1');
+			$data =  ImportDetail::where('IsDelete',0)
+			->where('Box_ID',$val['Box_ID'])
+			->where('Status','>',0)
+			->orderBy('ID','desc')
+			->first();
+			// return response()->json($data);
+			if ($data)
+			{
+				if ($data->Inventory != 0) 
+				{
+					return response()->json([
+							'success' => false,
+							'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
+						],400);
+				}
+			}
+			else
+			{
+				return response()->json([
+							'success' => false,
+							'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
+						],400);
+			}
+		}
 
 		foreach($detail as $value)
 		{
