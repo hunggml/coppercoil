@@ -428,68 +428,68 @@ class ImportMaterialsController extends Controller
 		} 
 	}
 
-	public  function decryption_box(Request $request)
-	{
-		$label = $request->Box_ID;
-		$arr_label = explode('[1D]',$label);
-		if(count($arr_label) >12)
-		{
-			$label_1 = $arr_label[12];
-			$label_2 = str_replace('Z','',$label_1);
-			$label_3 = str_replace('[1E][04]','',$label_2);
+	// public  function decryption_box(Request $request)
+	// {
+	// 	$label = $request->Box_ID;
+	// 	$arr_label = explode('[1D]',$label);
+	// 	if(count($arr_label) >12)
+	// 	{
+	// 		$label_1 = $arr_label[12];
+	// 		$label_2 = str_replace('Z','',$label_1);
+	// 		$label_3 = str_replace('[1E][04]','',$label_2);
 
-			if($label_3 != '')
-			{
-				$data1 = ImportDetail::where('IsDelete',0)
-									->where('Box_ID',$label_3)
-									->where('Status','>',0)
-									->orderBy('ID','desc')
-									->first();
-				if($data1)
-				{
-					if($data1->Inventory == 0)
-					{
-						return response()->json([
-							'success' => true,
-							'data'	  => [
-								'Box_ID'	=> $label_3,
-								'Quantity'	=> floatval($data1->Quantity),
-								'Location'	=> $data1->location ? $data1->location->ID : '',
-							]
-						],200);
-					}
-					else
-					{
-						return response()->json([
-							'success' => false,
-							'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
-						],400);
-					}
-				}
-				else
-				{
-					return response()->json([
-						'success' => false,
-						'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-					],400);
-				}
-			}
-			else
-			{
-				return response()->json([
-					'success' => false,
-					'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-				],400);
-			}
-		}
-		else
-		{
-			return response()->json([
-				'success' => false,
-				'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-			],400);
-		}
-	}
+	// 		if($label_3 != '')
+	// 		{
+	// 			$data1 = ImportDetail::where('IsDelete',0)
+	// 								->where('Box_ID',$label_3)
+	// 								->where('Status','>',0)
+	// 								->orderBy('ID','desc')
+	// 								->first();
+	// 			if($data1)
+	// 			{
+	// 				if($data1->Inventory == 0)
+	// 				{
+	// 					return response()->json([
+	// 						'success' => true,
+	// 						'data'	  => [
+	// 							'Box_ID'	=> $label_3,
+	// 							'Quantity'	=> floatval($data1->Quantity),
+	// 							'Location'	=> $data1->location ? $data1->location->ID : '',
+	// 						]
+	// 					],200);
+	// 				}
+	// 				else
+	// 				{
+	// 					return response()->json([
+	// 						'success' => false,
+	// 						'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
+	// 					],400);
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				return response()->json([
+	// 					'success' => false,
+	// 					'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
+	// 				],400);
+	// 			}
+	// 		}
+	// 		else
+	// 		{
+	// 			return response()->json([
+	// 				'success' => false,
+	// 				'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
+	// 			],400);
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		return response()->json([
+	// 			'success' => false,
+	// 			'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
+	// 		],400);
+	// 	}
+	// }
 
 	public function retype_add(Request $request)
 	{      
@@ -498,7 +498,7 @@ class ImportMaterialsController extends Controller
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
 										->where('Symbols', $request->location)
 										->first();
-
+		$arr1 = [];
 		if (empty($detail)) {
             return response()->json([
                 'success' => false,
@@ -580,13 +580,22 @@ class ImportMaterialsController extends Controller
 				'Warehouse_Detail_ID' => $location->ID,
 				'Status'           => 1,
 				'Type'             => 1,
+				'Time_Created'	   => now(),
+				'Time_Updated'	   => now(),
 				// 'User_Created'     => Auth::user()->id,
 				// 'User_Updated'     => Auth::user()->id,
 				'IsDelete'         => 0 
 			];
-			ImportDetail::create($arr);
+
+			array_push($arr1,$arr);
 			$dem++;
 		}
+		foreach(array_chunk($arr1, 50) as $value3)
+		{
+
+			ImportDetail::insert($value3);
+		}
+
 
 		if($dem > 0)
 		{

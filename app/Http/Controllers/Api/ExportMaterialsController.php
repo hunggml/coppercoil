@@ -166,14 +166,12 @@ class ExportMaterialsController extends Controller
     //                                 ->first();
     //     $arr       = [];
 
-    //     if ($mat) 
-    //     {
-    //         if (count($mat->group) == 0 || !$groupMat) {
-    //             return response()->json([
-    //                 'success'   => false,
-    //                 'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
-    //             ],400);
-    //         }
+
+    //     if (count($mat->group) == 0 || !$groupMat) {
+    //         return response()->json([
+    //             'success'   => false,
+    //             'data'      => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
+    //         ],400);
     //     }
 
     //     if ($find->detail) 
@@ -945,71 +943,71 @@ class ExportMaterialsController extends Controller
         ], 200);
     }
 
-    public function data_box_transfer(Request $request)
-    {
-        $label = $request->Box_ID;
-        $arr_label = explode('[1D]', $label);
-        $command_id = $request->command_id;
+    // public function data_box_transfer(Request $request)
+    // {
+    //     $label = $request->Box_ID;
+    //     $arr_label = explode('[1D]', $label);
+    //     $command_id = $request->command_id;
 
-        if (count($arr_label) > 12) {
-            $label_1 = $arr_label[12];
-            $label_2 = str_replace('Z', '', $label_1);
-            $label_3 = str_replace('[1E][04]', '', $label_2);
+    //     if (count($arr_label) > 12) {
+    //         $label_1 = $arr_label[12];
+    //         $label_2 = str_replace('Z', '', $label_1);
+    //         $label_3 = str_replace('[1E][04]', '', $label_2);
 
-            if ($label_3 != '') {
-                $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
-                ->first();
-                if ($data) {
-                    $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
-                    ->where('Box_ID', $label_3)
-                    ->where('Status', 1)
-                    ->where('Type', 0)
-                    ->first();
-                    if ($data1) {
-                        if ($data1->Transfer == 0) {
-                            return response()->json([
-                                'success' => true,
-                                'data' => [
-                                    'Box_ID'    => $label_3,
-                                    'Quantity'  => floatval($data1->Quantity),
-                                    // 'Location'=>$data1->location ? $data1->location->Symbols : '',
-                                ]
-                            ], 200);
-                        } else {
-                            return response()->json([
-                                'success' => false,
-                                'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
-                            ], 400);
-                        }
-                    }
-                    else 
-                    {
-                        return response()->json([
-                            'success' => false,
-                            'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
-                        ], 400);
-                    }
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
-                    ], 400);
-                }
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-                ], 400);
-            }
-        } 
-        else 
-        {
-            return response()->json([
-                'success' => false,
-                'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
-            ], 400);
-        }
-    }
+    //         if ($label_3 != '') {
+    //             $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
+    //             ->first();
+    //             if ($data) {
+    //                 $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
+    //                 ->where('Box_ID', $label_3)
+    //                 ->where('Status', 1)
+    //                 ->where('Type', 0)
+    //                 ->first();
+    //                 if ($data1) {
+    //                     if ($data1->Transfer == 0) {
+    //                         return response()->json([
+    //                             'success' => true,
+    //                             'data' => [
+    //                                 'Box_ID'    => $label_3,
+    //                                 'Quantity'  => floatval($data1->Quantity),
+    //                                 // 'Location'=>$data1->location ? $data1->location->Symbols : '',
+    //                             ]
+    //                         ], 200);
+    //                     } else {
+    //                         return response()->json([
+    //                             'success' => false,
+    //                             'data'      => ['message' => $label_3 . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
+    //                         ], 400);
+    //                     }
+    //                 }
+    //                 else 
+    //                 {
+    //                     return response()->json([
+    //                         'success' => false,
+    //                         'data'      => ['message' => $label_3 . ' ' . __('Not in command export')]
+    //                     ], 400);
+    //                 }
+    //             } else {
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'data'      => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
+    //                 ], 400);
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+    //             ], 400);
+    //         }
+    //     } 
+    //     else 
+    //     {
+    //         return response()->json([
+    //             'success' => false,
+    //             'data'      => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+    //         ], 400);
+    //     }
+    // }
 
     public function transfer_materials(Request $request)
     {
