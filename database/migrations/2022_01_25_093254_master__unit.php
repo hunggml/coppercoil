@@ -17,7 +17,6 @@ class MasterUnit extends Migration
             $table->id('ID');
             $table->string('Name');
             $table->string('Symbols');
-            $table->integer('Type');
             $table->string('Note',3000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();

@@ -6,50 +6,14 @@ use Illuminate\Validation\Rule;
 use App\Models\WarehouseSystem\CommandImport;
 use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\WarehouseSystem\ExportDetail;
-use Validator;
-use ExportLibraries;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\MasterWarehouseDetail;
 use App\Models\MasterData\MasterWarehouse;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\WarehouseSystem\TransferMaterials;
 
 class TransferLibraries
 {
-
-    private function read_file($request)
-    {
-        try {
-            $file     = request()->file('fileImport');
-            $name     = $file->getClientOriginalName();
-            $arr      = explode('.', $name);
-            $fileName = strtolower(end($arr));
-            // dd($file, $name, $arr, $fileName);
-            if ($fileName != 'xlsx' && $fileName != 'xls') {
-                return redirect()->back();
-            } else if ($fileName == 'xls') {
-                $reader  = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-            } else if ($fileName == 'xlsx') {
-                $reader  = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-            }
-            try {
-                $spreadsheet = $reader->load($file);
-                $data        = $spreadsheet->getActiveSheet()->toArray();
-
-                return $data;
-            } catch (\Exception $e) {
-                return ['danger' => __('Select The Standard ".xlsx" Or ".xls" File')];
-            }
-        } catch (\Exception $e) {
-            return ['danger' => __('Error Something')];
-        }
-    }
 
     public function add_transfer($request)
     {
@@ -66,34 +30,34 @@ class TransferLibraries
                 ->first();
             if ($im->Inventory <= 0) {
                 $dataSave = ([
-                    'Export_ID'        => $ex->Export_ID,
-                    'Export_Detail_ID' => $ex->ID,
-                    'Box_ID'           => $ex->Box_ID,
-                    'Materials_ID'     => $ex->Materials_ID,
+                    'Export_ID'              => $ex->Export_ID,
+                    'Export_Detail_ID'       => $ex->ID,
+                    'Box_ID'                 => $ex->Box_ID,
+                    'Materials_ID'           => $ex->Materials_ID,
                     'Warehouse_Detail_ID_Go' => $ex->Warehouse_Detail_ID,
                     'Warehouse_Detail_ID_To' => $request->To,
-                    'Quantity'         => $ex->Quantity,
-                    'Status'           => 1,
-                    'User_Created'     => Auth::user()->id,
-                    'User_Updated'     => Auth::user()->id,
-                    'IsDelete'         => 0
+                    'Quantity'               => $ex->Quantity,
+                    'Status'                 => 1,
+                    'User_Created'           => Auth::user()->id,
+                    'User_Updated'           => Auth::user()->id,
+                    'IsDelete'               => 0
                 ]);
                 $dataSave1 = ([
-                    'Materials_ID'    => $ex->Materials_ID,
-                    'Box_ID'          => $ex->Box_ID,
-                    'Case_No'         => $im->Case_No,
-                    'Lot_No'          => $im->Lot_No,
-                    'Quantity'        => $ex->Quantity,
-                    'Packing_Date'    => $im->Packing_Date,
-                    'Warehouse_Detail_ID' => $request->To,
-                    'Quantity'        => $ex->Quantity,
-                    'Inventory'       => $ex->Quantity,
-                    'Status'          => 1,
-                    'Type'            => 6,
-                    'Time_Import'     => Carbon::now(),
-                    'User_Created'    => Auth::user()->id,
-                    'User_Updated'    => Auth::user()->id,
-                    'IsDelete'        => 0
+                    'Materials_ID'          => $ex->Materials_ID,
+                    'Box_ID'                => $ex->Box_ID,
+                    'Case_No'               => $im->Case_No,
+                    'Lot_No'                => $im->Lot_No,
+                    'Quantity'              => $ex->Quantity,
+                    'Packing_Date'          => $im->Packing_Date,
+                    'Warehouse_Detail_ID'   => $request->To,
+                    'Quantity'              => $ex->Quantity,
+                    'Inventory'             => $ex->Quantity,
+                    'Status'                => 1,
+                    'Type'                  => 6,
+                    'Time_Import'           => Carbon::now(),
+                    'User_Created'          => Auth::user()->id,
+                    'User_Updated'          => Auth::user()->id,
+                    'IsDelete'              => 0
                 ]);
 
                 TransferMaterials::create($dataSave);
@@ -116,14 +80,14 @@ class TransferLibraries
 
     public function get_list_transfer($request)
     {
-        $materials = $request->Materials_ID;
-        $Box_ID = trim($request->Box_ID);
-        $Status = 1;
-        $from = $request->from;
-        $to   = $request->to;
-        $Go_to   = $request->Go_to;
-        $Lo_to   = $request->Lo_to;
-        $data = TransferMaterials::where('IsDelete', 0)
+        $materials  = $request->Materials_ID;
+        $Box_ID     = trim($request->Box_ID);
+        $Status     = 1;
+        $from       = $request->from;
+        $to         = $request->to;
+        $Go_to      = $request->Go_to;
+        $Lo_to      = $request->Lo_to;
+        $data       = TransferMaterials::where('IsDelete', 0)
             ->when($materials, function ($query, $materials) {
                 return $query->where('Materials_ID', $materials);
             })
@@ -150,12 +114,6 @@ class TransferLibraries
         return $data;
     }
 
-    // public function get_location($request)
-    // {
-        
-    // }
-
-
     public function get_all_pallet($request)
     {
 
@@ -180,15 +138,15 @@ class TransferLibraries
             ->get();
         if (count($data) > 0) {
             $val = [];
-            $val['Pallet_ID'] = $data[0]->Pallet_ID;
-            $val['Status']    = $data[0]->Status;
-            $val['Materials'] = $data[0]->materials ? $data[0]->materials->Symbols : '';
-            $val['Materials_ID'] = $data[0]->materials ? $data[0]->materials->ID : '';
-            $val['Wire_Type'] = $data[0]->materials ? $data[0]->materials->Wire_Type : '';
-            $val['Spec'] = $data[0]->materials ? $data[0]->materials->Spec   : '';
-            $val['Quantity'] = number_format(collect($data)->sum('Quantity'), 2, '.', '');
-            $val['Count'] = count($data);
-            $val['List'] = $data;
+            $val['Pallet_ID']       = $data[0]->Pallet_ID;
+            $val['Status']          = $data[0]->Status;
+            $val['Materials']       = $data[0]->materials ? $data[0]->materials->Symbols : '';
+            $val['Materials_ID']    = $data[0]->materials ? $data[0]->materials->ID : '';
+            $val['Wire_Type']       = $data[0]->materials ? $data[0]->materials->Wire_Type : '';
+            $val['Spec']            = $data[0]->materials ? $data[0]->materials->Spec   : '';
+            $val['Quantity']        = number_format(collect($data)->sum('Quantity'), 2, '.', '');
+            $val['Count']           = count($data);
+            $val['List']            = $data;
             return $val;
         }
     }
@@ -228,18 +186,18 @@ class TransferLibraries
                 ->first();
             if ($data) {
                 $arr1 = [
-                    'Export_ID' => '',
-                    'Pallet_ID' =>  '',
-                    'Box_ID'    =>  $data->Box_ID,
-                    'Materials_ID' =>    $data->Materials_ID,
-                    'Warehouse_Detail_ID' => $data->Warehouse_Detail_ID,
-                    'Quantity'  =>  $data->Quantity,
-                    'Status'    =>  1,
-                    'Type'      =>  2,
-                    'Time_Export' => Carbon::now(),
-                    'User_Created'     => Auth::user()->id,
-                    'User_Updated'     => Auth::user()->id,
-                    'IsDelete'         => 0
+                    'Export_ID'             => '',
+                    'Pallet_ID'             =>  '',
+                    'Box_ID'                =>  $data->Box_ID,
+                    'Materials_ID'          =>    $data->Materials_ID,
+                    'Warehouse_Detail_ID'   => $data->Warehouse_Detail_ID,
+                    'Quantity'              =>  $data->Quantity,
+                    'Status'                =>  1,
+                    'Type'                  =>  2,
+                    'Time_Export'           => Carbon::now(),
+                    'User_Created'          => Auth::user()->id,
+                    'User_Updated'          => Auth::user()->id,
+                    'IsDelete'              => 0
                 ];
                 ExportDetail::Create($arr1);
 
@@ -313,6 +271,7 @@ class TransferLibraries
                         'IsDelete'         => 0
                     ];
                     ExportDetail::Create($arr1);
+
 
                     $value1->update([
                         'Inventory' => 0,

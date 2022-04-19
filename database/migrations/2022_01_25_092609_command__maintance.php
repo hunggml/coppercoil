@@ -16,9 +16,9 @@ class CommandMaintance extends Migration
         Schema::create('Command_Maintance', function (Blueprint $table) {
             $table->id('ID');
             $table->bigInteger('Mold_ID')->nullable();
-            $table->integer('level')->nullable();
+            $table->integer('Level')->nullable();
             $table->integer('Status')->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->dateTime('Time_Maintance')->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();

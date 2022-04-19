@@ -18,8 +18,8 @@ class ForecastDetail extends Migration
             $table->bigInteger('FC_ID')->nullable();
             $table->bigInteger('Product_ID')->nullable();
             $table->float('Quantity')->nullable();
-            $table->string('Note',5000)->nullable();
-            $table->integer('Status')->nullable();
+            $table->string('Note',4000)->nullable();
+            $table->integer('Status')->default(0)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

@@ -15,8 +15,8 @@ class CommandImport extends Migration
     {
         Schema::create('Command_Import', function (Blueprint $table) {
             $table->id('ID');
-            $table->string('Name',5000)->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Name',4000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

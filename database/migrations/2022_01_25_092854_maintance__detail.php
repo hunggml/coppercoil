@@ -19,7 +19,7 @@ class MaintanceDetail extends Migration
             $table->bigInteger('Mold_ID')->nullable();
             $table->bigInteger('Accessories_ID')->nullable();
             $table->float('Quantity')->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

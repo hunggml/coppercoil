@@ -14,7 +14,7 @@ class Role extends Migration
     public function up()
     {
         Schema::create('role', function (Blueprint $table) {
-            $table->id('ID');
+            $table->id();
             $table->string('role');
             $table->string('description');
             $table->string('note',3000)->nullable();

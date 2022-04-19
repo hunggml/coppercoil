@@ -5,15 +5,9 @@ use Illuminate\Validation\Rule;
 use App\Models\WarehouseSystem\CommandImport;
 use App\Models\WarehouseSystem\ImportDetail;
 use Validator;
-use ExportLibraries;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Maatwebsite\Excel\Concerns\WithStyles;
 use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\MasterWarehouse;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class ImportLibraries
@@ -335,6 +329,19 @@ class ImportLibraries
                    ->where('IsDelete',0)
                    ->orderBy('ID','desc')
                    ->first();
+
+                   $check2 = ImportDetail::where('IsDelete',0)
+                   ->where('Box_ID',$value[0])
+                   ->where('Inventory','>',0)
+                   ->orderBy('ID','desc')
+                   ->first();
+
+                   if($check2)
+                   {
+                        $err1 = 'Box_ID '.($value[0]).' Đã Tồn Tại Trong Hệ Thống';
+                        array_push($err,$err1);
+                        return array_unique($err);
+                   }
                    
                    if($check)
                    {

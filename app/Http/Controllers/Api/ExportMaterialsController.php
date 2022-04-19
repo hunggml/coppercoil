@@ -17,6 +17,7 @@ use App\Mail\MailNotify;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Constraint\Count;
 
 class ExportMaterialsController extends Controller
 {
@@ -650,6 +651,7 @@ class ExportMaterialsController extends Controller
                 'Quantitative_Transfer' => Count($data3),
                 'Boxs_Exported'         => $data2,
             ];
+            
             array_push($arr, $obj);
         }
         if (count($arr) > 0) 
@@ -850,6 +852,19 @@ class ExportMaterialsController extends Controller
                                             'Inventory'     => 0,
                                             // 'User_Updated'  => Auth::user()->id
                                         ]); 
+
+                    $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status',1)->get();
+                    if($command->Go == $command->To)
+                    {
+                        if($command->Count == Count($Quantitative_Exported))
+                        {
+                            ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
+                            ->update([
+                                // 'User_Updated' => Auth::user()->id,
+                                'Status'       => 3
+                            ]);
+                        }
+                    }
                 }
                 else
                 {
@@ -1120,6 +1135,18 @@ class ExportMaterialsController extends Controller
                 ]);
                 $dem++;
             }
+        }
+        
+        $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status',1)->get();
+        $Quantitative_Transfer = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Transfer',1)->get();
+        
+        if(Count($Quantitative_Exported) == Count($Quantitative_Transfer))
+        {
+            ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
+                    ->update([
+                        // 'User_Updated' => Auth::user()->id,
+                        'Status'       => 3
+                    ]);
         }
         if ($dem  > 0) {
             return response()->json([

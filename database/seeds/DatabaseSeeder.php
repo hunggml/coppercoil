@@ -116,15 +116,328 @@ class DatabaseSeeder extends Seeder
         // DB::table('user_role')->truncate();
         // DB::table('users')->truncate();
         // // // User test 
-        // DB::table('users')->insert([
-        //     'name'       => 'Admin',
-        //     'username'   => 'admin',
-        //     'email'      => 'admin@gmail.com',
-        //     'password'   => bcrypt('sti@123'),
-        //     'avatar'     => 'user.png',
-        //     'level'      => 9999,
-        //     'created_at' => Carbon::now()->toDateTimeString(),
-        //     'updated_at' => Carbon::now()->toDateTimeString(),
-        // ]);
+        DB::table('users')->insert([
+            'name'       => 'Admin',
+            'username'   => 'admin',
+            'email'      => 'admin@gmail.com',
+            'password'   => bcrypt('sti@123'),
+            'avatar'     => 'user.png',
+            'level'      => 9999,
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ]);
+        DB::table('role')->insert(
+        [
+            'role'       => 'view_master',
+            'description'   => 'Xem master data',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_master',
+            'description'   => 'Thêm master data',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'update_master',
+            'description'   => 'Sửa master data',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_master',
+            'description'   => 'Xóa master data',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'import_master',
+            'description'   => 'Nhập file excel',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'export_master',
+            'description'   => 'Xuất file excel',
+            'software'      => 'All',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_import',
+            'description'   => 'Thêm Mới Lệnh Nhập Kho',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_command_export',
+            'description'   => 'Thêm Mới Lệnh Xuất Kho',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_command_export',
+            'description'   => 'Xóa Lệnh Xuất Kho',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_export',
+            'description'   => 'Thêm Mới Lệnh Xuất Kho Chi Tiết',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_export',
+            'description'   => 'Xóa Xuất Kho Chi Tiết',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_inventory',
+            'description'   => 'Thêm Mới Lênh Kiểm Kê',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_inventory',
+            'description'   => 'Xóa Lệnh Kiểm Kê',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'confirm_inventory',
+            'description'   => 'Xác Nhận Kiểm Kê',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_plan',
+            'description'   => 'Thêm Mới Kế Hoạch',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_plan',
+            'description'   => 'Xóa Kế Hoạch',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'import_plan',
+            'description'   => 'Nhập File Import Kế Hoạch',
+            'software'      => 'Warehouse',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_maintance',
+            'description'   => 'Thêm Mới Lệnh Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_maintance',
+            'description'   => 'Xóa lệnh bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'extend_maintance',
+            'description'   => 'Gia Hạn Bảo Dưỡng Khuôn',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'maintance',
+            'description'   => 'Tiến Hành Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'view_mold',
+            'description'   => 'Xem Danh Sách Khuôn',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'detail_maintance',
+            'description'   => 'Xem Chi Tiết Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'history_maintance',
+            'description'   => 'Xem Lịch Sử Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'view_command_maintance',
+            'description'   => 'Xem Lệnh Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+        DB::table('role')->insert([
+            'role'       => 'accept_maintance',
+            'description'   => 'Xác Nhận Bảo Dưỡng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'view_repair',
+            'description'   => 'Xem Lệnh Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_repair',
+            'description'   => 'Thêm Mới Lệnh Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'delete_repair',
+            'description'   => 'Xóa Lệnh Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'detail_repair',
+            'description'   => 'Xem Chi Tiết Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'repair',
+            'description'   => 'Tiến Hành Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'accept_repair',
+            'description'   => 'Xác Nhận Sửa Chữa',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'view_po_mold',
+            'description'   => 'Xem Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'create_po_mold',
+            'description'   => 'Thêm Mới Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+         DB::table('role')->insert( [
+            'role'       => 'accept_po_mold',
+            'description'   => 'Xác Nhận Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'order_po_mold',
+            'description'   => 'Đặt Hàng ',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'success_po_mold',
+            'description'   => 'Hoàn Thành Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+          DB::table('role')->insert([
+            'role'       => 'detail_po_mold',
+            'description'   => 'Chi Tiết Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
+        DB::table('role')->insert([
+            'role'       => 'delete_po_mold',
+            'description'   => 'Hủy Đơn Hàng',
+            'software'      => 'Maintance',
+            'time_created' => Carbon::now()->toDateTimeString(),
+            'time_updated' => Carbon::now()->toDateTimeString(),
+            'isdelete'=>0
+        ]);
     }
 }

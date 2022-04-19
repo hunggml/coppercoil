@@ -42,10 +42,10 @@
 				                    	<option value="">
 				                    		{{__('Choose')}} {{__('Type')}}
 				                    	</option>
-				                    	<option value=1 {{$unit->Type == 1 ? 'selected' : ''}}>
+				                    	<option value=1 {{$unit ? ($unit->Type == 1 ? 'selected' : '') : ''}}>
 				                    		{{__('Unit')}}
 				                    	</option>
-				                    	<option value=2 {{$unit->Type == 2 ? 'selected' : ''}}>
+				                    	<option value=2 {{$unit ? ($unit->Type == 2 ? 'selected' : '') : ''}}>
 				                    		{{__('Packing')}}
 				                    	</option>
 				                    </select>

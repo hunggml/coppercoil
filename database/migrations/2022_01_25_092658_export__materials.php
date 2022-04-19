@@ -22,7 +22,7 @@ class ExportMaterials extends Migration
             $table->tinyInteger('Type')->nullable();
             $table->integer('Status')->nullable();
             $table->bigInteger('To')->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

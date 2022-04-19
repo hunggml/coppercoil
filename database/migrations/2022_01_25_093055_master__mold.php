@@ -20,7 +20,8 @@ class MasterMold extends Migration
             $table->integer('Quantity_Report')->nullable();
             $table->integer('Quantity_limit')->nullable();
             $table->integer('Quantity_Stamping')->nullable();
-            $table->integer('Status')->nullable();
+            $table->integer('Status')->default(0)->nullable();
+            $table->float('Height_Use')->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

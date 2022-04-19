@@ -15,8 +15,8 @@ class Forecast extends Migration
     {
         Schema::create('Forecast', function (Blueprint $table) {
             $table->id('ID');
-            $table->string('Name',5000)->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Name',4000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->integer('Status')->nullable();
             $table->integer('Month')->nullable();
             $table->integer('Year')->nullable();

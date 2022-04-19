@@ -20,7 +20,7 @@ class CommandRepair extends Migration
             $table->string('Problem',3000)->nullable();
             $table->integer('Status')->nullable();
             $table->string('Type',3000)->nullable();
-            $table->integer('level')->nullable();
+            $table->integer('Level')->nullable();
             $table->string('Note',3000)->nullable();
             $table->bigInteger('User_Repair')->nullable();
             $table->dateTime('Time_Repair')->nullable();

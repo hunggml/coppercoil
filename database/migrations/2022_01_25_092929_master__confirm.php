@@ -18,7 +18,7 @@ class MasterConfirm extends Migration
             $table->integer('Step')->nullable();
             $table->integer('User_level')->nullable();
             $table->string('Group')->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

@@ -15,11 +15,9 @@ class CommandInventory extends Migration
     {
         Schema::create('Command_Inventory', function (Blueprint $table) {
             $table->id('ID');
-            $table->string('Name',5000)->nullable();
+            $table->string('Name',4000)->nullable();
             $table->integer('Status')->nullable();
-            $table->integer('Type')->nullable();
-            $table->string('Detail',5000)->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->bigInteger('User_Created')->nullable();
             $table->dateTime('Time_Created')->nullable();
             $table->bigInteger('User_Updated')->nullable();

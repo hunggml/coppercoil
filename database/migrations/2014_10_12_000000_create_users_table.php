@@ -20,6 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('api_token',3000)->nullable();
+            $table->string('software',3000)->nullable();
             $table->bigInteger('level')->default(0);
             $table->string('avatar')->default('user-default.png');
             $table->boolean('IsDelete')->default(0);

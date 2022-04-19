@@ -16,14 +16,14 @@ class ExportDetail extends Migration
         Schema::create('Export_Detail', function (Blueprint $table) {
             $table->id('ID');
             $table->bigInteger('Export_ID')->nullable();
-            $table->string('Pallet_ID',5000)->nullable();
-            $table->string('Box_ID',5000)->nullable();
+            $table->string('Pallet_ID',4000)->nullable();
+            $table->string('Box_ID',4000)->nullable();
             $table->bigInteger('Materials_ID')->nullable();
             $table->bigInteger('Warehouse_Detail_ID')->nullable();
             $table->float('Quantity')->nullable();
             $table->integer('Status')->nullable();
             $table->integer('Type')->nullable();
-            $table->string('Note',5000)->nullable();
+            $table->string('Note',4000)->nullable();
             $table->integer('STT')->nullable();
             $table->dateTime('Time_Export')->nullable();
             $table->bigInteger('User_Created')->nullable();

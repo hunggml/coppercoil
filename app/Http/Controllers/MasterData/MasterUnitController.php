@@ -29,6 +29,7 @@ class MasterUnitController extends Controller
     {
     	$unit 	= $this->unit->get_all_list_unit();
     	$units 	= $unit;
+		// dd($unit);
     	return view('master_data.unit.index', 
     	[
 			'unit'  => $unit,
@@ -64,7 +65,7 @@ class MasterUnitController extends Controller
     public function show(Request $request)
     {
     	$unit = $this->unit->filter($request);
-    	
+    	// dd($unit->first());
     	if (!$request->ID) 
     	{
     		$unit = collect([]);
@@ -80,6 +81,7 @@ class MasterUnitController extends Controller
 
     public function add_or_update(Request $request)
     {
+		// dd($request);
 		$check = $this->unit->check_unit($request);
 		$data  = $this->unit->add_or_update($request);
     	

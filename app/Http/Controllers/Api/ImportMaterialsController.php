@@ -13,6 +13,7 @@ use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\WarehouseSystem\ExportDetail;
 use App\Models\WarehouseSystem\TransferMaterials;
 use App\Models\MasterData\MasterWarehouseDetail;
+use App\Models\MasterData\MasterWarehouse;
 use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\GroupMaterials;
 use Illuminate\Support\Facades\Auth;
