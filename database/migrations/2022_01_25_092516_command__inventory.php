@@ -23,6 +23,8 @@ class CommandInventory extends Migration
             $table->bigInteger('User_Updated')->nullable();
             $table->dateTime('Time_Updated')->nullable();
             $table->boolean('IsDelete')->default(0);
+            $table->integer('Type')->nullable();
+            $table->string('Detail',4000)->nullable();
         });
     }
 
