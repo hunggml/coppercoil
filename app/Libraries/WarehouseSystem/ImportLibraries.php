@@ -59,6 +59,7 @@ class ImportLibraries
     }
     public function detail($request)
     {
+        // dd('run');
         $materials = $request->Materials_ID;
         $Pallet = $request->Pallet_ID;
         $data =  ImportDetail::where('IsDelete',0)
@@ -71,6 +72,7 @@ class ImportLibraries
 			return $query->where('Pallet_ID', $Pallet);
 		})
         ->where('Command_ID',$request->ID)
+        // ->paginate(10);
         ->get();
         // dd($data);
 
@@ -121,11 +123,11 @@ class ImportLibraries
     }
     public function detail_all_list($request)
     {
-        $ware = $request->warehouse;
-        $location = $request->location;
-        $materials = $request->Materials_ID;
-        $Pallet = $request->Pallet_ID;
-        $warehouse = MasterWarehouse::where('IsDelete',0)
+        $ware       = $request->warehouse;
+        $location   = $request->location;
+        $materials  = $request->Materials_ID;
+        $Pallet     = $request->Pallet_ID;
+        $warehouse  = MasterWarehouse::where('IsDelete',0)
         ->when($ware, function($query, $ware)
 		{
 			return $query->where('ID', $ware);
@@ -244,9 +246,10 @@ class ImportLibraries
     }
     public function get_list($request)
     {
-       
+        // dd($run);
         $data =  ImportDetail::where('IsDelete',0)
         ->where('Pallet_ID',$request->Pallet_ID)
+        // ->where('Command_ID',$request->Command_ID)
         // ->where('Inventory','>',0)
         ->where('Type',0)
         ->where('Status','!=',2)
@@ -298,12 +301,13 @@ class ImportLibraries
         $data = $this->read_file($request);
         $im = [];
         $err = [];
+        // dd(collect($data));
         foreach($data as $key => $value)
         {
             if($key>3)
             {
-            //    dd($value);
-               $mater = MasterMaterials::where('Wire_Type',$value[6])->where('Spec',trim($value[5]))->first();
+                $mater = MasterMaterials::where('Wire_Type',$value[6])->where('Spec',trim($value[5]))->first();
+                // dd($mater);
                if($mater)
                {
                    
@@ -332,15 +336,39 @@ class ImportLibraries
 
                    $check2 = ImportDetail::where('IsDelete',0)
                    ->where('Box_ID',$value[0])
-                   ->where('Inventory','>',0)
+                //    ->where('Inventory','>',0)
+                   ->where('Status','<>',2)
+                   ->orderBy('ID','desc')
+                   ->first();
+
+                   $check3 = ImportDetail::where('IsDelete',0)
+                   ->where('Pallet_ID',$value[3])
+                //    ->where('Inventory','>',0)
+                    ->where('Status','<>',2)
                    ->orderBy('ID','desc')
                    ->first();
 
                    if($check2)
                    {
+                       if($check2->Inventory > 0)
+                       {
                         $err1 = 'Box_ID '.($value[0]).' Đã Tồn Tại Trong Hệ Thống';
                         array_push($err,$err1);
                         return array_unique($err);
+                       }
+                       else if($check2->Inventory == 0)
+                       {
+                        $err1 = 'Box_ID '.($value[0]).' Đã Tồn Tại Trong Hệ Thống';
+                        array_push($err,$err1);
+                        return array_unique($err);
+                       }
+                   }
+
+                   if($check3)
+                   {
+                    $err1 = 'Pallet '.($value[3]).' Đã Tồn Tại Trong Hệ Thống';
+                    array_push($err,$err1);
+                    return array_unique($err);
                    }
                    
                    if($check)
@@ -351,14 +379,9 @@ class ImportLibraries
                         }
                         else
                         {
-                            if($check->Status == 0)
+                            if($check->Status != 0)
                             {
-                                ImportDetail::where('ID',$check->ID)->update(['Status'=>2]);
-                                array_push($im , $arr);
-                            }
-                            else
-                            {
-                                $err1 = 'Pallet '.$value[3].' Đã Được Nhập Kho';
+                               $err1 = 'Pallet '.$value[3].' Đã Được Nhập Kho';
                                 array_push($err,$err1);
                             }
                         }
@@ -382,6 +405,8 @@ class ImportLibraries
         ->where('Time_Created','<=',Carbon::now()->endOfDay()->toDateTimeString())
         ->count();
         // dd(array_unique($err));
+        // dd($im);
+
         if(count($im) > 0)
         {
             $cm = CommandImport::Create([
@@ -392,10 +417,22 @@ class ImportLibraries
                 'IsDelete'         => 0
             ]);
         }
+        $im = collect($im);
         foreach($im as $value)
         {
-            $value['Command_ID'] = $cm->ID;
-            ImportDetail::create($value);
+            $check2 = ImportDetail::where('IsDelete',0)
+                   ->where('Box_ID',$value['Box_ID'])
+                //    ->where('Status','<>',2)
+                   ->orderBy('ID','desc')
+                   ->first();
+            // dd($check2);
+            if(is_null($check2) || $check2->Status  == 2)
+            {
+                // dd('1'); 
+                $value['Command_ID'] = $cm->ID;
+                ImportDetail::create($value);
+            }
+
         }
        return array_unique($err);
     }   

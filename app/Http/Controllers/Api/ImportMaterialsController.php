@@ -26,6 +26,7 @@ class ImportMaterialsController extends Controller
 	{
 		$command_import = ImportDetail::where('IsDelete', 0)
 									->where('Pallet_ID', $request->Pallet_ID)
+									// ->where('Command_ID',$request->Command_ID)
 									->where('Status', 0)
 									->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
 									->get();

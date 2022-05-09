@@ -93,7 +93,7 @@
           </form>
           @include('basic.alert')
         </br>
-        <table class="table table-striped table-hover"  width="100%" id ="tableUnit">
+        <table class="table table-striped table-hover"  width="100%">
           <thead>
             <th>{{__('ID')}}</th>
             <th>{{__('Symbols')}} {{ __('Materials') }}</th>
@@ -158,6 +158,7 @@
             @endforeach
           </tbody>
         </table>
+        {{-- {{$data->links()}} --}}
 
       </div>
     </div>
@@ -359,6 +360,7 @@
         url: "{{route('warehousesystem.import.get_list')}}",
         data: { 
           Pallet_ID:b[3],
+          Command_ID : b[1],
         },
         success: function(data) 
         {
