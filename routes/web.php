@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -115,7 +115,7 @@ Route::group(['middleware' => 'language'], function()
 			// ->middleware(['role:create_master', 'role:update_master']);
 			Route::post('/add-or-update-type', 'MasterData\MasterWarehouseController@add_or_update_type')->name('masterData.warehouses.addOrUpdateType')->middleware(['role:create_master', 'role:update_master']);
 			Route::get('/destroy', 'MasterData\MasterWarehouseController@destroy')->name('masterData.warehouses.destroy')->middleware('role:delete_master');
-			Route::get('/filter-detail1', 'MasterData\MasterWarehouseController@filter_detail1')->name('masterData.warehouses.filterDetail1');\
+			Route::get('/filter-detail1', 'MasterData\MasterWarehouseController@filter_detail1')->name('masterData.warehouses.filterDetail1');
 			
 			Route::get('/filter_warehouse', 'MasterData\MasterWarehouseController@filter_warehouse')->name('masterData.warehouses.filter_warehouse');
 			Route::get('/get_list_materials_in_warehouse', 'MasterData\MasterWarehouseController@get_list_materials_in_warehouse')->name('masterData.warehouses.get_list_materials_in_warehouse');

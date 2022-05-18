@@ -22,7 +22,7 @@ class CheckInforController
             // thông tin pallet
             $data =  ImportDetail::where('IsDelete', 0)
                                 ->where('Pallet_ID', $request->Pallet_ID)
-                                ->where('Inventory', '>', 0)
+                                ->where('Inventory', '>', 0) // còn tồn kho
                                 ->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
                                 ->get();
             if (count($data) > 0) {
@@ -60,11 +60,11 @@ class CheckInforController
                 if ($label_3 != '') {
                     $data1 = ImportDetail::where('IsDelete', 0)
                                         ->where('Box_ID', $label_3)
-                                        ->where('Status', '>',0)
+                                        ->where('Status', '>',0) // đã nhập kho
                                         ->orderBy('ID', 'desc')
                                         ->first();
                     if ($data1) {
-                        if ($data1->Inventory > 0) {
+                        if ($data1->Inventory > 0) { //còn tồn kho
                             return response()->json([
                                 'success' => true,
                                 'data'      => [

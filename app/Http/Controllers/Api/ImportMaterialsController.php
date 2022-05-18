@@ -26,7 +26,6 @@ class ImportMaterialsController extends Controller
 	{
 		$command_import = ImportDetail::where('IsDelete', 0)
 									->where('Pallet_ID', $request->Pallet_ID)
-									// ->where('Command_ID',$request->Command_ID)
 									->where('Status', 0)
 									->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
 									->get();
@@ -34,7 +33,7 @@ class ImportMaterialsController extends Controller
 		if ($command_import->count() == 0) {
 			return response()->json([
 				'success' 	=> false,
-				'data' 		=> ['message' => __('Pallet_ID') . ' ' . __('In the completed / canceled import command')]
+				'data' 		=> ['message' => __('Pallet_ID') . ' ' . __('In the completed or canceled import command')]
 			],400);
 		}
 		else 
@@ -73,7 +72,7 @@ class ImportMaterialsController extends Controller
 
 		$data = ImportDetail::where('IsDelete', 0)
 							->where('Pallet_ID', $request->Pallet_ID)
-							->where('Status', 0)
+							->where('Status', 0) // 0 là chưa nhập kho
 							->with('materials')
 							->get();
 
@@ -84,7 +83,7 @@ class ImportMaterialsController extends Controller
         $warehouse = MasterWarehouse::where('IsDelete', 0)
 							        ->where('ID', $location->Warehouse_ID)
 							        ->first();
-
+	
 		if (!$location) {
 			return response()->json([
 				'success' 	=> false,
@@ -98,14 +97,31 @@ class ImportMaterialsController extends Controller
 						        	->where('ID', $value->materials->ID)
 									->first();
 
-				$groupMat = GroupMaterials::where('IsDelete',0)
+				$groupMat_warehouse = GroupMaterials::where('IsDelete',0)
 									->where('Group_ID',$warehouse->Group_Materials_ID)
 									->where('Materials_ID',$mat->ID)
 									->first();
 
-				if ($mat) 
+				$groupMat_location = GroupMaterials::where('IsDelete',0)
+									->where('Group_ID',$location->Group_Materials_ID)
+									->where('Materials_ID',$mat->ID)
+									->first();
+	
+				if(!is_null($warehouse->Group_Materials_ID))
 				{
-					if (count($mat->group) == 0 || !$groupMat) {
+					if (!$groupMat_warehouse) 
+					{
+						return response()->json([
+							'success' 	=> false,
+							'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
+						],400);
+					}
+				}
+
+				if(!is_null($location->Group_Materials_ID))
+				{
+					if(!$groupMat_location)
+					{
 						return response()->json([
 							'success' 	=> false,
 							'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
@@ -120,7 +136,7 @@ class ImportMaterialsController extends Controller
 					'Inventory'       		=> $value->Quantity,
 					'Time_Import'      		=> Carbon::now(),
 					'Warehouse_Detail_ID'   => $location->ID,
-					'Status'          		=> 1
+					'Status'          		=> 1 // đã nhập kho
 				]);
 			}
 
@@ -154,7 +170,7 @@ class ImportMaterialsController extends Controller
 				if($label_3 != '')
 				{
 					$data1 = ImportDetail::where('IsDelete',0)
-										->where('Inventory','>',0)
+										->where('Inventory','>',0) // tồn kho
 										->where('Box_ID',$label_3)
 										->orderBy('ID','desc')
 										->first();
@@ -200,7 +216,7 @@ class ImportMaterialsController extends Controller
 		{
 			$data =  ImportDetail::where('IsDelete', 0)
 								->where('Pallet_ID', $request->Pallet_ID)
-								->where('Inventory', '>', 0)
+								->where('Inventory', '>', 0) // lớn hơn 0 là tồn kho
 								->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
 								->get();
 
@@ -261,9 +277,25 @@ class ImportMaterialsController extends Controller
 
 			$data =  ImportDetail::where('IsDelete', 0)
 								->where('Box_ID', $request->Box_ID)
-								->where('Inventory', '>', 0)
+								->where('Inventory', '>', 0) // tồn kho
 								->orderBy('ID', 'desc')
 								->first();
+
+			$groupMat_location = GroupMaterials::where('IsDelete',0)
+												->where('Group_ID',$location->Group_Materials_ID)
+												->where('Materials_ID',$data->Materials_ID)
+												->first();
+
+			if(!is_null($location->Group_Materials_ID))
+			{
+				if(!$groupMat_location)
+				{
+					return response()->json([
+						'success' 	=> false,
+						'data' 		=> ['message' => __('Materials') . ' ' . $data->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
+					],400);
+				}
+			}
 
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
 												->where('ID', $data->Warehouse_Detail_ID)
@@ -283,8 +315,8 @@ class ImportMaterialsController extends Controller
 				'Materials_ID' 			=> $data->Materials_ID,
 				'Warehouse_Detail_ID' 	=> $data->Warehouse_Detail_ID,
 				'Quantity'  			=> $data->Quantity,
-				'Status'    			=> 1,
-				'Type'      			=> 2,
+				'Status'    			=> 1, // xuất
+				'Type'      			=> 2, // xuất cập nhật vị trí
 				'Time_Export' 			=> Carbon::now(),
 				// 'User_Created'     		=> Auth::user()->id,
 				// 'User_Updated'     		=> Auth::user()->id,
@@ -293,7 +325,7 @@ class ImportMaterialsController extends Controller
 			ExportDetail::Create($arr1);
 
 			$data->update([
-				'Inventory' => 0,
+				'Inventory' => 0, // không tồn kho
 				// 'User_Updated' => Auth::user()->id
 			]);
 
@@ -307,8 +339,8 @@ class ImportMaterialsController extends Controller
 				'Quantity'            => $data->Quantity,
 				'Inventory'           => $data->Quantity,
 				'Warehouse_Detail_ID' => $location->ID,
-				'Status'              => 1,
-				'Type'                => 3,
+				'Status'              => 1, // đã nhập kho
+				'Type'                => 3, // nhập cập nhật vị trí
 				// 'User_Created'        => Auth::user()->id,
 				// 'User_Updated'        => Auth::user()->id,
 				'IsDelete'            => 0
@@ -324,7 +356,7 @@ class ImportMaterialsController extends Controller
 				'Warehouse_Detail_ID_Go' 	=> $data->Warehouse_Detail_ID,
 				'Warehouse_Detail_ID_To' 	=> $location->ID,
 				'Quantity' 					=> $data->Quantity,
-				'Status' 					=> 2,
+				'Status' 					=> 2, // chuyển kho cho cập nhật vị trí
 				// 'User_Created'     			=> Auth::user()->id,
 				// 'User_Updated'     			=> Auth::user()->id,
 				'IsDelete'         			=> 0
@@ -349,13 +381,14 @@ class ImportMaterialsController extends Controller
 
 			$data =  ImportDetail::where('IsDelete', 0)
 								->where('Pallet_ID', $request->Pallet_ID)
-								->where('Inventory', '>', 0)
+								->where('Inventory', '>', 0) // tồn kho
 								->get();
 				
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
 												->where('ID', $data[0]->Warehouse_Detail_ID)
 												->first();
 
+			// từ chi tiết vị trí -> lấy được kho -> so sánh type của kho ( cùng type là cùng kho)
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
@@ -365,6 +398,22 @@ class ImportMaterialsController extends Controller
 
 			foreach ($data as $value1) 
 			{
+				$groupMat_location = GroupMaterials::where('IsDelete',0)
+												->where('Group_ID',$location->Group_Materials_ID)
+												->where('Materials_ID',$value1->Materials_ID)
+												->first();
+			
+				if(!is_null($location->Group_Materials_ID))
+				{
+					if(!$groupMat_location)
+					{
+						return response()->json([
+							'success' 	=> false,
+							'data' 		=> ['message' => __('Materials') . ' ' . $value1->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
+						],400);
+					}
+				}
+
 				$arr1 = [
 					'Export_ID' 			=> '',
 					'Box_ID'    			=> $value1->Box_ID,
@@ -372,8 +421,8 @@ class ImportMaterialsController extends Controller
 					'Materials_ID' 			=> $value1->Materials_ID,
 					'Warehouse_Detail_ID' 	=> $value1->Warehouse_Detail_ID,
 					'Quantity'  			=> $value1->Quantity,
-					'Status'    			=> 1,
-					'Type'      			=> 2,
+					'Status'    			=> 1, // đã xuất
+					'Type'      			=> 2, // xuất cập nhật vị trí
 					'Time_Export' 			=> Carbon::now(),
 					// 'User_Created'    		=> Auth::user()->id,
 					// 'User_Updated'     		=> Auth::user()->id,
@@ -382,7 +431,7 @@ class ImportMaterialsController extends Controller
 				ExportDetail::Create($arr1);
 
 				$value1->update([
-					'Inventory' => 0,
+					'Inventory' => 0, // không tồn kho
 					// 'User_Updated' => Auth::user()->id,
 				]);
 
@@ -396,8 +445,8 @@ class ImportMaterialsController extends Controller
 					'Quantity'            => $value1->Quantity,
 					'Inventory'           => $value1->Quantity,
 					'Warehouse_Detail_ID' => $location->ID,
-					'Status'              => 1,
-					'Type'                => 3,
+					'Status'              => 1, // đã nhập kho
+					'Type'                => 3, // nhập cập nhật vị trí
 					// 'User_Created'        => Auth::user()->id,
 					// 'User_Updated'        => Auth::user()->id,
 					'IsDelete'            => 0
@@ -413,7 +462,7 @@ class ImportMaterialsController extends Controller
 					'Warehouse_Detail_ID_Go' 	=> $value1->Warehouse_Detail_ID,
 					'Warehouse_Detail_ID_To' 	=> $location->ID,
 					'Quantity' 					=> $value1->Quantity,
-					'Status' 					=> 2,
+					'Status' 					=> 2, // chuyển cho cho cập nhật
 					// 'User_Created'     			=> Auth::user()->id,
 					// 'User_Updated'     			=> Auth::user()->id,
 					'IsDelete'        			=> 0
@@ -527,13 +576,13 @@ class ImportMaterialsController extends Controller
 			// dd('1');
 			$data =  ImportDetail::where('IsDelete',0)
 			->where('Box_ID',$val['Box_ID'])
-			->where('Status','>',0)
+			->where('Status','>',0) // đã nhập kho
 			->orderBy('ID','desc')
 			->first();
 			// return response()->json($data);
 			if ($data)
 			{
-				if ($data->Inventory != 0) 
+				if ($data->Inventory != 0) // còn tồn
 				{
 					return response()->json([
 							'success' => false,
@@ -555,8 +604,8 @@ class ImportMaterialsController extends Controller
 			
 			$data =  ImportDetail::where('IsDelete',0)
 								->where('Box_ID',$value['Box_ID'])
-								->where('Status','>',0)
-								->where('Inventory',0)
+								->where('Status','>',0) // đã nhập kho
+								->where('Inventory',0) // không còn tồn
 								->orderBy('ID','desc')
 								->first();
 
@@ -564,6 +613,7 @@ class ImportMaterialsController extends Controller
 												->where('ID', $data->Warehouse_Detail_ID)
 												->first();
 
+			// từ chi tiết vị trí -> lấy được kho -> so sánh type của kho ( cùng type là cùng kho)
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
@@ -580,8 +630,8 @@ class ImportMaterialsController extends Controller
 				'Quantity'         => $value['Quantity'],
 				'Inventory'        => $value['Quantity'],
 				'Warehouse_Detail_ID' => $location->ID,
-				'Status'           => 1,
-				'Type'             => 1,
+				'Status'           => 1, // đã nhập kho
+				'Type'             => 1, // nhập lại
 				'Time_Created'	   => now(),
 				'Time_Updated'	   => now(),
 				// 'User_Created'     => Auth::user()->id,

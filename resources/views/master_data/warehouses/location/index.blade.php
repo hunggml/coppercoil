@@ -194,6 +194,7 @@
                         {
                             label.Pallet_ID = ''
                         }
+                        // console.log(label.materials) 
                         a = a+`<tr class="cill">
                             <td>`+label.materials.Symbols+`</td>
                             <td>`+parseFloat(label.Inventory)+`</td>
