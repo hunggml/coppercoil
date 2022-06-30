@@ -8,35 +8,16 @@ use DateTimeInterface;
 class MasterWarehouse extends Model
 {
   const CREATED_AT      = 'Time_Created';
-	const UPDATED_AT      = 'Time_Updated';
-	
-	protected $table      = 'Master_Warehouse';
-	protected $primaryKey = 'ID';
+  const UPDATED_AT      = 'Time_Updated';
+
+  protected $table      = 'Master_Warehouse';
+  protected $primaryKey = 'ID';
   protected function serializeDate(DateTimeInterface $date)
   {
     return $date->format('Y-m-d H:i:s');
   }
-	protected $fillable   = [
-  	'Name'
-  	,'Symbols'
-  	,'Quantity_Rows'
-  	,'Quantity_Columns'
-  	,'MAC'
-  	,'Quantity_Unit'
-  	,'Unit_ID'
-  	,'Quantity_Packing'
-  	,'Packing_ID'
-   	,'Group_Materials_ID'
-    ,'Floor'
-  	,'Note'
-    ,'Accept'
-    ,'Email'
-    ,'Email2'
-  	,'Time_Created'
-  	,'User_Created'
-  	,'Time_Updated'
-  	,'User_Updated'
-  	,'IsDelete'
+  protected $fillable   = [
+    'Name', 'Symbols', 'Quantity_Rows', 'Quantity_Columns', 'MAC', 'Quantity_Unit', 'Unit_ID', 'Quantity_Packing', 'Packing_ID', 'Group_Materials_ID', 'Floor', 'Note', 'Accept', 'Email', 'Email2', 'Time_Created', 'User_Created', 'Time_Updated', 'User_Updated', 'IsDelete'
   ];
 
   public function user_created()
