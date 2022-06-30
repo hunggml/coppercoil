@@ -25,19 +25,17 @@ class ImportMaterialsController extends Controller
 	public function get_data_input_pallet(Request $request)
 	{
 		$command_import = ImportDetail::where('IsDelete', 0)
-									->where('Pallet_ID', $request->Pallet_ID)
-									->where('Status', 0)
-									->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
-									->get();
+			->where('Pallet_ID', $request->Pallet_ID)
+			->where('Status', 0)
+			->select('ID', 'Quantity', 'Materials_ID', 'Pallet_ID', 'Warehouse_Detail_ID', 'Box_ID')
+			->get();
 
 		if ($command_import->count() == 0) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Pallet_ID') . ' ' . __('In the completed or canceled import command')]
-			],400);
-		}
-		else 
-		{
+			], 400);
+		} else {
 			$val = [];
 			$val['Pallet_ID'] 		= $command_import[0]->Pallet_ID;
 			$val['Materials'] 		= $command_import[0]->materials ? $command_import[0]->materials->Symbols : '';
@@ -49,133 +47,122 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => true,
 				'data' => $val
-			],200);
+			], 200);
 		}
 	}
 
 	public function import_packing_list(Request $request)
 	{
-		if (empty($request->Pallet_ID)) 
-		{
+		if (empty($request->Pallet_ID)) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Dont Scan') . ' ' . __("Pallet")]
-			],400);
+			], 400);
 		}
 
 		if (empty($request->Warehouse_Detail_ID)) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Location') . ' ' . __("Can't be empty")]
-			],400);
+			], 400);
 		}
 
 		$data = ImportDetail::where('IsDelete', 0)
-							->where('Pallet_ID', $request->Pallet_ID)
-							->where('Status', 0) // 0 là chưa nhập kho
-							->with('materials')
-							->get();
+			->where('Pallet_ID', $request->Pallet_ID)
+			->where('Status', 0) // 0 là chưa nhập kho
+			->with('materials')
+			->get();
 
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
-										->where('Symbols', $request->Warehouse_Detail_ID)
-										->first();
+			->where('Symbols', $request->Warehouse_Detail_ID)
+			->first();
 
-        $warehouse = MasterWarehouse::where('IsDelete', 0)
-							        ->where('ID', $location->Warehouse_ID)
-							        ->first();
-	
+		$warehouse = MasterWarehouse::where('IsDelete', 0)
+			->where('ID', $location->Warehouse_ID)
+			->first();
+
 		if (!$location) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Location') . ' ' . __('Does Not Exist')]
-			],400);
+			], 400);
 		}
 
 		if (count($data) > 0) {
 			foreach ($data as $value) {
 				$mat = MasterMaterials::where('IsDelete', 0)
-						        	->where('ID', $value->materials->ID)
-									->first();
+					->where('ID', $value->materials->ID)
+					->first();
 
-				$groupMat_warehouse = GroupMaterials::where('IsDelete',0)
-									->where('Group_ID',$warehouse->Group_Materials_ID)
-									->where('Materials_ID',$mat->ID)
-									->first();
+				$groupMat_warehouse = GroupMaterials::where('IsDelete', 0)
+					->where('Group_ID', $warehouse->Group_Materials_ID)
+					->where('Materials_ID', $mat->ID)
+					->first();
 
-				$groupMat_location = GroupMaterials::where('IsDelete',0)
-									->where('Group_ID',$location->Group_Materials_ID)
-									->where('Materials_ID',$mat->ID)
-									->first();
-	
-				if(!is_null($warehouse->Group_Materials_ID))
-				{
-					if (!$groupMat_warehouse) 
-					{
+				$groupMat_location = GroupMaterials::where('IsDelete', 0)
+					->where('Group_ID', $location->Group_Materials_ID)
+					->where('Materials_ID', $mat->ID)
+					->first();
+
+				if (!is_null($warehouse->Group_Materials_ID)) {
+					if (!$groupMat_warehouse) {
 						return response()->json([
 							'success' 	=> false,
 							'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
-						],400);
+						], 400);
 					}
 				}
 
-				if(!is_null($location->Group_Materials_ID))
-				{
-					if(!$groupMat_location)
-					{
+				if (!is_null($location->Group_Materials_ID)) {
+					if (!$groupMat_location) {
 						return response()->json([
 							'success' 	=> false,
 							'data' 		=> ['message' => __('Materials') . ' ' . $value->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
-						],400);
+						], 400);
 					}
 				}
 
 				$data =  ImportDetail::where('IsDelete', 0)
-				->where('ID', $value->ID)
-				->update([
-					// 'User_Updated'     => Auth::user()->id,
-					'Inventory'       		=> $value->Quantity,
-					'Time_Import'      		=> Carbon::now(),
-					'Warehouse_Detail_ID'   => $location->ID,
-					'Status'          		=> 1 // đã nhập kho
-				]);
+					->where('ID', $value->ID)
+					->update([
+						// 'User_Updated'     => Auth::user()->id,
+						'Inventory'       		=> $value->Quantity,
+						'Time_Import'      		=> Carbon::now(),
+						'Warehouse_Detail_ID'   => $location->ID,
+						'Status'          		=> 1 // đã nhập kho
+					]);
 			}
 
 			return response()->json([
 				'success' => true,
 				'data' => ['message' => __('Import') . ' ' . __('Warehouse') . ' ' . __('Success')]
-			],200);
-		} 
-		else 
-		{
+			], 200);
+		} else {
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Import') . ' ' . __('Warehouse') . ' ' . __('Fail')]
-			],400);
+			], 400);
 		}
 	}
 
 	public function get_data_update_location(Request $request)
 	{
 		// box
-		if ($request->Type == 1) 
-		{
+		if ($request->Type == 1) {
 			$label = $request->Box_ID;
-			$arr_label = explode('[1D]',$label);
-			if(count($arr_label) >12)
-			{
+			$arr_label = explode('[1D]', $label);
+			if (count($arr_label) > 12) {
 				$label_1 = $arr_label[12];
-				$label_2 = str_replace('Z','',$label_1);
-				$label_3 = str_replace('[1E][04]','',$label_2);
+				$label_2 = str_replace('Z', '', $label_1);
+				$label_3 = str_replace('[1E][04]', '', $label_2);
 
-				if($label_3 != '')
-				{
-					$data1 = ImportDetail::where('IsDelete',0)
-										->where('Inventory','>',0) // tồn kho
-										->where('Box_ID',$label_3)
-										->orderBy('ID','desc')
-										->first();
-					if($data1)
-					{
+				if ($label_3 != '') {
+					$data1 = ImportDetail::where('IsDelete', 0)
+						->where('Inventory', '>', 0) // tồn kho
+						->where('Box_ID', $label_3)
+						->orderBy('ID', 'desc')
+						->first();
+					if ($data1) {
 						return response()->json([
 							'success' => true,
 							'data'	  => [
@@ -185,43 +172,35 @@ class ImportMaterialsController extends Controller
 								'Spec'		=> $data1->materials ? $data1->materials->Spec : '',
 								'Location'	=> $data1->location ? $data1->location->Symbols : '',
 							]
-						],200);
-					}
-					else
-					{
+						], 200);
+					} else {
 						return response()->json([
 							'success' => false,
-							'data'	  => ['message' => __('Box').' '.__('Dont').' '.__('Stock')]
-						],400);
+							'data'	  => ['message' => __('Box') . ' ' . __('Dont') . ' ' . __('Stock')]
+						], 400);
 					}
-				}
-				else
-				{
+				} else {
 					return response()->json([
 						'success' => false,
-						'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-					],400);
+						'data'	  => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+					], 400);
 				}
-			}
-			else
-			{
+			} else {
 				return response()->json([
 					'success' => false,
-					'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-				],400);
+					'data'	  => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+				], 400);
 			}
 		}
 		// pallet
-		else if ($request->Type == 2)
-		{
+		else if ($request->Type == 2) {
 			$data =  ImportDetail::where('IsDelete', 0)
-								->where('Pallet_ID', $request->Pallet_ID)
-								->where('Inventory', '>', 0) // lớn hơn 0 là tồn kho
-								->select('ID','Quantity','Materials_ID','Pallet_ID','Warehouse_Detail_ID','Box_ID')
-								->get();
+				->where('Pallet_ID', $request->Pallet_ID)
+				->where('Inventory', '>', 0) // lớn hơn 0 là tồn kho
+				->select('ID', 'Quantity', 'Materials_ID', 'Pallet_ID', 'Warehouse_Detail_ID', 'Box_ID')
+				->get();
 
-			if (count($data) > 0) 
-			{
+			if (count($data) > 0) {
 				$val = [];
 				$val['Pallet_ID'] 	= $data[0]->Pallet_ID;
 				$val['Spec'] 		= $data[0]->materials ? $data[0]->materials->Spec : '';
@@ -234,14 +213,12 @@ class ImportMaterialsController extends Controller
 				return response()->json([
 					'success' 	=> true,
 					'data' 		=> $val
-				],200);
-			} 
-			else 
-			{
+				], 200);
+			} else {
 				return response()->json([
 					'success' 	=> false,
 					'data' 		=> ['message' => __('Pallet') . ' ' . __("Don't") . ' ' . __('Stock')]
-				],400);
+				], 400);
 			}
 		}
 	}
@@ -252,60 +229,57 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __("Can't be empty")]
-			],400);
+			], 400);
 		}
 
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
-										->where('Symbols', $request->Warehouse_Detail_ID)
-										->first();
+			->where('Symbols', $request->Warehouse_Detail_ID)
+			->first();
 
 		if (!$location) {
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
-			],400);
+			], 400);
 		}
 		// box
-		if ($request->Type == 1)
-		{
+		if ($request->Type == 1) {
 			if (empty($request->Box_ID)) {
 				return response()->json([
 					'success' => false,
 					'data' => ['message' => __('Dont Scan') . ' ' . __("Box")]
-				],400);
+				], 400);
 			}
 
 			$data =  ImportDetail::where('IsDelete', 0)
-								->where('Box_ID', $request->Box_ID)
-								->where('Inventory', '>', 0) // tồn kho
-								->orderBy('ID', 'desc')
-								->first();
+				->where('Box_ID', $request->Box_ID)
+				->where('Inventory', '>', 0) // tồn kho
+				->orderBy('ID', 'desc')
+				->first();
 
-			$groupMat_location = GroupMaterials::where('IsDelete',0)
-												->where('Group_ID',$location->Group_Materials_ID)
-												->where('Materials_ID',$data->Materials_ID)
-												->first();
+			$groupMat_location = GroupMaterials::where('IsDelete', 0)
+				->where('Group_ID', $location->Group_Materials_ID)
+				->where('Materials_ID', $data->Materials_ID)
+				->first();
 
-			if(!is_null($location->Group_Materials_ID))
-			{
-				if(!$groupMat_location)
-				{
+			if (!is_null($location->Group_Materials_ID)) {
+				if (!$groupMat_location) {
 					return response()->json([
 						'success' 	=> false,
 						'data' 		=> ['message' => __('Materials') . ' ' . $data->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
-					],400);
+					], 400);
 				}
 			}
 
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
-												->where('ID', $data->Warehouse_Detail_ID)
-												->first();
+				->where('ID', $data->Warehouse_Detail_ID)
+				->first();
 
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
 					'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
-				],400);
+				], 400);
 			}
 
 			$arr1 = [
@@ -367,50 +341,46 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => true,
 				'data' => ['message' => __('Update') . ' ' . __('Location') . ' ' . __('Success')]
-			],200);
-		} 
+			], 200);
+		}
 		// pallet
-		else if ($request->Type == 2) 
-		{
+		else if ($request->Type == 2) {
 			if (empty($request->Pallet_ID)) {
 				return response()->json([
 					'success' => false,
 					'data' => ['message' => __('Dont Scan') . ' ' . __("Pallet")]
-				],400);
+				], 400);
 			}
 
 			$data =  ImportDetail::where('IsDelete', 0)
-								->where('Pallet_ID', $request->Pallet_ID)
-								->where('Inventory', '>', 0) // tồn kho
-								->get();
-				
+				->where('Pallet_ID', $request->Pallet_ID)
+				->where('Inventory', '>', 0) // tồn kho
+				->get();
+
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
-												->where('ID', $data[0]->Warehouse_Detail_ID)
-												->first();
+				->where('ID', $data[0]->Warehouse_Detail_ID)
+				->first();
 
 			// từ chi tiết vị trí -> lấy được kho -> so sánh type của kho ( cùng type là cùng kho)
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
 					'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
-				],400);
+				], 400);
 			}
 
-			foreach ($data as $value1) 
-			{
-				$groupMat_location = GroupMaterials::where('IsDelete',0)
-												->where('Group_ID',$location->Group_Materials_ID)
-												->where('Materials_ID',$value1->Materials_ID)
-												->first();
-			
-				if(!is_null($location->Group_Materials_ID))
-				{
-					if(!$groupMat_location)
-					{
+			foreach ($data as $value1) {
+				$groupMat_location = GroupMaterials::where('IsDelete', 0)
+					->where('Group_ID', $location->Group_Materials_ID)
+					->where('Materials_ID', $value1->Materials_ID)
+					->first();
+
+				if (!is_null($location->Group_Materials_ID)) {
+					if (!$groupMat_location) {
 						return response()->json([
 							'success' 	=> false,
 							'data' 		=> ['message' => __('Materials') . ' ' . $value1->materials->Symbols . ' ' . __("Can't be import in location") . ' ' . $location->Symbols]
-						],400);
+						], 400);
 					}
 				}
 
@@ -474,9 +444,8 @@ class ImportMaterialsController extends Controller
 			return response()->json([
 				'success' => true,
 				'data' => ['message' => __('Update') . ' ' . __('Location') . ' ' . __('Success')]
-			],200);
-			
-		} 
+			], 200);
+		}
 	}
 
 	// public  function decryption_box(Request $request)
@@ -543,82 +512,77 @@ class ImportMaterialsController extends Controller
 	// }
 
 	public function retype_add(Request $request)
-	{      
+	{
 		$detail = $request->detail;
 		$dem = 0;
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
-										->where('Symbols', $request->location)
-										->first();
+			->where('Symbols', $request->location)
+			->first();
 		$arr1 = [];
 		if (empty($detail)) {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Dont Scan') . ' ' . __("Box")]
-            ], 400);
-        }
+			return response()->json([
+				'success' => false,
+				'data' => ['message' => __('Dont Scan') . ' ' . __("Box")]
+			], 400);
+		}
 
-        if (empty($request->location)) {
+		if (empty($request->location)) {
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __("Can't be empty")]
-			],400);
+			], 400);
 		}
 
 		if (!$location) {
 			return response()->json([
 				'success' => false,
 				'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
-			],400);
+			], 400);
 		}
 
-		foreach($detail as $val)
-		{
+		foreach ($detail as $val) {
 			// dd('1');
-			$data =  ImportDetail::where('IsDelete',0)
-			->where('Box_ID',$val['Box_ID'])
-			->where('Status','>',0) // đã nhập kho
-			->orderBy('ID','desc')
-			->first();
+			$data =  ImportDetail::where('IsDelete', 0)
+				->where('Box_ID', $val['Box_ID'])
+				->where('Status', '>', 0) // đã nhập kho
+				->orderBy('ID', 'desc')
+				->first();
 			// return response()->json($data);
-			if ($data)
-			{
+			if ($data) {
 				if ($data->Inventory != 0) // còn tồn
 				{
 					return response()->json([
-							'success' => false,
-							'data'	  => ['message' => __('Box').' '.__('Chưa Xuất')]
-						],400);
+						'success' => false,
+						'data'	  => ['message' => __('Box') . ' ' . __('Chưa Xuất')]
+					], 400);
 				}
-			}
-			else
-			{
+			} else {
 				return response()->json([
-							'success' => false,
-							'data'	  => ['message' => __('Box').' '.__('Does Not Exist')]
-						],400);
+					'success' => false,
+					'data'	  => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+				], 400);
 			}
 		}
 
-		foreach($detail as $value)
-		{
-			
-			$data =  ImportDetail::where('IsDelete',0)
-								->where('Box_ID',$value['Box_ID'])
-								->where('Status','>',0) // đã nhập kho
-								->where('Inventory',0) // không còn tồn
-								->orderBy('ID','desc')
-								->first();
+		foreach ($detail as $value) {
+
+			$data =  ImportDetail::where('IsDelete', 0)
+				->where('Box_ID', $value['Box_ID'])
+				->where('Status', '>', 0) // đã nhập kho
+				->where('Inventory', 0) // không còn tồn
+				->orderBy('ID', 'desc')
+				->first();
 
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
-												->where('ID', $data->Warehouse_Detail_ID)
-												->first();
+				->where('ID', $data->Warehouse_Detail_ID)
+				->first();
 
 			// từ chi tiết vị trí -> lấy được kho -> so sánh type của kho ( cùng type là cùng kho)
 			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
 				return response()->json([
 					'success' => false,
-					'data' => ['message' => $value['Box_ID'] .' '.__('Retype'). ' ' . __("Not in warehouse export")]
-				],400);
+					'data' => ['message' => $value['Box_ID'] . ' ' . __('Retype') . ' ' . __("Not in warehouse export")]
+				], 400);
 			}
 
 			$arr = [
@@ -636,33 +600,28 @@ class ImportMaterialsController extends Controller
 				'Time_Updated'	   => now(),
 				// 'User_Created'     => Auth::user()->id,
 				// 'User_Updated'     => Auth::user()->id,
-				'IsDelete'         => 0 
+				'IsDelete'         => 0
 			];
 
-			array_push($arr1,$arr);
+			array_push($arr1, $arr);
 			$dem++;
 		}
-		foreach(array_chunk($arr1, 50) as $value3)
-		{
+		foreach (array_chunk($arr1, 50) as $value3) {
 
 			ImportDetail::insert($value3);
 		}
 
 
-		if($dem > 0)
-		{
+		if ($dem > 0) {
 			return response()->json([
 				'success' => true,
-				'data'	  => ['message' => __('Retype').' '.__('Box').' '.__('Success')]
-			],200);
-		}
-		else
-		{
+				'data'	  => ['message' => __('Retype') . ' ' . __('Box') . ' ' . __('Success')]
+			], 200);
+		} else {
 			return response()->json([
 				'success' => false,
-				'data'	  => ['message' => __('Retype').' '.__('Box').' '.__('Fail')]
-			],400);
-		}  
+				'data'	  => ['message' => __('Retype') . ' ' . __('Box') . ' ' . __('Fail')]
+			], 400);
+		}
 	}
-	
 }

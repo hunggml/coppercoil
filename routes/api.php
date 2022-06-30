@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
- 
+
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
@@ -63,7 +63,3 @@ Route::post('/import-packing-list', 'Api\ImportMaterialsController@import_packin
 // update location
 Route::get('/get-data-update-location', 'Api\ImportMaterialsController@get_data_update_location');
 Route::post('/update-location', 'Api\ImportMaterialsController@update_location');
-
-
-
-

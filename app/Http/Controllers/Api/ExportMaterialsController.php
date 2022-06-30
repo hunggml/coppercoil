@@ -40,13 +40,11 @@ class ExportMaterialsController extends Controller
         $arr        = [];
         $arr1       = [];
 
-        foreach ($units as $value) 
-        {
+        foreach ($units as $value) {
             $arr[$value->Symbols] = $value->ID;
         }
 
-        foreach ($warehouse as $value1) 
-        {
+        foreach ($warehouse as $value1) {
             $obj1 = [
                 'ID'        => $value1->ID,
                 'Name'      => $value1->Name,
@@ -67,89 +65,75 @@ class ExportMaterialsController extends Controller
     public function get_list_materials_in_warehouse(Request $request)
     {
         $find = MasterWarehouse::where('IsDelete', 0)
-                                ->where('ID', $request->Go)
-                                ->first();
+            ->where('ID', $request->Go)
+            ->first();
         // foreach de lay du lieu cua kho tong
         $finds = MasterWarehouse::where('IsDelete', 0)
-                                ->where('Type', $request->Type)
-                                ->get();
+            ->where('Type', $request->Type)
+            ->get();
         $arr  = [];
         $arr2 = [];
 
         // foreach($finds as $find)
         // {
-            if ($find->detail) 
-            {
-                foreach ($find->detail as $value) 
-                {
-                    if ($value->inventory) 
-                    {
-                        foreach ($value->inventory->GroupBy('Materials_ID') as $key => $value1) 
-                        {
-                            if (array_key_exists($key,$arr)) 
-                            {
-                                $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
-                                $coun = $arr[$key]['Count'] += Count($value1);
-                            }
-                            else
-                            {
+        if ($find->detail) {
+            foreach ($find->detail as $value) {
+                if ($value->inventory) {
+                    foreach ($value->inventory->GroupBy('Materials_ID') as $key => $value1) {
+                        if (array_key_exists($key, $arr)) {
+                            $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
+                            $coun = $arr[$key]['Count'] += Count($value1);
+                        } else {
                             $arr1 = [
-                                    'Materials_ID'  => $key,
-                                    'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
-                                    'Quantity'      => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
-                                    'Count'         => Count($value1)
-                                ]; 
-                                $arr[$key] = $arr1; 
-                            }
+                                'Materials_ID'  => $key,
+                                'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
+                                'Quantity'      => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+                                'Count'         => Count($value1)
+                            ];
+                            $arr[$key] = $arr1;
                         }
                     }
                 }
             }
+        }
         // }
-        if (count($arr) > 0) 
-        {
+        if (count($arr) > 0) {
             return response()->json([
                 'success' => true,
                 'data' => $arr
-            ],200);
-        } 
-        else 
-        {
+            ], 200);
+        } else {
             return response()->json([
                 'success' => false,
                 'data' => ["message" => __('Dont') . ' ' . __('Stock') . ' ' . __('Materials')]
-            ],400);
+            ], 400);
         }
     }
 
     public function export_add(Request $request)
     {
-        if (empty($request->Go))
-        {
+        if (empty($request->Go)) {
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Warehouse') . ' ' . __("Export") . ' ' . __("Can't be empty")]
             ], 400);
         }
 
-        if (empty($request->To))
-        {
+        if (empty($request->To)) {
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Warehouse') . ' ' . __("Import") . ' ' . __("Can't be empty")]
             ], 400);
         }
 
-        if (empty($request->Materials_ID))
-        {
+        if (empty($request->Materials_ID)) {
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Materials') . ' ' . __("Can't be empty")]
             ], 400);
         }
 
-        if (empty($request->Unit_ID)) 
-        {
+        if (empty($request->Unit_ID)) {
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Unit') . ' ' . __("Can't be empty")]
@@ -157,58 +141,49 @@ class ExportMaterialsController extends Controller
         }
 
         $warehouse = MasterWarehouse::where('IsDelete', 0)
-                                    ->where('ID', $request->To)
-                                    ->first();
+            ->where('ID', $request->To)
+            ->first();
 
-        $groupMat  = GroupMaterials::where('IsDelete',0)
-                                    ->where('Group_ID',$warehouse->Group_Materials_ID)
-                                    ->where('Materials_ID',$request->Materials_ID)
-                                    ->first();
+        $groupMat  = GroupMaterials::where('IsDelete', 0)
+            ->where('Group_ID', $warehouse->Group_Materials_ID)
+            ->where('Materials_ID', $request->Materials_ID)
+            ->first();
 
         $mat       = MasterMaterials::where('IsDelete', 0)
-                                    ->where('ID', $request->Materials_ID)
-                                    ->first();
+            ->where('ID', $request->Materials_ID)
+            ->first();
 
         $unit      = MasterUnit::where('IsDelete', 0)
-                                    ->where('ID', $request->Unit_ID)
-                                    ->first();
+            ->where('ID', $request->Unit_ID)
+            ->first();
 
         $find      = MasterWarehouse::where('IsDelete', 0)
-                                    ->where('ID', $request->Go)
-                                    ->first();
+            ->where('ID', $request->Go)
+            ->first();
         $arr       = [];
-  
-        if(!is_null($warehouse->Group_Materials_ID))
-        {
-            if (!$groupMat) 
-            {
+
+        if (!is_null($warehouse->Group_Materials_ID)) {
+            if (!$groupMat) {
                 return response()->json([
-                    'success' 	=> false,
-                    'data' 		=> ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
-                ],400);
+                    'success'     => false,
+                    'data'         => ['message' => __('Materials') . ' ' . $mat->Symbols . ' ' . __("Can't be import in warehouse") . ' ' . $warehouse->Symbols]
+                ], 400);
             }
         }
 
-        if ($find->detail) 
-        {
-            foreach ($find->detail as $value) 
-            {
-                if ($value->inventory) 
-                {
-                    foreach ($value->inventory->where('Materials_ID',$request->Materials_ID)->GroupBy('Materials_ID') as $key => $value1) 
-                    {
-                        if (array_key_exists($key,$arr)) 
-                        {
+        if ($find->detail) {
+            foreach ($find->detail as $value) {
+                if ($value->inventory) {
+                    foreach ($value->inventory->where('Materials_ID', $request->Materials_ID)->GroupBy('Materials_ID') as $key => $value1) {
+                        if (array_key_exists($key, $arr)) {
                             $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
                             $coun = $arr[$key]['Count'] += Count($value1);
-                        }
-                        else
-                        {
-                          $arr1 = [
+                        } else {
+                            $arr1 = [
                                 'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
                                 'Count' => Count($value1)
-                            ]; 
-                            $arr[$key] = $arr1; 
+                            ];
+                            $arr[$key] = $arr1;
                         }
                     }
                 }
@@ -217,53 +192,45 @@ class ExportMaterialsController extends Controller
 
         if ($unit->Type == 2) // box
         {
-            if (empty($request->Count)) 
-            {
+            if (empty($request->Count)) {
                 return response()->json([
                     'success' => false,
                     'data' => ['message' => __('Roll Number') . ' ' . __("Can't be empty")]
                 ], 400);
             }
 
-            if (!is_numeric($request->Count) || $request->Count <= 0 || is_numeric($request->Count) && is_float($request->Count)) 
-            {
+            if (!is_numeric($request->Count) || $request->Count <= 0 || is_numeric($request->Count) && is_float($request->Count)) {
                 return response()->json([
                     'success' => false,
                     'data' => ['message' => __('Roll Number') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Origin') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
                 ], 400);
             }
 
-            if ($request->Count > $arr[$key]['Count']) 
-            {
-            	return response()->json([
-            		'success'=> false,
-            		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
-            	],400);
-            } 
-        } 
-        else 
-        {
-            if (empty($request->Quantity)) 
-            {
+            if ($request->Count > $arr[$key]['Count']) {
+                return response()->json([
+                    'success' => false,
+                    'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Count'] . ' ' . __('Box')]
+                ], 400);
+            }
+        } else {
+            if (empty($request->Quantity)) {
                 return response()->json([
                     'success' => false,
                     'data' => ['message' => __('Quantity') . ' ' . __("Can't be empty")]
                 ], 400);
             }
-            if (!is_numeric($request->Quantity) || $request->Quantity <= 0)
-            {
+            if (!is_numeric($request->Quantity) || $request->Quantity <= 0) {
                 return response()->json([
                     'success' => false,
                     'data' => ['message' => __('Quantity') . ' ' . __('Must be') . ' ' . __('Number') . ' ' . __('Real') . ' ' . __('And') . ' ' . __('Bigger') . ' ' . "0"]
                 ], 400);
             }
 
-            if ($request->Quantity > $arr[$key]['Quantity']) 
-            {
-            	return response()->json([
-            		'success'=>false,
-            		'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
-            	],400);
+            if ($request->Quantity > $arr[$key]['Quantity']) {
+                return response()->json([
+                    'success' => false,
+                    'data' => ['message' => __('Quantity Requested Greater Than Allowed Quantity') . ',' . ' ' . __('Stock') . ': ' . $arr[$key]['Quantity'] . ' ' . __('kg')]
+                ], 400);
             }
         }
 
@@ -283,28 +250,21 @@ class ExportMaterialsController extends Controller
         $mater  = $data->materials ? $data->materials->Symbols : '';
         $Go     = $data->go ? $data->go->Symbols : '';
         $To     = $data->to ? $data->to->Symbols : '';
-        if ($data->go && $data->to) 
-        {
-            if ($data->to->Accept == 0) 
-            {
-                if ($data->to->Email) 
-                {
+        if ($data->go && $data->to) {
+            if ($data->to->Accept == 0) {
+                if ($data->to->Email) {
                     $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
                 }
-            } 
-            else 
-            {
+            } else {
                 if ($data->go->Accept == 0) // cần xác nhận hay không
                 {
                     ExportMaterials::where('IsDelete', 0)
-                    ->where('ID', $data->ID)
-                    ->update([
-                        // 'User_Updated' => Auth::user()->id,
-                        'Status'       => 1 
-                    ]);
-                } 
-                else 
-                {
+                        ->where('ID', $data->ID)
+                        ->update([
+                            // 'User_Updated' => Auth::user()->id,
+                            'Status'       => 1
+                        ]);
+                } else {
                     $this->accept((object)[
                         'ID' => $data->ID
                     ]);
@@ -535,11 +495,10 @@ class ExportMaterialsController extends Controller
     {
         // dd($run);
         $data =  ExportMaterials::where('IsDelete', 0)
-        ->where('ID', $request->ID)
-        ->first();
+            ->where('ID', $request->ID)
+            ->first();
 
-        if ($data->Status == 1) 
-        {
+        if ($data->Status == 1) {
             $request->Materials_ID = $data->Materials_ID;
             $request->warehouse = [];
             if ($data->go) {
@@ -554,16 +513,13 @@ class ExportMaterialsController extends Controller
             $arr = [];
             if ($data->Count) {
                 $quan = $data->Count;
-            } 
-            else 
-            {
+            } else {
                 $quan = $data->Quantity;
             }
 
             // dd($quan);
             $dem = 0;
-            foreach ($list as $value) 
-            {
+            foreach ($list as $value) {
                 if ($quan > 0) {
                     $arr1 = [
                         'Export_ID'     => $data->ID,
@@ -583,77 +539,68 @@ class ExportMaterialsController extends Controller
                     array_push($arr, $arr1);
                 }
             }
-            foreach ($arr as $value) 
-            {
+            foreach ($arr as $value) {
                 ExportDetail::Create($value);
             }
-        } 
-        else 
-        {
+        } else {
             $num = 2;
             $mater = $data->materials ? $data->materials->Symbols : '';
             $Go = $data->go ? $data->go->Symbols : '';
             $To = $data->to ? $data->to->Symbols : '';
-            if ($data->go && $data->to) 
-            {
-                if ($data->go->Accept == 0) 
-                {
-                    if ($data->go->Email) 
-                    {
+            if ($data->go && $data->to) {
+                if ($data->go->Accept == 0) {
+                    if ($data->go->Email) {
                         $this->send_mail->send_mail($data->go->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
                     }
-                } 
-                else 
-                {
+                } else {
                     ExportMaterials::where('IsDelete', 0)
-                    ->where('ID', $request->ID)
-                    ->update([
-                        // 'User_Updated'   => Auth::user()->id,
-                        'Status'         => 1
-                    ]);
+                        ->where('ID', $request->ID)
+                        ->update([
+                            // 'User_Updated'   => Auth::user()->id,
+                            'Status'         => 1
+                        ]);
 
                     $this->accept((object)[
                         'ID' => $request->ID
                     ]);
 
                     return ExportMaterials::where('IsDelete', 0)
-                    ->where('ID', $request->ID)
-                    ->update([
-                        // 'User_Updated'   => Auth::user()->id,
-                        'Status'         => 2
-                    ]);
+                        ->where('ID', $request->ID)
+                        ->update([
+                            // 'User_Updated'   => Auth::user()->id,
+                            'Status'         => 2
+                        ]);
                 }
             }
         }
         return ExportMaterials::where('IsDelete', 0)
-        ->where('ID', $request->ID)
-        ->update([
-            // 'User_Updated'   => Auth::user()->id,
-            'Status'         => ($data->Status + 1)
-        ]);
+            ->where('ID', $request->ID)
+            ->update([
+                // 'User_Updated'   => Auth::user()->id,
+                'Status'         => ($data->Status + 1)
+            ]);
     }
 
     public function command_export(Request $request)
     {
         $data = ExportMaterials::where('IsDelete', 0)
-                            ->where('Status', 2)
-                            ->get();
+            ->where('Status', 2)
+            ->get();
 
         $arr = [];
-        foreach ($data as $value) 
-        {
+        foreach ($data as $value) {
             $data2 = ExportDetail::where('IsDelete', 0)
-                                ->where('Export_ID', $value->ID)
-                                ->where('Status',1)
-                                ->select('ID','Export_ID','Box_ID','Materials_ID','Warehouse_Detail_ID','Quantity')
-                                ->get();
+                ->where('Export_ID', $value->ID)
+                ->where('Status', 1)
+                ->select('ID', 'Export_ID', 'Box_ID', 'Materials_ID', 'Warehouse_Detail_ID', 'Quantity')
+                ->get();
 
             $data3 = ExportDetail::where('IsDelete', 0)
-                                ->where('Export_ID', $value->ID)
-                                ->where('Transfer',1)->get();
+                ->where('Export_ID', $value->ID)
+                ->where('Transfer', 1)->get();
 
             $obj = [
-                "Name"                  => ($value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT') ) ) .'-'.date_format(date_create($value->Time_Created),"YmdHis"),
+                "Name"                  => ($value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT'))) . '-' . date_format(date_create($value->Time_Created), "YmdHis"),
                 'ID'                    => $value->ID,
                 'Materials'             => $value->materials ? $value->materials->Symbols : '',
                 'Unit'                  => $value->Quantity ? 'Kg' : 'Box',
@@ -665,18 +612,15 @@ class ExportMaterialsController extends Controller
                 'Quantitative_Transfer' => Count($data3),
                 'Boxs_Exported'         => $data2,
             ];
-            
+
             array_push($arr, $obj);
         }
-        if (count($arr) > 0) 
-        {
+        if (count($arr) > 0) {
             return response()->json([
                 'success' => true,
                 'data'    => $arr
             ], 200);
-        } 
-        else 
-        {
+        } else {
             return response()->json([
                 'success' => false,
                 'data'    => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
@@ -688,32 +632,28 @@ class ExportMaterialsController extends Controller
     {
         $command_id = $request->command_id;
         $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)
-        ->first();
-        if ($data) 
-        {
+            ->first();
+        if ($data) {
             $a = count(collect($data->detail)->where('Status', 1));
             $b = count(collect($data->detail)->where('Transfer', 1));
-            if ($a > $b && $data->Go != $data->To) 
-            {
+            if ($a > $b && $data->Go != $data->To) {
                 $num1   = $a;
                 $num2   = $b;
                 $mater  = $data->materials ? $data->materials->Symbols : '';
                 $Go     = $data->go ? $data->go->Symbols : '';
                 $To     = $data->to ? $data->to->Symbols : '';
-                $this->send_mail->send_mail2($data->to->Email,$num1,$num2, $mater, $Go, $To,$command_id);
+                $this->send_mail->send_mail2($data->to->Email, $num1, $num2, $mater, $Go, $To, $command_id);
             }
             ExportMaterials::where('IsDelete', 0)->where('ID', $data->ID)
-            ->update([
-                // 'User_Updated' => Auth::user()->id,
-                'Status'       => 3
-            ]);
+                ->update([
+                    // 'User_Updated' => Auth::user()->id,
+                    'Status'       => 3
+                ]);
             return response()->json([
                 'success' => true,
                 'data'    => ['message' => __('Success') . ' ' . __('Command') . ' ' . __('Succes')]
             ], 200);
-        } 
-        else 
-        {
+        } else {
             return response()->json([
                 'success' => false,
                 'data'    => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
@@ -735,19 +675,17 @@ class ExportMaterialsController extends Controller
                 $data = ExportMaterials::where('IsDelete', 0)->where('ID', $command_id)->first();
                 if ($data) {
                     $data1 = ExportDetail::where('IsDelete', 0)->where('Export_ID', $data->ID)
-                    ->where('Box_ID', $label_3)
-                    ->where('Type', 0)
-                    ->first();
+                        ->where('Box_ID', $label_3)
+                        ->where('Type', 0)
+                        ->first();
 
-                    $data2 =  ImportDetail::where('IsDelete',0)
-                    ->where('Box_ID',$label_3)
-                    ->orderBy('ID','desc')
-                    ->first();
-                    
-                    if ($data1 && $data2) 
-                    {
-                        if ($data1->Status == 0 && $data2->Inventory > 0) 
-                        {
+                    $data2 =  ImportDetail::where('IsDelete', 0)
+                        ->where('Box_ID', $label_3)
+                        ->orderBy('ID', 'desc')
+                        ->first();
+
+                    if ($data1 && $data2) {
+                        if ($data1->Status == 0 && $data2->Inventory > 0) {
                             return response()->json([
                                 'success' => true,
                                 'data' => [
@@ -756,31 +694,25 @@ class ExportMaterialsController extends Controller
                                     'Location'  => $data1->location ? $data1->location->Symbols : '',
                                 ]
                             ], 200);
-                        } 
-                        else {
+                        } else {
                             return response()->json([
                                 'success' => false,
-                                'data'    => ['message' => __('Box') . ' ' . __('Was').' '.__('Export')]
+                                'data'    => ['message' => __('Box') . ' ' . __('Was') . ' ' . __('Export')]
                             ], 400);
                         }
-                    }
-                    else 
-                    {
+                    } else {
                         return response()->json([
                             'success' => false,
-                            'data'    => ['message' => __('Command').' '.__('Export').' '.__("Can't export box")]
+                            'data'    => ['message' => __('Command') . ' ' . __('Export') . ' ' . __("Can't export box")]
                         ], 400);
                     }
-                }
-                else {
+                } else {
                     return response()->json([
                         'success' => false,
                         'data'    => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
                     ], 400);
                 }
-            } 
-            else 
-            {
+            } else {
                 return response()->json([
                     'success' => false,
                     'data'    => ['message' => __('Box') . ' ' . __('Does Not Exist')]
@@ -822,150 +754,126 @@ class ExportMaterialsController extends Controller
             ], 400);
         }
 
-        if($command)
-        {
-            foreach($detail as $value)
-            {
-                array_push($arr,$value['Box_ID']);
+        if ($command) {
+            foreach ($detail as $value) {
+                array_push($arr, $value['Box_ID']);
 
-                $data1 = ImportDetail::where('IsDelete',0)
-                                    ->where('Box_ID',$value['Box_ID'])
-                                    ->where('Inventory','>',0)
-                                    ->orderBy('ID', 'desc')
-                                    ->first();
+                $data1 = ImportDetail::where('IsDelete', 0)
+                    ->where('Box_ID', $value['Box_ID'])
+                    ->where('Inventory', '>', 0)
+                    ->orderBy('ID', 'desc')
+                    ->first();
 
-                if ($data1->Warehouse_Detail_ID != $location->ID) 
-                {
+                if ($data1->Warehouse_Detail_ID != $location->ID) {
                     return response()->json([
-                        'success'=>false,
-                        'data'=>['message'=> $value['Box_ID'] .' '.__('Not in location').' '.$location->Symbols]
-                    ],400);
+                        'success' => false,
+                        'data' => ['message' => $value['Box_ID'] . ' ' . __('Not in location') . ' ' . $location->Symbols]
+                    ], 400);
                 }
-        	}
+            }
 
-            if ($command->Count) 
-            {
-                $boxs_export = count(collect($command->detail->where('Status',1)));
+            if ($command->Count) {
+                $boxs_export = count(collect($command->detail->where('Status', 1)));
                 $boxs_need = $command->Count - $boxs_export;
                 // dd($boxs_need);
                 // return response()->json($boxs_need);
 
-                if ($boxs_need >= count($detail)) 
-                {
-                    $data2 = ExportDetail::where('IsDelete',0)
-                                        ->where('Export_ID',$command->ID)
-                                        ->whereIn('Box_ID',$arr)
-                                        ->update([
-                                            'Status' => 1
-                                        ]);
+                if ($boxs_need >= count($detail)) {
+                    $data2 = ExportDetail::where('IsDelete', 0)
+                        ->where('Export_ID', $command->ID)
+                        ->whereIn('Box_ID', $arr)
+                        ->update([
+                            'Status' => 1
+                        ]);
                     $data3 = ImportDetail::where('IsDelete', 0)
-                                        ->whereIn('Box_ID', $arr)
-                                        ->where('Inventory','>',0)
-                                        ->orderBy('ID', 'desc')
-                                        ->update([
-                                            'Inventory'     => 0,
-                                            // 'User_Updated'  => Auth::user()->id
-                                        ]); 
+                        ->whereIn('Box_ID', $arr)
+                        ->where('Inventory', '>', 0)
+                        ->orderBy('ID', 'desc')
+                        ->update([
+                            'Inventory'     => 0,
+                            // 'User_Updated'  => Auth::user()->id
+                        ]);
 
-                    $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status',1)->get();
-                    if($command->Go == $command->To)
-                    {
-                        if($command->Count == Count($Quantitative_Exported))
-                        {
+                    $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status', 1)->get();
+                    if ($command->Go == $command->To) {
+                        if ($command->Count == Count($Quantitative_Exported)) {
                             ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
-                            ->update([
-                                // 'User_Updated' => Auth::user()->id,
-                                'Status'       => 3
-                            ]);
+                                ->update([
+                                    // 'User_Updated' => Auth::user()->id,
+                                    'Status'       => 3
+                                ]);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     return response()->json([
-                       'success' => false,
+                        'success' => false,
                         'data'      => ['message' => __('Just need export') . ' ' . $boxs_need . ' ' . __('Box')]
                     ], 400);
                 }
-                
-            }
-            else
-            {
-                $quan_export = floatval(collect($command->detail->where('Status',1))->sum('Quantity'));
+            } else {
+                $quan_export = floatval(collect($command->detail->where('Status', 1))->sum('Quantity'));
                 $quan_need = $command->Quantity - $quan_export;
                 $arr_box = [];
                 $quan = 0;
 
-                if ($command->Quantity > $quan_export) 
-                {
-                    if ($quan_need >= collect($detail)->sum('Quantity')) 
-                    {
-                        $data2 = ExportDetail::where('IsDelete',0)
-                                        ->where('Export_ID',$command->ID)
-                                        ->whereIn('Box_ID',$arr)
-                                        ->update([
-                                            'Status' => 1
-                                        ]);
+                if ($command->Quantity > $quan_export) {
+                    if ($quan_need >= collect($detail)->sum('Quantity')) {
+                        $data2 = ExportDetail::where('IsDelete', 0)
+                            ->where('Export_ID', $command->ID)
+                            ->whereIn('Box_ID', $arr)
+                            ->update([
+                                'Status' => 1
+                            ]);
                         $data3 = ImportDetail::where('IsDelete', 0)
-                                            ->whereIn('Box_ID', $arr)
-                                            ->where('Inventory','>',0)
-                                            ->orderBy('ID', 'desc')
-                                            ->update([
-                                                'Inventory'     => 0,
-                                                // 'User_Updated'  => Auth::user()->id
-                                            ]); 
-                    }
-                    else
-                    {
-                        foreach($detail as $value)
-                        {
-                            if ($quan_need > $quan) 
-                            {
-                                array_push($arr_box,$value['Box_ID']);
+                            ->whereIn('Box_ID', $arr)
+                            ->where('Inventory', '>', 0)
+                            ->orderBy('ID', 'desc')
+                            ->update([
+                                'Inventory'     => 0,
+                                // 'User_Updated'  => Auth::user()->id
+                            ]);
+                    } else {
+                        foreach ($detail as $value) {
+                            if ($quan_need > $quan) {
+                                array_push($arr_box, $value['Box_ID']);
                                 $quan += $value['Quantity'];
-                            }
-                            else
-                            {
+                            } else {
                                 return response()->json([
                                     'success' => false,
                                     'data'    => ['message' => __('Just need export') . ' ' . count($arr_box) . ' ' . __('Box')]
-                                ],400);
+                                ], 400);
                             }
                         }
 
-                        $data4 = ExportDetail::where('IsDelete',0)
-                                            ->where('Export_ID',$command->ID)
-                                            ->whereIn('Box_ID', $arr_box)
-                                            ->update([
-                                                'Status' => 1
-                                            ]);
+                        $data4 = ExportDetail::where('IsDelete', 0)
+                            ->where('Export_ID', $command->ID)
+                            ->whereIn('Box_ID', $arr_box)
+                            ->update([
+                                'Status' => 1
+                            ]);
                         $data5 = ImportDetail::where('IsDelete', 0)
-                                            ->whereIn('Box_ID', $arr_box)
-                                            ->where('Inventory','>',0)
-                                            ->orderBy('ID', 'desc')
-                                            ->update([
-                                                'Inventory'     => 0,
-                                                // 'User_Updated'  => Auth::user()->id
-                                            ]); 
+                            ->whereIn('Box_ID', $arr_box)
+                            ->where('Inventory', '>', 0)
+                            ->orderBy('ID', 'desc')
+                            ->update([
+                                'Inventory'     => 0,
+                                // 'User_Updated'  => Auth::user()->id
+                            ]);
                     }
-                }
-                else 
-                {
+                } else {
                     return response()->json([
-                       'success' => false,
+                        'success' => false,
                         'data'      => ['message' => __('Quantity has been exported, dont need export more')]
                     ], 400);
-                }  
+                }
             }
-        }
-        else
-        {
+        } else {
             return response()->json([
                 'success' => false,
                 'data'      => ['message' => __('Command') . ' ' . __('Does Not Exist')]
             ], 400);
         }
-        
+
         return response()->json([
             'success' => true,
             'data'      => ['message' => __('Export') . ' ' . __('Box') . ' ' . __('Success')]
@@ -1043,14 +951,13 @@ class ExportMaterialsController extends Controller
         $label = $request->detail;
         $dem = 0;
         $location  = MasterWarehouseDetail::where('IsDelete', 0)->where('Symbols', $request->location)->first();
-        $command   = ExportMaterials::where('IsDelete',0)->where('ID',$request->command_id)->first();
-        $warehouse = MasterWarehouse::where('IsDelete',0)->where('ID');
+        $command   = ExportMaterials::where('IsDelete', 0)->where('ID', $request->command_id)->first();
+        $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID');
 
-        if ($command->To != $location->Warehouse_ID) 
-        {
+        if ($command->To != $location->Warehouse_ID) {
             return response()->json([
                 'success' => false,
-                'data' => ['message' => __('Location').' '.__('Not in warehouse import')]
+                'data' => ['message' => __('Location') . ' ' . __('Not in warehouse import')]
             ], 400);
         }
 
@@ -1075,14 +982,13 @@ class ExportMaterialsController extends Controller
             ], 400);
         }
 
-        foreach($label as $val)
-        {
+        foreach ($label as $val) {
             $data1 = ExportDetail::where('IsDelete', 0)
-                                ->where('Export_ID', $request->command_id)
-                                ->where('Box_ID', $val['Box_ID'])
-                                ->where('Status', 1)
-                                ->where('Type', 0)
-                                ->first();
+                ->where('Export_ID', $request->command_id)
+                ->where('Box_ID', $val['Box_ID'])
+                ->where('Status', 1)
+                ->where('Type', 0)
+                ->first();
             if ($data1) {
                 if ($data1->Transfer != 0) {
                     return response()->json([
@@ -1090,9 +996,7 @@ class ExportMaterialsController extends Controller
                         'data'      => ['message' => $val['Box_ID'] . ' ' . __('Was') . ' ' . __('Transfer') . ' ' . __('Warehouse')]
                     ], 400);
                 }
-            }
-            else 
-            {
+            } else {
                 return response()->json([
                     'success' => false,
                     'data'      => ['message' => $val['Box_ID'] . ' ' . __('Not in command export')]
@@ -1100,8 +1004,7 @@ class ExportMaterialsController extends Controller
             }
         }
 
-        foreach ($label as $value) 
-        {
+        foreach ($label as $value) {
             // dd($value);
             $data = ExportMaterials::where('IsDelete', 0)->where('ID', $request->command_id)->first();
 
@@ -1142,25 +1045,24 @@ class ExportMaterialsController extends Controller
                 TransferMaterials::create($dataSave);
                 ImportDetail::create($dataSave1);
                 ExportDetail::where('IsDelete', 0)
-                ->where('ID', $data1->ID)
-                ->update([
-                    'Transfer' => 1,
-                    // 'User_Updated'     => Auth::user()->id,
-                ]);
+                    ->where('ID', $data1->ID)
+                    ->update([
+                        'Transfer' => 1,
+                        // 'User_Updated'     => Auth::user()->id,
+                    ]);
                 $dem++;
             }
         }
-        
-        $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status',1)->get();
-        $Quantitative_Transfer = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Transfer',1)->get();
-        
-        if(Count($Quantitative_Exported) == Count($Quantitative_Transfer))
-        {
+
+        $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status', 1)->get();
+        $Quantitative_Transfer = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Transfer', 1)->get();
+
+        if (Count($Quantitative_Exported) == Count($Quantitative_Transfer)) {
             ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
-                    ->update([
-                        // 'User_Updated' => Auth::user()->id,
-                        'Status'       => 3
-                    ]);
+                ->update([
+                    // 'User_Updated' => Auth::user()->id,
+                    'Status'       => 3
+                ]);
         }
         if ($dem  > 0) {
             return response()->json([
@@ -1174,5 +1076,4 @@ class ExportMaterialsController extends Controller
             ], 400);
         }
     }
-
 }
