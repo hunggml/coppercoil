@@ -68,9 +68,9 @@ class ExportMaterialsController extends Controller
             ->where('ID', $request->Go)
             ->first();
         // foreach de lay du lieu cua kho tong
-        $finds = MasterWarehouse::where('IsDelete', 0)
-            ->where('Type', $request->Type)
-            ->get();
+        // $finds = MasterWarehouse::where('IsDelete', 0)
+        //     ->where('Type', $request->Type)
+        //     ->get();
         $arr  = [];
         $arr2 = [];
 
