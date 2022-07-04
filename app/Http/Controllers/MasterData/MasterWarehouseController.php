@@ -9,27 +9,28 @@ use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
 use App\Libraries\MasterData\MasterUnitLibraries;
 use App\Libraries\MasterData\MasterGroupMaterialsLibraries;
 use App\Libraries\WarehouseSystem\ExportLibraries;
+
 class MasterWarehouseController extends Controller
 {
-	private $warehouse;
+    private $warehouse;
     private $unit;
     private $group;
 
-	public function __construct(
-		MasterWarehouseLibraries $masterWarehouseLibraries
-        ,MasterWarehouseDetailLibraries $masterWarehouseDetailLibraries
-        ,MasterUnitLibraries $masterUnitLibraries
-        ,MasterGroupMaterialsLibraries $masterGroupMaterialsLibraries
-        ,ExportLibraries $ExportLibraries
+    public function __construct(
+        MasterWarehouseLibraries $masterWarehouseLibraries,
+        MasterWarehouseDetailLibraries $masterWarehouseDetailLibraries,
+        MasterUnitLibraries $masterUnitLibraries,
+        MasterGroupMaterialsLibraries $masterGroupMaterialsLibraries,
+        ExportLibraries $ExportLibraries
 
-	){
+    ) {
         $this->middleware('auth');
         $this->warehouse        = $masterWarehouseLibraries;
         $this->warehouse_detail = $masterWarehouseDetailLibraries;
         $this->unit             = $masterUnitLibraries;
         $this->group            = $masterGroupMaterialsLibraries;
         $this->export = $ExportLibraries;
-	}
+    }
 
     public function index(Request $request)
     {
@@ -37,13 +38,15 @@ class MasterWarehouseController extends Controller
         $units    = $this->unit->get_all_list_unit();
         $groups   = $this->group->get_all_list_group_materials();
 
-    	return view('master_data.warehouses.setting.index', 
-    	[
-            'warehouses' => $data,
-            'units'      => $units,
-            'groups'     => $groups,
-            'request'    => $request
-    	]);
+        return view(
+            'master_data.warehouses.setting.index',
+            [
+                'warehouses' => $data,
+                'units'      => $units,
+                'groups'     => $groups,
+                'request'    => $request
+            ]
+        );
     }
 
     public function show(Request $request)
@@ -54,17 +57,13 @@ class MasterWarehouseController extends Controller
         $data     = $this->warehouse->filter($request);
         // $type     = $this->type->get_all_type()->first();
 
-        if ($request->ID) 
-        {
-            if ($data->first()) 
-            {
+        if ($request->ID) {
+            if ($data->first()) {
                 $warehouse = $data->first();
-            } else
-            {
+            } else {
                 $warehouse = '';
             }
-        } else
-        {
+        } else {
             $warehouse = '';
         }
         // dd($warehouse);
@@ -77,7 +76,7 @@ class MasterWarehouseController extends Controller
             // 'type'      => $type
         ]);
     }
- 
+
     public function test_led()
     {
         $macs = $this->warehouse->get_all_list_warehouse();
@@ -92,7 +91,7 @@ class MasterWarehouseController extends Controller
         $data1      = $this->export->get_all_list_detail($request);
         return response()->json([
             'data' => $data,
-            'list_Box'=>$data1->where('Status',1)
+            'list_Box' => $data1->where('Status', 1)
         ]);
     }
 
@@ -101,10 +100,12 @@ class MasterWarehouseController extends Controller
     {
         $data     = $this->warehouse->get_all_list_warehouse();
 
-        return view('master_data.warehouses.location.index', 
-        [
-            'warehouses' => $data,
-        ]);
+        return view(
+            'master_data.warehouses.location.index',
+            [
+                'warehouses' => $data,
+            ]
+        );
     }
 
     public function add_or_update_type(Request $request)
@@ -142,7 +143,7 @@ class MasterWarehouseController extends Controller
     public function history_location(Request $request)
     {
         $data = $this->warehouse_detail->history_location($request);
-        dd($data);
+        // dd($data);
         return response()->json([
             'data' => $data
         ]);
@@ -159,8 +160,7 @@ class MasterWarehouseController extends Controller
     public function add_or_update_detail(Request $request)
     {
         $errors = $this->warehouse_detail->check_detail($request);
-        if (count($errors) != 0) 
-        {
+        if (count($errors) != 0) {
             return response()->json([
                 'data'   => array(),
                 'errors' => $errors
@@ -179,8 +179,7 @@ class MasterWarehouseController extends Controller
     {
         $errors = $this->warehouse_detail->check_led($request);
 
-        if (count($errors) != 0) 
-        {
+        if (count($errors) != 0) {
             return response()->json([
                 'data'   => array(),
                 'errors' => $errors
@@ -206,16 +205,13 @@ class MasterWarehouseController extends Controller
     public function get_list_materials_in_warehouse(Request $request)
     {
         $data = $this->warehouse->get_list_materials_in_warehouse($request);
-        if(count($data) > 0)
-        {
+        if (count($data) > 0) {
             $suc = true;
-        }
-        else
-        {
+        } else {
             $suc = false;
         }
         return response()->json([
-            'success'=> $suc,
+            'success' => $suc,
             'data'   => $data,
         ]);
     }
