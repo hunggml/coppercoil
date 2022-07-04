@@ -38,7 +38,7 @@
 							@csrf
 							<div class="row">
 								<div class="form-group col-md-2">
-									<label>{{__('Choose')}} {{__('Symbols')}} {{ __('Command') }}</label>
+									<label>{{__('Choose')}} {{ __('Materials') }}</label>
 									<select class="custom-select select2" name="materials">
 										<option value="">
 											{{__('Choose')}} {{__('Symbols')}}
@@ -157,7 +157,7 @@
 							<th>{{__('ID')}}</th>
 							<th>{{__('Type')}}</th>
 							<th>{{__('Name')}}</th>
-							<th>{{__('Materials')}} {{__('Symbols')}}</th>
+							<th>{{__('Materials')}} </th>
 							<th>{{__('Warehouse')}} {{__('Go')}}</th>
 							<th>{{__('Warehouse')}} {{__('To')}}</th> 
 							<th>{{__('Quantity')}} {{__('To Be Exported')}}</th>

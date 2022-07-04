@@ -72,6 +72,7 @@ class ImportMaterialsController extends Controller
 			->where('Status', 0) // 0 là chưa nhập kho
 			->with('materials')
 			->get();
+		// dd($data);
 
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
 			->where('Symbols', $request->Warehouse_Detail_ID)
@@ -231,6 +232,12 @@ class ImportMaterialsController extends Controller
 				'data' => ['message' => __('Location') . ' ' . __("Can't be empty")]
 			], 400);
 		}
+		if (empty($request->Type)) {
+			return response()->json([
+				'success' => false,
+				'data' => ['message' => __('Type') . ' ' . __("Can't be empty")]
+			], 400);
+		}
 
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
 			->where('Symbols', $request->Warehouse_Detail_ID)
@@ -256,6 +263,14 @@ class ImportMaterialsController extends Controller
 				->where('Inventory', '>', 0) // tồn kho
 				->orderBy('ID', 'desc')
 				->first();
+			if (!$data) {
+				// return response()->json('false');
+				return response()->json([
+					'success' => false,
+					'data' => ['message' => __('Box') . ' ' . __("Don't") . ' ' . __('Stock')]
+				], 400);
+			}
+			// return response()->json('true');
 
 			$groupMat_location = GroupMaterials::where('IsDelete', 0)
 				->where('Group_ID', $location->Group_Materials_ID)
@@ -355,7 +370,16 @@ class ImportMaterialsController extends Controller
 			$data =  ImportDetail::where('IsDelete', 0)
 				->where('Pallet_ID', $request->Pallet_ID)
 				->where('Inventory', '>', 0) // tồn kho
+				->orderBy('ID', 'desc')
 				->get();
+			if (count($data) <= 0) {
+				// dd('false');
+				return response()->json([
+					'success' => false,
+					'data' => ['message' => __('Pallet') . ' ' . __("Don't") . ' ' . __('Stock')]
+				], 400);
+			}
+			// dd('true');
 
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
 				->where('ID', $data[0]->Warehouse_Detail_ID)

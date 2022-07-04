@@ -241,21 +241,18 @@ class TransferLibraries
 
                 TransferMaterials::create($dataSave);
             }
-        } 
-        else {
+        } else {
 
             $data =  ImportDetail::where('IsDelete', 0)
                 ->where('Pallet_ID', $request->Pallet_ID)
-                ->where('Status', '!=', 2)
+                ->where('Inventory', '>', 0)
                 ->orderBy('ID', 'desc')
                 ->with('materials', 'location')
                 ->get();
             // dd($request->Warehouse_Detail_ID_pallet);
-
             if ($data) {
                 foreach ($data as $value1) {
                     // dd($value1);
-
                     $arr1 = [
                         'Export_ID' => '',
                         'Box_ID'    =>  $value1->Box_ID,
@@ -401,12 +398,12 @@ class TransferLibraries
                 ->where('Status', 1)
                 ->with('materials', 'location')
                 ->get();
-                // dd($data1);
+            // dd($data1);
             foreach ($data1 as $value2) {
                 if ($value2->Type == 0) {
                     $value2->Type = 4;
                     $value2->Count = 1;
-                } 
+                }
                 if ($value2->Type == 2) {
                     $value2->Type = 5;
                     $value2->Count = 1;

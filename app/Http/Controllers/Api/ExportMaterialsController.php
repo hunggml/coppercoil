@@ -31,11 +31,10 @@ class ExportMaterialsController extends Controller
 
     public function get_warehouse_and_unit()
     {
-
         // group by theo type để lấy kho tổng của vị trí
         $warehouse  = MasterWarehouse::where('IsDelete', 0)->get();
-        // $warehouse  = MasterWarehouse::where('IsDelete', 0)->select('ID','Name','Symbols','Type')->get()->groupBy('Type');
-
+        // $warehouse  = MasterWarehouse::where('IsDelete', 0)->select('ID', 'Name', 'Symbols', 'Type')->get()->groupBy('Type');
+        // return response()->json($warehouse);
         $units      = MasterUnit::where('IsDelete', 0)->get();
         $arr        = [];
         $arr1       = [];
@@ -45,6 +44,7 @@ class ExportMaterialsController extends Controller
         }
 
         foreach ($warehouse as $value1) {
+            // return response()->json($value1);
             $obj1 = [
                 'ID'        => $value1->ID,
                 'Name'      => $value1->Name,
@@ -74,8 +74,8 @@ class ExportMaterialsController extends Controller
         $arr  = [];
         $arr2 = [];
 
-        // foreach($finds as $find)
-        // {
+
+        // foreach ($finds as $find) {
         if ($find->detail) {
             foreach ($find->detail as $value) {
                 if ($value->inventory) {
@@ -140,26 +140,11 @@ class ExportMaterialsController extends Controller
             ], 400);
         }
 
-        $warehouse = MasterWarehouse::where('IsDelete', 0)
-            ->where('ID', $request->To)
-            ->first();
-
-        $groupMat  = GroupMaterials::where('IsDelete', 0)
-            ->where('Group_ID', $warehouse->Group_Materials_ID)
-            ->where('Materials_ID', $request->Materials_ID)
-            ->first();
-
-        $mat       = MasterMaterials::where('IsDelete', 0)
-            ->where('ID', $request->Materials_ID)
-            ->first();
-
-        $unit      = MasterUnit::where('IsDelete', 0)
-            ->where('ID', $request->Unit_ID)
-            ->first();
-
-        $find      = MasterWarehouse::where('IsDelete', 0)
-            ->where('ID', $request->Go)
-            ->first();
+        $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID', $request->To)->first();
+        $groupMat  = GroupMaterials::where('IsDelete', 0)->where('Group_ID', $warehouse->Group_Materials_ID)->where('Materials_ID', $request->Materials_ID)->first();
+        $mat       = MasterMaterials::where('IsDelete', 0)->where('ID', $request->Materials_ID)->first();
+        $unit      = MasterUnit::where('IsDelete', 0)->where('ID', $request->Unit_ID)->first();
+        $find      = MasterWarehouse::where('IsDelete', 0)->where('ID', $request->Go)->first();
         $arr       = [];
 
         if (!is_null($warehouse->Group_Materials_ID)) {
@@ -175,6 +160,8 @@ class ExportMaterialsController extends Controller
             foreach ($find->detail as $value) {
                 if ($value->inventory) {
                     foreach ($value->inventory->where('Materials_ID', $request->Materials_ID)->GroupBy('Materials_ID') as $key => $value1) {
+                        // return response()->json('run');
+
                         if (array_key_exists($key, $arr)) {
                             $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
                             $coun = $arr[$key]['Count'] += Count($value1);
@@ -954,12 +941,7 @@ class ExportMaterialsController extends Controller
         $command   = ExportMaterials::where('IsDelete', 0)->where('ID', $request->command_id)->first();
         $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID');
 
-        if ($command->To != $location->Warehouse_ID) {
-            return response()->json([
-                'success' => false,
-                'data' => ['message' => __('Location') . ' ' . __('Not in warehouse import')]
-            ], 400);
-        }
+
 
         if (empty($request->location)) {
             return response()->json([
@@ -979,6 +961,12 @@ class ExportMaterialsController extends Controller
             return response()->json([
                 'success' => false,
                 'data' => ['message' => __('Location') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
+        if ($command->To != $location->Warehouse_ID) {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Location') . ' ' . __('Not in warehouse import')]
             ], 400);
         }
 

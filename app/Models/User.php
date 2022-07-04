@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use DateTimeInterface;
+use Auth;
 
 class User extends Authenticatable
 {
@@ -17,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','api_token', 'username', 'level', 'avatar', 'IsDelete'
+        'name', 'email', 'password', 'api_token', 'username', 'level', 'avatar', 'IsDelete'
     ];
 
     /**
@@ -50,9 +51,16 @@ class User extends Authenticatable
 
     public function checkRole($role)
     {
-        if($this->role()->where('role', $role)->count() == 1)
-        {
-            return true;
+        if (Auth::check()) {
+            if (Auth::user()->level == 9999) return true;
+        }
+        if (Session::has('roles')) {
+            $find = array_search($role, Session::get('roles'));
+            if ($find !== false) return true;
+        } else {
+            if ($this->role()->where('role', $role)->count() == 1) {
+                return true;
+            }
         }
 
         return false;

@@ -31,23 +31,20 @@ class MasterWarehouseLibraries
 		$symbols = $request->Symbols;
 
 		$data = MasterWarehouse::where('IsDelete', 0)
-		->when($id, function($q, $id)
-		{
-			return $q->where('ID', $id);
-		})
-		->when($name, function($q, $name)
-		{
-			return $q->where('Name', $name);
-		})
-		->when($symbols, function($q, $symbols)
-		{
-			return $q->where('Symbols', $symbols);
-		})
-		->with([
-			'detail',
-			'detail.inventory',
-		])
-		->get();
+			->when($id, function ($q, $id) {
+				return $q->where('ID', $id);
+			})
+			->when($name, function ($q, $name) {
+				return $q->where('Name', $name);
+			})
+			->when($symbols, function ($q, $symbols) {
+				return $q->where('Symbols', $symbols);
+			})
+			->with([
+				'detail',
+				'detail.inventory',
+			])
+			->get();
 
 		return $data;
 	}
@@ -56,41 +53,41 @@ class MasterWarehouseLibraries
 	{
 		$id = $request->ID;
 		$message = [
-			'Symbols.unique' => $request->Symbols.' '.__('Already Exists').'!',
-			'MAC.unique'     => $request->MAC.' '.__('Already Exists').'!',
+			'Symbols.unique' => $request->Symbols . ' ' . __('Already Exists') . '!',
+			'MAC.unique'     => $request->MAC . ' ' . __('Already Exists') . '!',
 		];
 
-		Validator::make($request->all(), 
-		[
-			'Name'	  => 'required|max:255',
-	        'Symbols' => ['required','max:255',
-	        Rule::unique('Master_Warehouse')->where(function($q) use ($id) 
-	        {
-	        	$q->where('ID', '!=', $id)->where('IsDelete',0);
-	        })],
-	        'MAC' => ['max:255',
-	        // Rule::unique('Master_Warehouse')->where(function($q) use ($id) 
-	        // {
-	        // 	$q->where('ID', '!=', $id)->where('IsDelete',0);
-	        // })
-	    	],
-			'Quantity_Rows'    => 'required|min:1|numeric',
-			'Quantity_Columns' => 'required|min:1|numeric',
-	    ], $message)->validate();
+		$validator = Validator::make(
+			$request->all(),
+			[
+				'Name'	  => 'required|max:255',
+				'Symbols' => [
+					'required', 'max:255',
+					Rule::unique('Master_Warehouse')->where(function ($q) use ($id) {
+						$q->where('ID', '!=', $id)->where('IsDelete', 0);
+					})
+				],
+				'MAC' => [
+					'max:255',
+					// Rule::unique('Master_Warehouse')->where(function($q) use ($id) 
+					// {
+					// 	$q->where('ID', '!=', $id)->where('IsDelete',0);
+					// })
+				]
+			],
+			$message
+		)->validate();
 	}
 
 	public function add_or_update($request)
 	{
-		
 		$find = MasterWarehouse::where('IsDelete', 0)
-		->where('ID', $request->ID)
-		->first();
+			->where('ID', $request->ID)
+			->first();
 
-		if (!$find) 
-		{
-			if (!Auth::user()->checkRole('create_master') && Auth::user()->level != 9999) 
-			{
-				abort(401);	
+		if (!$find) {
+			if (!Auth::user()->checkRole('create_master') && Auth::user()->level != 9999) {
+				abort(401);
 			}
 
 			$find = MasterWarehouse::create([
@@ -115,13 +112,11 @@ class MasterWarehouseLibraries
 
 			$data = array();
 
-			for ($i=1; $i <= $request->Quantity_Rows ; $i++) 
-			{ 
-				for ($j=1; $j <= $request->Quantity_Columns ; $j++) 
-				{ 
+			for ($i = 1; $i <= $request->Quantity_Rows; $i++) {
+				for ($j = 1; $j <= $request->Quantity_Columns; $j++) {
 					array_push($data, [
-						'Name'               => $find->Symbols.'-'.$i.'-'.$j,
-						'Symbols'            => $find->Symbols.'-'.$i.'-'.$j,
+						'Name'               => $find->Symbols . '-' . $i . '-' . $j,
+						'Symbols'            => $find->Symbols . '-' . $i . '-' . $j,
 						'Warehouse_ID'       => $find->ID,
 						'MAC'                => $find->MAC,
 						'Quantity_Unit'      => $find->Quantity_Unit,
@@ -139,16 +134,13 @@ class MasterWarehouseLibraries
 			// dd($data);
 			$find->detail()->createMany($data);
 
-			$status = __('Create').' '.__('Success');
-		} 
-		else
-		{
-			
-			if (!Auth::user()->checkRole('update_master')) 
-			{
-				abort(401);	
+			$status = __('Create') . ' ' . __('Success');
+		} else {
+
+			if (!Auth::user()->checkRole('update_master') || Auth::user()->level != 9999) {
+				abort(401);
 			}
-			// dd('run');
+			// dd('run'); 
 			// dd($find);
 			$find->detail()->update([
 				'User_Updated' => Auth::user()->id,
@@ -158,19 +150,16 @@ class MasterWarehouseLibraries
 
 			$data = array();
 
-			for ($i=1; $i <= $request->Quantity_Rows ; $i++) 
-			{ 
-				for ($j=1; $j <= $request->Quantity_Columns ; $j++) 
-				{
+			for ($i = 1; $i <= $request->Quantity_Rows; $i++) {
+				for ($j = 1; $j <= $request->Quantity_Columns; $j++) {
 					$child = $find->update_detail()
-					// ->where('Name', $find->Symbols.'-'.$i.'-'.$j)
-					->where('Symbols', $find->Symbols.'-'.$i.'-'.$j)
-					->first();
-					if ($child) 
-					{
+						// ->where('Name', $find->Symbols.'-'.$i.'-'.$j)
+						->where('Symbols', $find->Symbols . '-' . $i . '-' . $j)
+						->first();
+					if ($child) {
 						$child->update([
-							'Name'               => $find->Symbols.'-'.$i.'-'.$j,
-							'Symbols'            => $find->Symbols.'-'.$i.'-'.$j,
+							'Name'               => $find->Symbols . '-' . $i . '-' . $j,
+							'Symbols'            => $find->Symbols . '-' . $i . '-' . $j,
 							'Warehouse_ID'       => $find->ID,
 							'MAC'                => $request->MAC,
 							'Quantity_Unit'      => $request->Quantity_Unit,
@@ -184,11 +173,10 @@ class MasterWarehouseLibraries
 							'Floor'              => $request->Floor,
 							'IsDelete'           => 0
 						]);
-					} else
-					{
+					} else {
 						$find->update_detail()->create([
-							'Name'               => $find->Symbols.'-'.$i.'-'.$j,
-							'Symbols'            => $find->Symbols.'-'.$i.'-'.$j,
+							'Name'               => $find->Symbols . '-' . $i . '-' . $j,
+							'Symbols'            => $find->Symbols . '-' . $i . '-' . $j,
 							'Warehouse_ID'       => $find->ID,
 							'MAC'                => $request->MAC,
 							'Quantity_Unit'      => $request->Quantity_Unit,
@@ -203,7 +191,6 @@ class MasterWarehouseLibraries
 							'IsDelete'           => 0
 						]);
 					}
-					
 				}
 			}
 
@@ -226,7 +213,7 @@ class MasterWarehouseLibraries
 			$find->IsDelete           = 0;
 			$find->save();
 
-			$status = __('Update').' '.__('Success');
+			$status = __('Update') . ' ' . __('Success');
 		}
 
 		return (object)[
@@ -238,8 +225,8 @@ class MasterWarehouseLibraries
 	public function destroy($request)
 	{
 		$find = MasterWarehouse::where('IsDelete', 0)
-		->where('ID', $request->ID)
-		->first();
+			->where('ID', $request->ID)
+			->first();
 
 		$find->User_Updated = Auth::user()->id;
 		$find->IsDelete     = 1;
@@ -256,17 +243,17 @@ class MasterWarehouseLibraries
 	// 	->where('ID', $request->Warehouse_ID)
 	// 	->first();
 	// 	$arr = [];
-	
+
 	// 	if($find->detail)
 	// 	{
 	// 		foreach($find->detail as $value)
 	// 		{
-				
+
 	// 			if($value->inventory)
 	// 			{
 	// 				foreach($value->inventory->GroupBy('Materials_ID') as $key => $value1)
 	// 				{
-						
+
 	// 					$arr1 = [
 	// 						'Materials_ID'=>$key,
 	// 						'Materials'=>$value1[0]->materials ? $value1[0]->materials->Symbols : '',
@@ -284,38 +271,31 @@ class MasterWarehouseLibraries
 	public function get_list_materials_in_warehouse($request)
 	{
 		$find = MasterWarehouse::where('IsDelete', 0)
-		->where('ID', $request->Warehouse_ID)
-		->first();
+			->where('ID', $request->Warehouse_ID)
+			->first();
 		$arr = [];
-	
-		if($find->detail)
-		{
-			foreach($find->detail as $value)
-			{
-				
-				if($value->inventory)
-				{
-					foreach ($value->inventory->GroupBy('Materials_ID') as $key => $value1) 
-                    {
-                        if (array_key_exists($key,$arr)) 
-                        {
-                            $quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
-                            $coun = $arr[$key]['Count'] += Count($value1);
-                        }
-                        else
-                        {
-                          $arr1 = [
-                                'Materials_ID'  => $key,
-                                'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
-                                'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
-                                'Count' => Count($value1)
-                            ]; 
-                            $arr[$key] = $arr1; 
-                        }
-                    }
+
+		if ($find->detail) {
+			foreach ($find->detail as $value) {
+
+				if ($value->inventory) {
+					foreach ($value->inventory->GroupBy('Materials_ID') as $key => $value1) {
+						if (array_key_exists($key, $arr)) {
+							$quan = $arr[$key]['Quantity'] += number_format(Collect($value1)->sum('Inventory'), 2, '.', '');
+							$coun = $arr[$key]['Count'] += Count($value1);
+						} else {
+							$arr1 = [
+								'Materials_ID'  => $key,
+								'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
+								'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
+								'Count' => Count($value1)
+							];
+							$arr[$key] = $arr1;
+						}
+					}
 				}
 			}
 		}
-		return($arr);
+		return ($arr);
 	}
 }
