@@ -4,19 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Libraries\UserLibraries;
-use Illuminate\Support\Facades\Log;
 use App\Models\WarehouseSystem\CommandInventory;
 use App\Libraries\WarehouseSystem\InventoryLibraries;
 use App\Models\WarehouseSystem\InventoryMaterials;
 use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\WarehouseSystem\ExportDetail;
 use App\Models\MasterData\MasterWarehouseDetail;
-use App\Models\MasterData\MasterWarehouse;
 use App\Models\MasterData\MasterMaterials;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 
 class InventoriesController extends Controller
 {
@@ -24,6 +21,7 @@ class InventoriesController extends Controller
         InventoryLibraries $InventoryLibraries
     ) {
         $this->inventory = $InventoryLibraries;
+        $this->middleware('auth:api');
     }
 
     public function command_inventory(Request $request)
@@ -209,8 +207,8 @@ class InventoriesController extends Controller
                         'Box_ID'           => $value['Box_ID'],
                         'Quantity'         => $value['Quantity'],
                         'Status'           => 1,
-                        // 'User_Created'     => Auth::user()->id,
-                        // 'User_Updated'     => Auth::user()->id,
+                        'User_Created'     => Auth::user()->id,
+                        'User_Updated'     => Auth::user()->id,
                         'IsDelete'         => 0
                     ];
                 } else {
@@ -218,8 +216,8 @@ class InventoriesController extends Controller
                         'Box_ID'           => $value['Box_ID'],
                         'Quantity'         => $value['Quantity'],
                         'Status'           => 3,
-                        // 'User_Created'     => Auth::user()->id,
-                        // 'User_Updated'     => Auth::user()->id,
+                        'User_Created'     => Auth::user()->id,
+                        'User_Updated'     => Auth::user()->id,
                         'IsDelete'         => 0
                     ];
                 }
@@ -254,8 +252,8 @@ class InventoriesController extends Controller
                             'Quantity'              => $value['Quantity'],
                             'Status'                => 2,
                             'Type'                  => 0,
-                            // 'User_Created'          => Auth::user()->id,
-                            // 'User_Updated'          => Auth::user()->id,
+                            'User_Created'          => Auth::user()->id,
+                            'User_Updated'          => Auth::user()->id,
                             'IsDelete'              => 0
                         ];
                         InventoryMaterials::create($arr1);
@@ -270,8 +268,8 @@ class InventoriesController extends Controller
                             'Quantity'              => $value['Quantity'],
                             'Status'                => 2,
                             'Type'                  => 0,
-                            // 'User_Created'          => Auth::user()->id,
-                            // 'User_Updated'          => Auth::user()->id,
+                            'User_Created'          => Auth::user()->id,
+                            'User_Updated'          => Auth::user()->id,
                             'IsDelete'              => 0
                         ];
                         InventoryMaterials::create($arr2);
@@ -318,8 +316,8 @@ class InventoriesController extends Controller
                             'Status'                => 1,
                             'Type'                  => 1,
                             'Time_Export'           => Carbon::now(),
-                            // 'User_Created'     		=> Auth::user()->id,
-                            // 'User_Updated'     		=> Auth::user()->id,
+                            'User_Created'             => Auth::user()->id,
+                            'User_Updated'             => Auth::user()->id,
                             'IsDelete'              => 0
                         ];
                         ExportDetail::Create($arr1);
@@ -336,14 +334,14 @@ class InventoriesController extends Controller
                             'Warehouse_Detail_ID' => $value->Warehouse_System_ID,
                             'Status'              => 1,
                             'Type'                => 2,
-                            // 'User_Created'        => Auth::user()->id,
-                            // 'User_Updated'        => Auth::user()->id,
+                            'User_Created'        => Auth::user()->id,
+                            'User_Updated'        => Auth::user()->id,
                             'IsDelete'            => 0
                         ];
                         ImportDetail::create($arr);
                         ImportDetail::where('ID', $value1->ID)
                             ->update([
-                                // 'User_Updated'     => Auth::user()->id,
+                                'User_Updated'     => Auth::user()->id,
                                 'Inventory'        => 0,
                             ]);
                     }
@@ -365,8 +363,8 @@ class InventoriesController extends Controller
                             'Warehouse_Detail_ID' => $value->Warehouse_System_ID,
                             'Status'              => 1,
                             'Type'                => 2,
-                            // 'User_Created'        => Auth::user()->id,
-                            // 'User_Updated'        => Auth::user()->id,
+                            'User_Created'        => Auth::user()->id,
+                            'User_Updated'        => Auth::user()->id,
                             'IsDelete'            => 0
                         ];
                         ImportDetail::create($arr);
@@ -381,8 +379,8 @@ class InventoriesController extends Controller
                             'Warehouse_Detail_ID' => $value->Warehouse_System_ID,
                             'Status'              => 1,
                             'Type'                => 2,
-                            // 'User_Created'        => Auth::user()->id,
-                            // 'User_Updated'        => Auth::user()->id,
+                            'User_Created'        => Auth::user()->id,
+                            'User_Updated'        => Auth::user()->id,
                             'IsDelete'            => 0
                         ];
                         ImportDetail::create($arr);
@@ -394,7 +392,7 @@ class InventoriesController extends Controller
                         ->first();
                     if ($value1) {
                         ImportDetail::where('ID', $value1->ID)->update([
-                            // 'User_Updated'     => Auth::user()->id,
+                            'User_Updated'     => Auth::user()->id,
                             'Inventory'        => 0,
                         ]);
 
@@ -408,8 +406,8 @@ class InventoriesController extends Controller
                             'Status'              => 1,
                             'Type'                => 1,
                             'Time_Export'         => Carbon::now(),
-                            // 'User_Created'         => Auth::user()->id,
-                            // 'User_Updated'         => Auth::user()->id,
+                            'User_Created'         => Auth::user()->id,
+                            'User_Updated'         => Auth::user()->id,
                             'IsDelete'            => 0
                         ];
                         ExportDetail::Create($arr1);
@@ -419,7 +417,7 @@ class InventoriesController extends Controller
             CommandInventory::where('ID', $request->command_id)
                 ->update([
                     'Status' => 1,
-                    // 'User_Updated'        => Auth::user()->id,
+                    'User_Updated'        => Auth::user()->id,
                 ]);
 
             return response()->json([

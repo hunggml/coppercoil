@@ -4,24 +4,42 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Libraries\WarehouseSystem\ImportLibraries;
-use App\Libraries\MasterData\MasterMaterialsLibraries;
-use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
-use App\Libraries\MasterData\MasterWarehouseLibraries;
-use App\Models\WarehouseSystem\CommandImport;
-use App\Models\WarehouseSystem\ImportDetail;
-use App\Models\MasterData\MasterWarehouseDetail;
-use App\Models\MasterData\MasterMaterials;
-use App\Models\User;
-use auth;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cache;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('auth:api', ['except' => ['login']]);
+	}
 
+	public function login(Request $request)
+	{
+		$credentials = $request->only('username', 'password');
+		if (Auth::attempt($credentials)) {
+			try {
+				if (!$token = JWTAuth::attempt($credentials)) {
+					return response()->json(['error' => 'invalid_credentials'], 400);
+				}
+			} catch (JWTException $e) {
+				return response()->json(['error' => 'could_not_create_token'], 500);
+			}
+
+			return response()->json([
+				'user' => Auth::user(),
+				'token' => $token
+			]);
+		}
+	}
+
+	public function logout()
+	{
+		auth()->logout();
+
+		return response()->json(['message' => __('Logout') . ' ' . __('Success')]);
+	}
 	// public function login(Request $request)
 	// {
 	// 	$username = $request->username;

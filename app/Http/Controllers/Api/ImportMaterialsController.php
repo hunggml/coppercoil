@@ -4,11 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Libraries\WarehouseSystem\ImportLibraries;
-use App\Libraries\MasterData\MasterMaterialsLibraries;
-use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
-use App\Libraries\MasterData\MasterWarehouseLibraries;
-use App\Models\WarehouseSystem\CommandImport;
 use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\WarehouseSystem\ExportDetail;
 use App\Models\WarehouseSystem\TransferMaterials;
@@ -21,6 +16,10 @@ use Carbon\Carbon;
 
 class ImportMaterialsController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('auth:api');
+	}
 
 	public function get_data_input_pallet(Request $request)
 	{
@@ -77,17 +76,17 @@ class ImportMaterialsController extends Controller
 		$location = MasterWarehouseDetail::where('IsDelete', 0)
 			->where('Symbols', $request->Warehouse_Detail_ID)
 			->first();
-
-		$warehouse = MasterWarehouse::where('IsDelete', 0)
-			->where('ID', $location->Warehouse_ID)
-			->first();
-
 		if (!$location) {
 			return response()->json([
 				'success' 	=> false,
 				'data' 		=> ['message' => __('Location') . ' ' . __('Does Not Exist')]
 			], 400);
 		}
+
+		$warehouse = MasterWarehouse::where('IsDelete', 0)
+			->where('ID', $location->Warehouse_ID)
+			->first();
+
 
 		if (count($data) > 0) {
 			foreach ($data as $value) {
@@ -126,7 +125,7 @@ class ImportMaterialsController extends Controller
 				$data =  ImportDetail::where('IsDelete', 0)
 					->where('ID', $value->ID)
 					->update([
-						// 'User_Updated'     => Auth::user()->id,
+						'User_Updated'     		=> Auth::user()->id,
 						'Inventory'       		=> $value->Quantity,
 						'Time_Import'      		=> Carbon::now(),
 						'Warehouse_Detail_ID'   => $location->ID,
@@ -307,15 +306,15 @@ class ImportMaterialsController extends Controller
 				'Status'    			=> 1, // xuất
 				'Type'      			=> 2, // xuất cập nhật vị trí
 				'Time_Export' 			=> Carbon::now(),
-				// 'User_Created'     		=> Auth::user()->id,
-				// 'User_Updated'     		=> Auth::user()->id,
+				'User_Created'     		=> Auth::user()->id,
+				'User_Updated'     		=> Auth::user()->id,
 				'IsDelete'         		=> 0
 			];
 			ExportDetail::Create($arr1);
 
 			$data->update([
 				'Inventory' => 0, // không tồn kho
-				// 'User_Updated' => Auth::user()->id
+				'User_Updated' => Auth::user()->id
 			]);
 
 			$arr = [
@@ -330,8 +329,8 @@ class ImportMaterialsController extends Controller
 				'Warehouse_Detail_ID' => $location->ID,
 				'Status'              => 1, // đã nhập kho
 				'Type'                => 3, // nhập cập nhật vị trí
-				// 'User_Created'        => Auth::user()->id,
-				// 'User_Updated'        => Auth::user()->id,
+				'User_Created'        => Auth::user()->id,
+				'User_Updated'        => Auth::user()->id,
 				'IsDelete'            => 0
 			];
 			ImportDetail::create($arr);
@@ -346,8 +345,8 @@ class ImportMaterialsController extends Controller
 				'Warehouse_Detail_ID_To' 	=> $location->ID,
 				'Quantity' 					=> $data->Quantity,
 				'Status' 					=> 2, // chuyển kho cho cập nhật vị trí
-				// 'User_Created'     			=> Auth::user()->id,
-				// 'User_Updated'     			=> Auth::user()->id,
+				'User_Created'     			=> Auth::user()->id,
+				'User_Updated'     			=> Auth::user()->id,
 				'IsDelete'         			=> 0
 			]);
 
@@ -418,15 +417,15 @@ class ImportMaterialsController extends Controller
 					'Status'    			=> 1, // đã xuất
 					'Type'      			=> 2, // xuất cập nhật vị trí
 					'Time_Export' 			=> Carbon::now(),
-					// 'User_Created'    		=> Auth::user()->id,
-					// 'User_Updated'     		=> Auth::user()->id,
+					'User_Created'    		=> Auth::user()->id,
+					'User_Updated'     		=> Auth::user()->id,
 					'IsDelete'         		=> 0
 				];
 				ExportDetail::Create($arr1);
 
 				$value1->update([
 					'Inventory' => 0, // không tồn kho
-					// 'User_Updated' => Auth::user()->id,
+					'User_Updated' => Auth::user()->id,
 				]);
 
 				$arr = [
@@ -441,8 +440,8 @@ class ImportMaterialsController extends Controller
 					'Warehouse_Detail_ID' => $location->ID,
 					'Status'              => 1, // đã nhập kho
 					'Type'                => 3, // nhập cập nhật vị trí
-					// 'User_Created'        => Auth::user()->id,
-					// 'User_Updated'        => Auth::user()->id,
+					'User_Created'        => Auth::user()->id,
+					'User_Updated'        => Auth::user()->id,
 					'IsDelete'            => 0
 				];
 				ImportDetail::create($arr);
@@ -457,8 +456,8 @@ class ImportMaterialsController extends Controller
 					'Warehouse_Detail_ID_To' 	=> $location->ID,
 					'Quantity' 					=> $value1->Quantity,
 					'Status' 					=> 2, // chuyển cho cho cập nhật
-					// 'User_Created'     			=> Auth::user()->id,
-					// 'User_Updated'     			=> Auth::user()->id,
+					'User_Created'     			=> Auth::user()->id,
+					'User_Updated'     			=> Auth::user()->id,
 					'IsDelete'        			=> 0
 				]);
 
@@ -583,7 +582,7 @@ class ImportMaterialsController extends Controller
 			} else {
 				return response()->json([
 					'success' => false,
-					'data'	  => ['message' => __('Box') . ' ' . __('Does Not Exist')]
+					'data'	  => ['message' => $val['Box_ID'] . ' ' . __('Not in command export')]
 				], 400);
 			}
 		}
@@ -622,8 +621,8 @@ class ImportMaterialsController extends Controller
 				'Type'             => 1, // nhập lại
 				'Time_Created'	   => now(),
 				'Time_Updated'	   => now(),
-				// 'User_Created'     => Auth::user()->id,
-				// 'User_Updated'     => Auth::user()->id,
+				'User_Created'     => Auth::user()->id,
+				'User_Updated'     => Auth::user()->id,
 				'IsDelete'         => 0
 			];
 
