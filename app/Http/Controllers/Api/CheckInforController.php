@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use App\Models\WarehouseSystem\ProductReport;
 use App\Models\WarehouseSystem\ImportDetail;
 use App\Models\MasterData\MasterWarehouseDetail;
-use Illuminate\Support\Arr;
 
-class CheckInforController
+
+class CheckInforController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function check_infor(Request $request)
     {
         $type     = $request->Type;

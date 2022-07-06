@@ -14,10 +14,9 @@ use App\Models\MasterData\MasterWarehouseDetail;
 use App\Models\MasterData\GroupMaterials;
 use App\Libraries\WarehouseSystem\ImportLibraries;
 use App\Mail\MailNotify;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\Constraint\Count;
 
 class ExportMaterialsController extends Controller
 {
@@ -27,6 +26,7 @@ class ExportMaterialsController extends Controller
     ) {
         $this->send_mail = $MailNotify;
         $this->import = $ImportLibraries;
+        $this->middleware('auth:api');
     }
 
     public function get_warehouse_and_unit()
@@ -141,11 +141,39 @@ class ExportMaterialsController extends Controller
         }
 
         $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID', $request->To)->first();
+        if (!$warehouse) {
+            return response()->json([
+                'success'     => false,
+                'data'         => ['message' => __('Warehouse') . ' ' . __('To') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
         $groupMat  = GroupMaterials::where('IsDelete', 0)->where('Group_ID', $warehouse->Group_Materials_ID)->where('Materials_ID', $request->Materials_ID)->first();
         $mat       = MasterMaterials::where('IsDelete', 0)->where('ID', $request->Materials_ID)->first();
         $unit      = MasterUnit::where('IsDelete', 0)->where('ID', $request->Unit_ID)->first();
         $find      = MasterWarehouse::where('IsDelete', 0)->where('ID', $request->Go)->first();
         $arr       = [];
+
+
+        if (!$find) {
+            return response()->json([
+                'success'     => false,
+                'data'         => ['message' => __('Warehouse') . ' ' . __('Go') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
+
+        if (!$unit) {
+            return response()->json([
+                'success'     => false,
+                'data'         => ['message' => __('Unit') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
+
+        if (!$mat) {
+            return response()->json([
+                'success'     => false,
+                'data'         => ['message' => __('Materials') . ' ' . __('Does Not Exist')]
+            ], 400);
+        }
 
         if (!is_null($warehouse->Group_Materials_ID)) {
             if (!$groupMat) {
@@ -175,6 +203,12 @@ class ExportMaterialsController extends Controller
                     }
                 }
             }
+        }
+        if (count($arr) <= 0) {
+            return response()->json([
+                'success' => false,
+                'data' => ['message' => __('Materials') . ' ' . __("Don't") . ' ' . __('Stock')]
+            ], 400);
         }
 
         if ($unit->Type == 2) // box
@@ -229,8 +263,8 @@ class ExportMaterialsController extends Controller
             'Count'         => $request->Count,
             'Type'          => 1, // Kiểu xuất - PDA
             'Status'        => 0, // chờ xác nhận
-            // 'User_Created'  => Auth::user()->id,
-            // 'User_Updated'  => Auth::user()->id,
+            'User_Created'  => Auth::user()->id,
+            'User_Updated'  => Auth::user()->id,
             'IsDelete'      => 0
         ]);
         $num    = 1;
@@ -248,7 +282,7 @@ class ExportMaterialsController extends Controller
                     ExportMaterials::where('IsDelete', 0)
                         ->where('ID', $data->ID)
                         ->update([
-                            // 'User_Updated' => Auth::user()->id,
+                            'User_Updated' => Auth::user()->id,
                             'Status'       => 1
                         ]);
                 } else {
@@ -518,8 +552,8 @@ class ExportMaterialsController extends Controller
                         'Status'        => 0,
                         'Type'          => 0,
                         'STT'           => $dem,
-                        // 'User_Created'     => Auth::user()->id,
-                        // 'User_Updated'     => Auth::user()->id,
+                        'User_Created'     => Auth::user()->id,
+                        'User_Updated'     => Auth::user()->id,
                         'IsDelete'         => 0
                     ];
 
@@ -543,7 +577,7 @@ class ExportMaterialsController extends Controller
                     ExportMaterials::where('IsDelete', 0)
                         ->where('ID', $request->ID)
                         ->update([
-                            // 'User_Updated'   => Auth::user()->id,
+                            'User_Updated'   => Auth::user()->id,
                             'Status'         => 1
                         ]);
 
@@ -554,7 +588,7 @@ class ExportMaterialsController extends Controller
                     return ExportMaterials::where('IsDelete', 0)
                         ->where('ID', $request->ID)
                         ->update([
-                            // 'User_Updated'   => Auth::user()->id,
+                            'User_Updated'   => Auth::user()->id,
                             'Status'         => 2
                         ]);
                 }
@@ -563,7 +597,7 @@ class ExportMaterialsController extends Controller
         return ExportMaterials::where('IsDelete', 0)
             ->where('ID', $request->ID)
             ->update([
-                // 'User_Updated'   => Auth::user()->id,
+                'User_Updated'   => Auth::user()->id,
                 'Status'         => ($data->Status + 1)
             ]);
     }
@@ -573,34 +607,70 @@ class ExportMaterialsController extends Controller
         $data = ExportMaterials::where('IsDelete', 0)
             ->where('Status', 2)
             ->get();
+        if (Auth::user()->level != 9999) {
+            $warehouse = MasterWarehouse::where('IsDelete', 0)->where('ID', Auth::user()->software)->first();
+            if (!$warehouse) {
+                return false;
+            }
+        }
 
         $arr = [];
         foreach ($data as $value) {
-            $data2 = ExportDetail::where('IsDelete', 0)
-                ->where('Export_ID', $value->ID)
-                ->where('Status', 1)
-                ->select('ID', 'Export_ID', 'Box_ID', 'Materials_ID', 'Warehouse_Detail_ID', 'Quantity')
-                ->get();
+            if (Auth::user()->level == 9999) {
+                $data2 = ExportDetail::where('IsDelete', 0)
+                    ->where('Export_ID', $value->ID)
+                    ->where('Status', 1)
+                    ->select('ID', 'Export_ID', 'Box_ID', 'Materials_ID', 'Warehouse_Detail_ID', 'Quantity')
+                    ->get();
 
-            $data3 = ExportDetail::where('IsDelete', 0)
-                ->where('Export_ID', $value->ID)
-                ->where('Transfer', 1)->get();
+                $data3 = ExportDetail::where('IsDelete', 0)
+                    ->where('Export_ID', $value->ID)
+                    ->where('Transfer', 1)->get();
 
-            $obj = [
-                "Name"                  => ($value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT'))) . '-' . date_format(date_create($value->Time_Created), "YmdHis"),
-                'ID'                    => $value->ID,
-                'Materials'             => $value->materials ? $value->materials->Symbols : '',
-                'Unit'                  => $value->Quantity ? 'Kg' : 'Box',
-                'Go'                    => $value->go ? $value->go->Name : '',
-                'To'                    => $value->to ? $value->to->Name : '',
-                'Transfer'              => $value->go != $value->to ? true : false,
-                'Quantitative_Request'  => $value->Quantity ? floatval($value->Quantity) : $value->Count,
-                'Quantitative_Exported' => $value->Quantity ? number_format(Collect($data2)->sum('Quantity'), 2, '.', '') : Count($data2),
-                'Quantitative_Transfer' => Count($data3),
-                'Boxs_Exported'         => $data2,
-            ];
+                $obj = [
+                    "Name"                  => ($value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT'))) . '-' . date_format(date_create($value->Time_Created), "YmdHis"),
+                    'ID'                    => $value->ID,
+                    'Materials'             => $value->materials ? $value->materials->Symbols : '',
+                    'Unit'                  => $value->Quantity ? 'Kg' : 'Box',
+                    'Go'                    => $value->go ? $value->go->Name : '',
+                    'To'                    => $value->to ? $value->to->Name : '',
+                    'Transfer'              => $value->go != $value->to ? true : false,
+                    'Quantitative_Request'  => $value->Quantity ? floatval($value->Quantity) : $value->Count,
+                    'Quantitative_Exported' => $value->Quantity ? number_format(Collect($data2)->sum('Quantity'), 2, '.', '') : Count($data2),
+                    'Quantitative_Transfer' => Count($data3),
+                    'Boxs_Exported'         => $data2,
+                ];
 
-            array_push($arr, $obj);
+                array_push($arr, $obj);
+            } else {
+                if ($value->go->Name == $warehouse->Name || $value->to->Name == $warehouse->Name) {
+                    $data2 = ExportDetail::where('IsDelete', 0)
+                        ->where('Export_ID', $value->ID)
+                        ->where('Status', 1)
+                        ->select('ID', 'Export_ID', 'Box_ID', 'Materials_ID', 'Warehouse_Detail_ID', 'Quantity')
+                        ->get();
+
+                    $data3 = ExportDetail::where('IsDelete', 0)
+                        ->where('Export_ID', $value->ID)
+                        ->where('Transfer', 1)->get();
+
+                    $obj = [
+                        "Name"                  => ($value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT'))) . '-' . date_format(date_create($value->Time_Created), "YmdHis"),
+                        'ID'                    => $value->ID,
+                        'Materials'             => $value->materials ? $value->materials->Symbols : '',
+                        'Unit'                  => $value->Quantity ? 'Kg' : 'Box',
+                        'Go'                    => $value->go ? $value->go->Name : '',
+                        'To'                    => $value->to ? $value->to->Name : '',
+                        'Transfer'              => $value->go != $value->to ? true : false,
+                        'Quantitative_Request'  => $value->Quantity ? floatval($value->Quantity) : $value->Count,
+                        'Quantitative_Exported' => $value->Quantity ? number_format(Collect($data2)->sum('Quantity'), 2, '.', '') : Count($data2),
+                        'Quantitative_Transfer' => Count($data3),
+                        'Boxs_Exported'         => $data2,
+                    ];
+
+                    array_push($arr, $obj);
+                }
+            }
         }
         if (count($arr) > 0) {
             return response()->json([
@@ -610,7 +680,7 @@ class ExportMaterialsController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'data'    => ['message' => __('Does Not Exist') . ' ' . __('Command') . ' ' . __('Export')]
+                'data'    => []
             ], 400);
         }
     }
@@ -633,7 +703,7 @@ class ExportMaterialsController extends Controller
             }
             ExportMaterials::where('IsDelete', 0)->where('ID', $data->ID)
                 ->update([
-                    // 'User_Updated' => Auth::user()->id,
+                    'User_Updated' => Auth::user()->id,
                     'Status'       => 3
                 ]);
             return response()->json([
@@ -778,7 +848,7 @@ class ExportMaterialsController extends Controller
                         ->orderBy('ID', 'desc')
                         ->update([
                             'Inventory'     => 0,
-                            // 'User_Updated'  => Auth::user()->id
+                            'User_Updated'  => Auth::user()->id
                         ]);
 
                     $Quantitative_Exported = ExportDetail::where('IsDelete', 0)->where('Export_ID', $request->command_id)->where('Status', 1)->get();
@@ -786,7 +856,7 @@ class ExportMaterialsController extends Controller
                         if ($command->Count == Count($Quantitative_Exported)) {
                             ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
                                 ->update([
-                                    // 'User_Updated' => Auth::user()->id,
+                                    'User_Updated' => Auth::user()->id,
                                     'Status'       => 3
                                 ]);
                         }
@@ -817,7 +887,7 @@ class ExportMaterialsController extends Controller
                             ->orderBy('ID', 'desc')
                             ->update([
                                 'Inventory'     => 0,
-                                // 'User_Updated'  => Auth::user()->id
+                                'User_Updated'  => Auth::user()->id
                             ]);
                     } else {
                         foreach ($detail as $value) {
@@ -844,7 +914,7 @@ class ExportMaterialsController extends Controller
                             ->orderBy('ID', 'desc')
                             ->update([
                                 'Inventory'     => 0,
-                                // 'User_Updated'  => Auth::user()->id
+                                'User_Updated'  => Auth::user()->id
                             ]);
                     }
                 } else {
@@ -1009,8 +1079,8 @@ class ExportMaterialsController extends Controller
                     'Warehouse_Detail_ID_To' => $location->ID,
                     'Quantity'               => $data1->Quantity,
                     'Status'                 => 1,
-                    // 'User_Created'           => Auth::user()->id,
-                    // 'User_Updated'           => Auth::user()->id,
+                    'User_Created'           => Auth::user()->id,
+                    'User_Updated'           => Auth::user()->id,
                     'IsDelete'               => 0
                 ]);
                 $dataSave1 = ([
@@ -1036,7 +1106,7 @@ class ExportMaterialsController extends Controller
                     ->where('ID', $data1->ID)
                     ->update([
                         'Transfer' => 1,
-                        // 'User_Updated'     => Auth::user()->id,
+                        'User_Updated'     => Auth::user()->id,
                     ]);
                 $dem++;
             }
@@ -1048,7 +1118,7 @@ class ExportMaterialsController extends Controller
         if (Count($Quantitative_Exported) == Count($Quantitative_Transfer)) {
             ExportMaterials::where('IsDelete', 0)->where('ID', $command->ID)
                 ->update([
-                    // 'User_Updated' => Auth::user()->id,
+                    'User_Updated' => Auth::user()->id,
                     'Status'       => 3
                 ]);
         }

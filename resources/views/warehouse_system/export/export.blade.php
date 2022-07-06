@@ -190,7 +190,7 @@
 								<td>{{$value->Count ? (count($value->detail->where('Transfer',1))) : floatval(collect($value->detail->where('Transfer',1))->sum('Quantity')) }}</td>
 								@endif 
 								<td>{{$value->Count ? 'Box' : 'Kg' }}</td>
-								@if( (floatval($a) - floatval($b)) < 0 && (($value->go ? $value->go->Symbols : '') != ($value->to ? $value->to->Symbols : '')))
+								@if($value->Status != 3 && (floatval($a) - floatval($b)) < 0 && (($value->go ? $value->go->Symbols : '') != ($value->to ? $value->to->Symbols : '')))
 									<td>
 										{{__('Waiting')}} {{__('Transfer')}} {{__('Warehouse')}}
 									</td>
