@@ -1,67 +1,116 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name') }}</title>
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="180x180" href="{{ asset('dist/img/sti.png') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/multi-select.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <style>
+    </style>
+</head>
 
+<body>
+    <div class="flex-center position-ref full-height">
+        <div class="top-right links">
+            <a href="{{ url('/') }}">{{ __('Back') }}</a>
+            <a href="{{ route('home.changeLanguage', ['vi']) }}" class="dropdown-item">
+                {{ __('Vietnamese') }}
+            </a>
+            <a href="{{ route('home.changeLanguage', ['en']) }}" class="dropdown-item">
+                English
+            </a>
+            <a href="{{ route('home.changeLanguage', ['ko']) }}" class="dropdown-item hide">
+                {{ __('Korean') }}
+            </a>
+        </div>
+        <div class="container">
+            <div class="card" style="width: 100%;">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="username" class="col-md-4 col-form-label text-md-right">{{ __('User Name') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="username" type="username" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autofocus placeholder="{{__('Enter')}} {{__('User Name')}}" autocomplete="off">
-
-                                @error('username')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                    <div class="row content_body">
+                        <div class="col-7 logo">
                         </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="{{__('Enter')}} {{__('Password')}}">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
+                        <div class="col-5 " style="background-color: white;">
+                            <div style="background-color: white;">
+                                <div class="title_form">
+                                    <p class="control title2">{{ __('Login') }}</p>
+                                    <label> STI MES
                                     </label>
                                 </div>
                             </div>
-                        </div>
+                            <div style="background-color: white;">
+                                {{-- <x-auth-validation-errors class="mb-4" :errors="$errors" /> --}}
+                                <form method="POST" action="{{ route('login') }}">
+                                    @csrf
+                                    <div class="form-input">
+                                        <div class="col-12 form-group">
+                                            <label>{{ __('User Name') }}</label>
+                                            <input type="text" class="form-control main-form" maxlength="20"
+                                                name="username" placeholder="{{ __('User Name') }}" required
+                                                autofocus>
+                                            @error('username')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
 
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-outline-primary">
-                                    {{ __('Login') }}
-                                </button>
+                                        <div class="col-12 form-group pass">
+                                            <label>{{ __('Password') }}</label>
+                                            <input type="password" class="form-control main-form" maxlength="20"
+                                                name="password" placeholder="{{ __('Password') }}" required>
+                                            @error('password')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+                                        <div class="col-12 remember">
+                                            <input type="checkbox" value="lsRememberMe" name="remember" id="rememberMe">
+                                            <label for="rememberMe">{{ __('Remember Me') }}</label>
+                                        </div>
+                                        <div class="col-12 btn-div">
+                                            <button class="btn btn-primary">{{ __('Login') }}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div style="background-color: white;">
+                                <div class="title_form">
+                                    <!-- <p style="color: gray;">khong co tai khoan ? <a href="register.html">register</a> -->
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
+
             </div>
         </div>
+        {{-- </div> --}}
     </div>
-</div>
-@endsection
+</body>
+<!-- ./wrapper -->
+<script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('dist/js/p5.min.js') }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ asset('dist/js/adminlte.js') }}"></script>
+<script>
+    let lang = $('html').attr('lang');
+</script>
+<script src="{{ asset('dist/js/rowgroup.js') }}"></script>
+<script src="{{ asset('plugins/dhtml/dhtmlgantt.js') }}"></script>
+<!-- AngularJS 1.6.9 -->
+<script src="{{ asset('js/languages/vi.js') }}"></script>
+<script src="{{ asset('js/languages/en.js') }}"></script>
+<script src="{{ asset('js/languages/ko.js') }}"></script>
+<!-- jQuery -->
+<script></script>
+
+</html>

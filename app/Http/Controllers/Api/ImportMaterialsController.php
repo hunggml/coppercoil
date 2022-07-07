@@ -36,12 +36,12 @@ class ImportMaterialsController extends Controller
 			], 400);
 		} else {
 			$val = [];
-			$val['Pallet_ID'] 		= $command_import[0]->Pallet_ID;
-			$val['Materials'] 		= $command_import[0]->materials ? $command_import[0]->materials->Symbols : '';
-			$val['Spec']			= $command_import[0]->materials ? $command_import[0]->materials->Spec   : '';
-			$val['Quantity'] 		= number_format(collect($command_import)->sum('Quantity'), 2, '.', '');
-			$val['Count'] 			= count($command_import);
-			$val['List'] 			= $command_import;
+			$val['Pallet_ID'] 	= $command_import[0]->Pallet_ID;
+			$val['Materials'] 	= $command_import[0]->materials ? $command_import[0]->materials->Symbols : '';
+			$val['Spec'] 		= $command_import[0]->materials ? $command_import[0]->materials->Spec   : '';
+			$val['Quantity'] 	= number_format(collect($command_import)->sum('Quantity'), 2, '.', '');
+			$val['Count'] 		= count($command_import);
+			$val['List'] 		= $command_import;
 
 			return response()->json([
 				'success' => true,
