@@ -616,6 +616,7 @@ class ExportMaterialsController extends Controller
 
         $arr = [];
         foreach ($data as $value) {
+            // return response()->json($value);
             if (Auth::user()->level == 9999) {
                 $data2 = ExportDetail::where('IsDelete', 0)
                     ->where('Export_ID', $value->ID)
