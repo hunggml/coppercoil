@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\MasterData\MasterSupplierController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\MasterData\MasterUnitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,3 +65,17 @@ Route::post('/import-packing-list', 'Api\ImportMaterialsController@import_packin
 // update location
 Route::get('/get-data-update-location', 'Api\ImportMaterialsController@get_data_update_location');
 Route::post('/update-location', 'Api\ImportMaterialsController@update_location');
+
+
+
+// masterdata
+Route::prefix('settings')->group(function () {
+    Route::prefix('unit')->group(function () {
+        Route::get('/', [MasterUnitController::class, 'index']);
+        // Route::get('/history', [MasterUnitController::class, 'history']);
+    });
+    Route::prefix('supplier')->group(function () {
+        Route::get('/', [MasterSupplierController::class, 'index']);
+        // Route::get('/history', [MasterUnitController::class, 'history']);
+    });
+});

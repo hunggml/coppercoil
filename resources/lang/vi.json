@@ -321,5 +321,7 @@
 	"Quantity has been exported, dont need export more" : "Đã xuất đủ khối lượng, không cần xuất thêm",
 	"Roll number has been exported, dont need export more" : "Đã xuất đủ số thùng, không cần xuất thêm",
 	"Dont import stock" : "Chưa nhập kho",
-	"Succes" : "Thành Công"
+	"Succes" : "Thành Công",
+	"False": "Thất Bại"
+
 }

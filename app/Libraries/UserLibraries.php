@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Libraries;
 
@@ -19,11 +19,11 @@ class UserLibraries
 	public function get_all_list_user()
 	{
 		$data = User::where('IsDelete', 0)->where('level', '!=', 9999)
-		->with([
-			'role'
-		])
-		->get();
-		
+			->with([
+				'role'
+			])
+			->get();
+
 		return $data;
 	}
 
@@ -33,20 +33,17 @@ class UserLibraries
 		$name     = $request->name;
 		$username = $request->username;
 		$data = User::where('IsDelete', 0)
-		->where('level', '!=', 9999)
-		->when($id, function($q, $id)
-		{
-			return $q->where('id', $id);
-		})
-		->when($name, function($q, $name)
-		{
-			return $q->where('name', $name);
-		})
-		->when($username, function($q, $username)
-		{
-			return $q->where('username', $username);
-		})
-		->select('id', 'name', 'username')->first();
+			->where('level', '!=', 9999)
+			->when($id, function ($q, $id) {
+				return $q->where('id', $id);
+			})
+			->when($name, function ($q, $name) {
+				return $q->where('name', $name);
+			})
+			->when($username, function ($q, $username) {
+				return $q->where('username', $username);
+			})
+			->select('id', 'name', 'username')->first();
 
 		return $data;
 	}
@@ -62,8 +59,8 @@ class UserLibraries
 		$email    = $request->email;
 		$username = $request->username;
 		$message  = [
-			'unique.username'   => $request->username.' '.__('Already Exist').'!',
-			'unique.email'      => $request->email.' '.__('Already Exist').'!',
+			'unique.username'   => $request->username . ' ' . __('Already Exist') . '!',
+			'unique.email'      => $request->email . ' ' . __('Already Exist') . '!',
 		];
 
 		$validation = Validator::make($request->all(), [
@@ -71,8 +68,7 @@ class UserLibraries
 			'username' => [
 				'required',
 				'max:255',
-				Rule::unique('users')->where(function($q) use ($id, $username)
-				{
+				Rule::unique('users')->where(function ($q) use ($id, $username) {
 					$q->where('id', '!=', $id)->where('IsDelete', 0);
 				}),
 			],
@@ -80,15 +76,13 @@ class UserLibraries
 				'required',
 				'max:255',
 				'email',
-				Rule::unique('users')->where(function($q) use ($id, $email)
-				{
+				Rule::unique('users')->where(function ($q) use ($id, $email) {
 					$q->where('id', '!=', $id)->where('IsDelete', 0);
 				}),
 			],
 		], $message)->validate();
 
 		return $validation;
-
 	}
 
 	public function show($request)
@@ -98,32 +92,28 @@ class UserLibraries
 		$username = $request->username;
 
 		$find = User::where('IsDelete', 0)
-		->where('level', '!=', 9999)
-		->when($id, function($q, $id)
-		{
-			return $q->where('id', $id);
-		})
-		->when($name, function($q, $name)
-		{
-			return $q->where('name', $name);
-		})
-		->when($username, function($q, $username)
-		{
-			return $q->where('username', $username);
-		})
-		->first();
+			->where('level', '!=', 9999)
+			->when($id, function ($q, $id) {
+				return $q->where('id', $id);
+			})
+			->when($name, function ($q, $name) {
+				return $q->where('name', $name);
+			})
+			->when($username, function ($q, $username) {
+				return $q->where('username', $username);
+			})
+			->first();
 
 		return $find;
 	}
 
 	public function reset_password($request)
 	{
-		if (Auth::user()->level == 9999 && Auth::user()->username == 'admin') 
-		{
+		if (Auth::user()->level == 9999 && Auth::user()->username == 'admin') {
 			$find = User::where('IsDelete', 0)->where('id', $request->id)->first();
+			// dd($request->id);
 
-			if ($find) 
-			{
+			if ($find) {
 				$find->password = bcrypt($request->password);
 				$find->save();
 			}
@@ -137,8 +127,7 @@ class UserLibraries
 
 		$find = User::where('IsDelete', 0)->where('id', Auth::user()->id)->first();
 
-		if ($find) 
-		{
+		if ($find) {
 			$find->password = bcrypt($request->password);
 			$find->save();
 		}
@@ -150,20 +139,18 @@ class UserLibraries
 	{
 		// dd($request);
 		$find   = User::where('IsDelete', 0)
-		->where('id', $request->id)->first();
-		
+			->where('id', $request->id)->first();
+
 		$status = __('No Action');
 
-		if ($find) 
-		{
+		if ($find) {
 			$find->name     = $request->name;
 			$find->username = $request->username;
 			$find->email    = $request->email;
 			$find->save();
 
-			$status = __('Update').' '.__('Account').' '.__('Success');
-		} else
-		{
+			$status = __('Update') . ' ' . __('Account') . ' ' . __('Success');
+		} else {
 			$find = User::create([
 				'name'     => $request->name,
 				'username' => $request->username,
@@ -171,7 +158,7 @@ class UserLibraries
 				'password' => bcrypt('123')
 			]);
 
-			$status = __('Create').' '.__('Account').' '.__('Success');
+			$status = __('Create') . ' ' . __('Account') . ' ' . __('Success');
 		}
 
 		$find->refresh()->role()->detach();
@@ -186,21 +173,19 @@ class UserLibraries
 	public function destroy($request)
 	{
 		$find = User::where('IsDelete', 0)
-		->where('level', '!=', 9999)
-		->where('id', $request->ID)
-		->first();
+			->where('level', '!=', 9999)
+			->where('id', $request->ID)
+			->first();
 
-		$status = __('Account').' '.__('Does Not Exist');
+		$status = __('Account') . ' ' . __('Does Not Exist');
 
-		if ($find) 
-		{
+		if ($find) {
 			$find->IsDelete = 1;
 			$find->save();
 
-			$status = __('Destroy').' '.__('Account').' '.__('Success');
+			$status = __('Destroy') . ' ' . __('Account') . ' ' . __('Success');
 		}
 
 		return $status;
 	}
-	
 }

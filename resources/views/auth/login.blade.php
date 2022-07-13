@@ -45,6 +45,19 @@
                             </div>
                             <div style="background-color: white;">
                                 {{-- <x-auth-validation-errors class="mb-4" :errors="$errors" /> --}}
+                                @if ($errors->any())
+                                    {{-- <div {{ $attributes }}> --}}
+                                    <div class="font-medium text-red-600">
+                                        {{ __('Login') }} {{ __('False') }}
+                                    </div>
+
+                                    <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                                        @foreach ($errors->all() as $error)
+                                            <p style="color: red">{{ $error }}</p>
+                                        @endforeach
+                                    </ul>
+                                    {{-- </div> --}}
+                                @endif
                                 <form method="POST" action="{{ route('login') }}">
                                     @csrf
                                     <div class="form-input">
@@ -53,22 +66,14 @@
                                             <input type="text" class="form-control main-form" maxlength="20"
                                                 name="username" placeholder="{{ __('User Name') }}" required
                                                 autofocus>
-                                            @error('username')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
+
                                         </div>
 
                                         <div class="col-12 form-group pass">
                                             <label>{{ __('Password') }}</label>
                                             <input type="password" class="form-control main-form" maxlength="20"
                                                 name="password" placeholder="{{ __('Password') }}" required>
-                                            @error('password')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
+
                                         </div>
                                         <div class="col-12 remember">
                                             <input type="checkbox" value="lsRememberMe" name="remember" id="rememberMe">
