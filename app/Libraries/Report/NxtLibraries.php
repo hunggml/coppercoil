@@ -40,6 +40,7 @@ class NxtLibraries
                 array_push($list_warehouse, $value1->ID);
             }
         }
+        // dd($list_warehouse);
         // dd($from,$to); 
         $list_mater = MasterMaterials::where('IsDelete', 0)
             ->when($mater, function ($query, $mater) {
@@ -68,10 +69,11 @@ class NxtLibraries
             $im1 = ImportDetail::where('IsDelete', 0)
                 ->where('Materials_ID', $value->ID)
                 ->whereIn('Warehouse_Detail_ID', $list_warehouse)
-                ->where('Type', 0)
+                ->whereIn('Type',[0,6])
                 ->where('Time_Import', '>=', $from)
                 ->where('Time_Import', '<=', $to)
                 ->get();
+            
             $im1_count = collect($im1)->count();
             $im1_quan = collect($im1)->sum('Quantity');
             //nhập lại

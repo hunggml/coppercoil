@@ -53,6 +53,15 @@
       text-align: center;
       vertical-align: middle;
     }
+    table.dataTable tbody td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+    table.dataTable thead th {
+            vertical-align: middle;
+            text-align: center;
+    }
     .hide {
       display: none;
     }

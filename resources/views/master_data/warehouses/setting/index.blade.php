@@ -148,7 +148,7 @@
 
         function add_or_update_detail(dataSave) {
             return $.ajax({
-                method: 'post',
+                method: 'get',
                 url: "{{ route('masterData.warehouses.addOrUpdateDetail') }}",
                 data: dataSave,
                 dataType: 'json',
@@ -266,6 +266,7 @@
                     $('#Email').val(dat.Email);
                     $('#Email2').val(dat.Email2);
                     $('#groupMaterialsWare').val(dat.Group_Materials_ID).select2();
+                    $('#are').val(dat.Area);
                     $('#note').val(dat.Note);
                 }
 
@@ -384,5 +385,21 @@
             $('#nameDel').text(name);
             $('#idDel').val(id.split('-').pop());
         });
+        $('.btn-input').on('click',function(){
+				$('.area_select').val('')
+				$('.area_select').hide()
+				$('.area_input').show()
+				$('.btn-input').hide()
+				$('.btn-select').show()
+				
+				
+		})
+		$('.btn-select').on('click',function(){
+				$('.area_input').val('')
+				$('.area_select').show()
+				$('.area_input').hide()
+				$('.btn-input').show()
+				$('.btn-select').hide()
+		})
     </script>
 @endpush

@@ -20,6 +20,7 @@
               <table class="table table-hover table-bordered table-detail" id="tableDetail" width="50%">
                 <thead>
                   <th>{{__('Materials')}}</th>
+                  <th>{{__('Supplier')}}</th>
                   <th>{{__('Quantity')}}(kg)</th>
                   <th>{{__('Pallet_ID')}}</th>
                   <th>{{__('Box ID')}}</th>
@@ -35,6 +36,7 @@
                 <thead>
                   <th>{{__('ID')}}</th>
                   <th>{{__('Materials')}}</th>
+                  <th>{{__('Supplier')}}</th>
                   <th>{{__('Quantity')}}(kg)</th>
                   <th>{{__('Pallet')}}</th>
                   <th>{{__('Roll Number')}}</th>

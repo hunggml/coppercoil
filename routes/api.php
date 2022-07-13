@@ -68,6 +68,7 @@ Route::post('/update-location', 'Api\ImportMaterialsController@update_location')
 
 
 
+<<<<<<< HEAD
 // masterdata
 Route::prefix('settings')->group(function () {
     Route::prefix('unit')->group(function () {
@@ -78,4 +79,11 @@ Route::prefix('settings')->group(function () {
         Route::get('/', [MasterSupplierController::class, 'index']);
         // Route::get('/history', [MasterUnitController::class, 'history']);
     });
+=======
+
+
+//api table master-data
+Route::prefix('/settings')->group(function () {
+    Route::get('/unit', 'Api\MasterDataController@unit');
+>>>>>>> ac6326cc4ac17c09168a3da964348ab4740293d0
 });

@@ -96,9 +96,9 @@
 							@endforeach
 						@endif
 		            	</br>
-		                <table class="table table-striped table-hover" id="tableProduct" width="100%">
+		                <table class="table table-bordered text-nowrap w-100" id="tableProduct" width="100%">
 		                	<thead>
-		                		<th>{{__('ID')}}</th>
+		                		<!-- <th>{{__('ID')}}</th> -->
 		                		<th>{{__('Product Model')}}</th>
 		                		<th>{{__('Symbols')}} {{ __('Product') }}</th>
 		                		<th>{{__('Materials') }}</th>
@@ -114,7 +114,7 @@
 		                	<tbody>
 		                		@foreach($product as $value)
 			                		<tr>
-			                			<th colspan="1">{{$value->ID}}</th>
+			                			<!-- <th colspan="1">{{$value->ID}}</th> -->
 			                			<td>{{$value->Name}}</td>
 			                			<td>{{$value->Symbols}}</td>
 			                			<td>

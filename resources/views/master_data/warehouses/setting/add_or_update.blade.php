@@ -78,7 +78,7 @@
 	                                    </span>
 				                    @endif
 				                </div>
-
+								
 				                <!-- <div class="form-group col-md-3">
 				                    <label for="mac">{{__('MAC')}}</label>
 				                    <input type="text" value="{{old('MAC') ? old('MAC') : ($warehouse ? $warehouse->MAC : '') }}" class="form-control" id="mac" name="MAC" placeholder="{{__('Enter')}} {{__('MAC')}}">
@@ -144,6 +144,29 @@
 									<label for="Email2">{{__('Email')}}2</label>
 									<input type="text"  class="form-control" id="Email2" value="{{old('Email2') ? old('Email2') : ($warehouse ? ($warehouse->Email2 == '' ? '' : $warehouse->Email2) : '') }}" name="Email2" placeholder="{{__('Enter')}} {{__('Email')}} 2">
 								</div>
+								<div class="form-group col-md-4 row">
+				                    <label for="Area" class="col-12">
+				                    	{{__('Area')}}
+				                    </label>
+									<div class="area_select col-6">
+										<select name="Area" class="form-control select2" >
+											<option value="">
+												{{__('Choose')}} {{__('Area')}}
+											</option>
+											@foreach($area as $value)
+											<option value="{{$value->ID}}" 
+												{{old('Area') ? (old('Area') == $value->ID ? 'selected' : '') : ($warehouse ? ($warehouse->Area == $value->ID ? 'selected' : '') : '')}} class="">
+												{{$value->Name}}
+											</option>
+				                    	@endforeach
+				                    </select>
+									</div>
+									<div class="area_input col-6 hide">
+										<input type="text"  class="form-control area_input hide" id="Area" value="" name="Area1" placeholder="{{__('Enter')}} {{__('Area')}}">
+									</div>
+									<button type="button" class="btn btn-success float-right col-6 btn-input" >{{__('Create')}} {{__('Area')}}</button>
+									<button type="button" class="btn btn-success float-right col-6 btn-select hide" >{{__('Choose')}} {{__('Area')}}</button>
+				                </div>
 		                </div>
 		                <div class="card-footer">
 		                	<a href="{{ route('masterData.warehouses') }}" class="btn btn-info">{{__('Back')}}</a>
@@ -177,5 +200,21 @@
 			$('#quantityUnit').val(myClss.split('-')[1])
 			$('#unitID').val(myClss.split('-')[0]).select2()
 		});
+		$('.btn-input').on('click',function(){
+				$('.area_select').val('')
+				$('.area_select').hide()
+				$('.area_input').show()
+				$('.btn-input').hide()
+				$('.btn-select').show()
+				
+				
+		})
+		$('.btn-select').on('click',function(){
+				$('.area_input').val('')
+				$('.area_select').show()
+				$('.area_input').hide()
+				$('.btn-input').show()
+				$('.btn-select').hide()
+		})
 	</script>
 @endpush

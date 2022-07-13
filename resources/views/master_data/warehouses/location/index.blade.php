@@ -1,13 +1,9 @@
 @extends('layouts.main')
-
 @section('content')
-
 @push('myCss')
     <link rel="stylesheet" href="{{asset('my_setup/css/warehouse.css')}}">
 @endpush
-
 @include('basic.modal_detail_inventories')
-
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -89,7 +85,6 @@
     </div>
 </div>
 @endsection
-
 @push('scripts')
     <script>
         function filter_detail(dataDetail)
@@ -181,12 +176,10 @@
             filter_detail(dataDetail).done(function(data)
             {
                 $('.cill').remove()
-                // console.log(data);
                 let i = 1;
-                // table.clear().draw();
                 for (let dat of data.data)
                 {
-                    // console.log(dat);
+                   
                     let a = '';
                     for(let label of dat.inventory_nl)
                     {
@@ -194,14 +187,14 @@
                         {
                             label.Pallet_ID = ''
                         }
-                        // console.log(label.materials) 
+                        console.log(label) 
                         a = a+`<tr class="cill">
                             <td>`+label.materials.Symbols+`</td>
+                            <td>`+(label.supplier ? label.supplier.Symbols : '' )+`</td>
                             <td>`+parseFloat(label.Inventory)+`</td>
                             <td>`+label.Pallet_ID+`</td>
                             <td>`+label.Box_ID+`</td>
                             <td>`+label.Count+`</td>
-                            
                         </tr>`
                     }
                     $('#tableDetail tbody').append(a)  
@@ -213,7 +206,6 @@
             {
                 console.log(err);
             })
-
 
             filter_detail_history(dataDetail).done(function(data)
             {
@@ -228,7 +220,7 @@
                 // table.clear().draw();
                 for (let dat of data.data)
                 {
-                    // console.log(dat);
+                    console.log(dat);
                     let b = '';
                     let c ;
                     if(dat.Type == 0)
@@ -261,7 +253,6 @@
                     {
                         c = 'Xuất Kiểm Kê'; 
                     }
-                    
                     if(dat.Pallet_ID == null)
                     {
                         dat.Pallet_ID = ''
@@ -269,29 +260,22 @@
                     b = b+`<tr class="cill1">
                             <td>`+(i++)+`</td>
                             <td>`+dat.materials.Symbols+`</td>
+                            <td>`+(dat.supplier ? dat.supplier.Symbols : '' )+`</td>
                             <td>`+parseFloat(dat.Quantity)+`</td>
                             <td>`+dat.Pallet_ID+`</td>
                             <td>`+dat.Count+`</td>
                             <td>`+dat.Box_ID+`</td>
                             <td>`+c+`</td>
                         </tr>`
-                    
-                    $('#tableHistory tbody').append(b)  
-                    // $('#tableHistory').DataTable({
-                    //     language: __languages.table,
-                    //     scrollX : '100%',
-                    //     scrollY : '100%'
-                    // });
+                    $('#tableHistory tbody').append(b)
                 }
-
                 $('.loading').hide();
                 $('.hide').hide();
-            }).fail(function(err)
+            })
+            .fail(function(err)
             {
                 console.log(err);
             })
         });
-
-
     </script>
 @endpush

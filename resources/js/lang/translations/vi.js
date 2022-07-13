@@ -68,12 +68,20 @@ export default {
     "Normal": "Xuất Thường",
     "Cancel": "Hủy",
     "Start": "Bắt Đầu",
+<<<<<<< HEAD
     "User Name" : "Tên Đăng Nhập",
     "ENABLE" : "Kích Hoạt",
     "DISABLE" : "Không Kích Hoạt",
     "Action Name" : "Kiểu Hành Động",
     "INSERT" : "Thêm Mới",
     "Insert" : "Thêm Mới",
+=======
+    "User Name": "Tên Đăng Nhập",
+    "ENABLE": "Kích Hoạt",
+    "DISABLE": "Không Kích Hoạt",
+    "Action Name": "Kiểu Hành Động",
+    "INSERT": "Thêm Mới",
+>>>>>>> ac6326cc4ac17c09168a3da964348ab4740293d0
     "OEE": "Hiệu Suất Tổng Thể",
     "Availability": "Khả Dụng",
     "Performance": "Hiệu Suất",
@@ -85,9 +93,13 @@ export default {
     "Role": "Vai Trò",
     "Waiting for AGV": "Chờ AGV",
     "AGV Shipping": "AGV Đang Chuyển Hàng",
+<<<<<<< HEAD
     "IsDelete" : "Xóa",
     "To" : "Tới",
     "Command" : "Lệnh",
+=======
+    "IsDelete": "Xóa",
+>>>>>>> ac6326cc4ac17c09168a3da964348ab4740293d0
     "INSERT_USER": "Thêm Mới Tài Khoản",
     "INSERT_ROLE": "Thêm Mới Vai Trò",
     "Update_User": "Cập Nhật Tài Khoản",
@@ -101,7 +113,11 @@ export default {
     "Quantity NG": "Số lượng sản phẩm lỗi",
     "OEE parameter chart": "Biểu đồ thông số hiệu suất OEE",
     "Active timeline chart": "Biểu đồ thời gian hoạt động",
+<<<<<<< HEAD
     "Address" : "Địa Chỉ",
     "Contact" : "Liên Hệ",
     "Phone" : "Điện Thoại"
 } 
+=======
+}
+>>>>>>> ac6326cc4ac17c09168a3da964348ab4740293d0

@@ -19,6 +19,7 @@ class CommandImport extends Model
 	protected $fillable   = [
   	'Name'
   	,'Symbols'
+    ,'Supplier_ID'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'
@@ -38,9 +39,13 @@ class CommandImport extends Model
   }
 
 
-public function detail()
+  public function detail()
   {
     return $this->hasMany('App\Models\WarehouseSystem\ImportDetail', 'Command_ID', 'ID')->whereIsdelete(0);
+  }
+  public function supplier()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterSupplier', 'ID', 'Supplier_ID')->whereIsdelete(0);
   }
 
 }

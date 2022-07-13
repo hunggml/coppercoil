@@ -37,13 +37,14 @@ class MasterWarehouseController extends Controller
         $data     = $this->warehouse->get_all_list_warehouse();
         $units    = $this->unit->get_all_list_unit();
         $groups   = $this->group->get_all_list_group_materials();
-
+        $area     = $this->warehouse->get_area();
         return view(
             'master_data.warehouses.setting.index',
             [
-                'warehouses' => $data,
+                'warehouses' => $data->Where('Area','>','0'),
                 'units'      => $units,
                 'groups'     => $groups,
+                'area'      => $area,
                 'request'    => $request
             ]
         );
@@ -56,7 +57,7 @@ class MasterWarehouseController extends Controller
         $groups   = $this->group->get_all_list_group_materials();
         $data     = $this->warehouse->filter($request);
         // $type     = $this->type->get_all_type()->first();
-
+        $area     = $this->warehouse->get_area();
         if ($request->ID) {
             if ($data->first()) {
                 $warehouse = $data->first();
@@ -71,6 +72,7 @@ class MasterWarehouseController extends Controller
         return view('master_data.warehouses.setting.add_or_update', [
             'warehouse' => $warehouse,
             'units'     => $units,
+            'area'      => $area,
             // 'packings'  => $packings,
             'groups'    => $groups,
             // 'type'      => $type

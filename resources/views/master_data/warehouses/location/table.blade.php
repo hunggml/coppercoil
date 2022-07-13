@@ -90,6 +90,7 @@
                             <th>{{__('Location')}}</th>
                             <th>{{__('Pallet')}}</th>
                             <th>{{__('Materials')}}</th>
+                            <th>{{__('Supplier')}}</th>
                             <th>{{__('Time_Import')}}</th>
                             <th>{{__('Box')}}</th>
                             <th>{{__('Quantity')}}(kg)</th>
@@ -104,6 +105,7 @@
                                     <th rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value1['Symbols']}}</th>
                                     <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value2['Pallet_ID']}}</td>
                                     <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value2['Materials']}}</td>
+                                    <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{$value2['Supplier']}}</td>
                                     <!-- <td rowspan="{{count($value2['Inven'])+2}}" style="vertical-align: middle;">{{date_format(date_create($value2['Time_Import']),"d/m/Y")}}
                                     </td> -->
                                 </tr>
@@ -128,8 +130,8 @@
 
                               @endforeach
                             <tr>
-                                <td colspan="3" style="background-color: #99ff99;">{{__('Roll Number')}} : {{$dem_t}}</td>
-                                <td colspan="3" style="background-color: #99ff99;">{{__('Quantity')}}(kg) : {{floatval($sum_t)}}</td>
+                                <td colspan="4" style="background-color: #99ff99;">{{__('Roll Number')}} : {{$dem_t}}</td>
+                                <td colspan="4" style="background-color: #99ff99;">{{__('Quantity')}}(kg) : {{floatval($sum_t)}}</td>
                             </tr>
                             @endforeach
                         </tbody>

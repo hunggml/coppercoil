@@ -368,7 +368,7 @@ class TransferLibraries
         $arr = [];
         foreach ($datas as $value) {
             $data = ImportDetail::where('IsDelete', 0)->where('Warehouse_Detail_ID', $value->ID)
-                ->with('materials', 'location')
+                ->with('materials', 'location','supplier')
                 ->get();
             // foreach($data as $value1)
             // {
@@ -396,7 +396,7 @@ class TransferLibraries
 
             $data1 = ExportDetail::where('IsDelete', 0)->where('Warehouse_Detail_ID', $value->ID)
                 ->where('Status', 1)
-                ->with('materials', 'location')
+                ->with('materials', 'location','supplier')
                 ->get();
             // dd($data1);
             foreach ($data1 as $value2) {

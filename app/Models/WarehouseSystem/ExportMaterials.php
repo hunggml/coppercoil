@@ -24,6 +24,7 @@ class ExportMaterials extends Model
     ,'Type'
     ,'Status'
     ,'To'
+    ,'Machine_ID'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'
@@ -46,17 +47,21 @@ class ExportMaterials extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_ID')->whereIsdelete(0);
   }
+  public function machine()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterMachine', 'ID', 'Machine_ID')->whereIsdelete(0);
+  }
   public function location()
   {
     return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail', 'ID', 'Warehouse_Detail_ID')->whereIsdelete(0);
   }
   public function go()
   {
-    return $this->hasOne('App\Models\MasterData\MasterWarehouse', 'ID', 'Go')->whereIsdelete(0);
+    return $this->hasOne('App\Models\MasterData\MasterArea', 'ID', 'Go')->whereIsdelete(0);
   }
   public function to()
   {
-    return $this->hasOne('App\Models\MasterData\MasterWarehouse', 'ID', 'To')->whereIsdelete(0);
+    return $this->hasOne('App\Models\MasterData\MasterArea', 'ID', 'To')->whereIsdelete(0);
   }
   public function detail()
   {

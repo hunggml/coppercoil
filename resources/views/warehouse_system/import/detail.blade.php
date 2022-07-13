@@ -11,7 +11,7 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="text-bold" style="font-size: 23px">
-                            {{ __('Command') }} {{ __('Import') }} {{ __('Detail') }}
+                            {{ __('Command') }} {{ __('Import') }} {{ __('Detail') }} : <span style = "color:red">{{$data_cm->Name}}</span>
                         </span>
                         <div class="card-tools">
                             <button class="btn btn-success btn-pallet" data-toggle="modal" data-target="#add-pallet"
@@ -22,7 +22,6 @@
                     </div>
                     <div class="card-body">
                         <form action="{{ route('warehousesystem.import.detail') }}" method="get">
-                            @csrf
                             <div class="row">
                                 <div class="form-group col-md-2">
                                     <input type="text" name="ID" value="{{ $request->ID }}"
@@ -94,10 +93,11 @@
                         </form>
                         @include('basic.alert')
                         </br>
-                        <table class="table table-striped table-hover" id="tableUnit" width="100%">
+                        <table class="table table-bordered text-nowrap"   width="100%" id="tableUnit">
                             <thead>
                                 <th>{{ __('ID') }}</th>
                                 <th>{{ __('Symbols') }} {{ __('Materials') }}</th>
+                                <th>{{__('Supplier')}}</th>
                                 <th>{{ __('Pallet') }}</th>
                                 <th>{{ __('Wire Type') }}</th>
                                 <th>{{ __('Roll Number') }}</th>
@@ -105,37 +105,27 @@
                                 <th>{{ __('Location') }}</th>
                                 <th>{{ __('User Created') }}</th>
                                 <th>{{ __('Time Created') }}</th>
-                                <th>{{ __('User Updated') }}</th>
-                                <th>{{ __('Time Updated') }}</th>
                                 <th>{{ __('Status') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </thead>
                             <tbody>
                                 <?php $dem = 0; ?>
-                                @foreach ($data as $key => $value1)
-                                    <?php $value2 = $value1->GroupBy('Pallet_ID'); ?>
-                                    @foreach ($value2 as $key1 => $value3)
-                                        <?php $dem++; ?>
-                                        <?php $value = $value3[0]; ?>
-                                        <?php $count = count($value3); ?>
-                                        <?php $quan = $value3->sum('Quantity'); ?>
+                                @foreach ($data as $key => $value)
+                                    <?php $dem++;  ?>
                                         <tr>
                                             <td>{{ $dem }}</td>
                                             <td>{{ $value->materials ? $value->materials->Symbols : '' }}</td>
-                                            <td>{{ $key1 }}</td>
+                                            <td>{{ $value->supplier ? $value->supplier->Symbols : '' }}</td>
+                                            <td>{{ $value->Pallet_ID }}</td>
                                             <td>{{ $value->materials ? $value->materials->Wire_Type : '' }}</td>
-                                            <td>{{ $count }}</td>
-                                            <td>{{ $quan }}</td>
+                                            <td>{{ $value->count }}</td>
+                                            <td>{{ floatval($value->quan) }}</td>
                                             <td>{{ $value->location ? $value->location->Symbols : '' }}</td>
                                             <td>
                                                 {{ $value->user_created ? $value->user_created->name : '' }}
                                             </td>
                                             <td>{{ $value->Time_Created }}</td>
-                                            <td>
-                                                {{ $value->user_updated ? $value->user_updated->name : '' }}
-                                            </td>
-                                            <td>{{ $value->Time_Updated }}</td>
-
+                                        
                                             <td>{{ $value->Status == 0 ? __('Waiting') : ($value->Status == 1 ? __('Success') : __('Cancel')) }}
                                             </td>
                                             <td>
@@ -159,13 +149,12 @@
                                                     @endif
                                                 @endif
                                             </td>
-                                        </tr>
-                                    @endforeach
                                 @endforeach
                             </tbody>
                         </table>
-                        {{-- {{$data->links()}} --}}
-
+                         {{$data->appends([
+                            'ID'=>$request->ID
+                            ])->links()}}
                     </div>
                 </div>
             </div>
@@ -492,7 +481,8 @@
         $('#tableUnit').DataTable({
             language: __languages.table,
             scrollX: '100%',
-            scrollY: '100%'
+            scrollY: '100%',
+            dom: '<"bottom"><"clear">',
         });
 
         $('.btn-import').on('click', function() {

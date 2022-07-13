@@ -195,6 +195,7 @@ class MasterWarehouseDetailLibraries
 		->with([
 			'inventory.materials',
 			'group_materials',
+			// 'inventory.supplier',
 			// 'inventory:ID,Inventory,User_Created,Time_Created,User_Updated,Time_Updated,Warehouse_Detail_ID',
 			// 'inventory_null:ID,Inventory,Label_ID,User_Created,Time_Created,User_Updated,Time_Updated,Warehouse_Detail_ID',
 			// 'inventory_null.label.materials:ID,Name,Symbols,Model',
@@ -274,6 +275,7 @@ class MasterWarehouseDetailLibraries
 		})
 		->with([
 			'inventory.materials',
+			'inventory.supplier',
 			'group_materials',
 			'inventory',
 			'inventory_null.user_created:id,name,username',
@@ -464,7 +466,7 @@ class MasterWarehouseDetailLibraries
 		$ex_to = TransferMaterials::where('Warehouse_Detail_ID_To',$request->Warehouse_Detail_ID)
 		// ->with('materials,location_go,location_to')
 		->get();
-
+		// dd($run);
 		return [
 			'import_history' => $im,
 			'export_history' => $ex,

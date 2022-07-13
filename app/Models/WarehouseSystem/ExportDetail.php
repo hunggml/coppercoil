@@ -55,5 +55,8 @@ class ExportDetail extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail', 'ID', 'Warehouse_Detail_ID')->whereIsdelete(0);
   }
-
+  public function export()
+  {
+    return $this->hasOne('App\Models\WarehouseSystem\ExportMaterials', 'ID', 'Export_ID')->whereIsdelete(0);
+  }
 }
