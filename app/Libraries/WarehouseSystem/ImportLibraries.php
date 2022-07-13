@@ -6,6 +6,7 @@ use App\Models\WarehouseSystem\CommandImport;
 use App\Models\WarehouseSystem\ImportDetail;
 use Validator;
 use App\Models\MasterData\MasterMaterials;
+use App\Models\MasterData\MasterSupplier;
 use App\Models\MasterData\MasterWarehouse;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -57,69 +58,93 @@ class ImportLibraries
         ->orderBy('Time_Created','desc')
         ->get();
     }
+    public function get_one_command($request)
+    {
+        return CommandImport::where('IsDelete',0)
+        ->orderBy('Time_Created','desc')
+        ->where('ID',$request->ID)
+        ->first();
+    }
     public function detail($request)
     {
         // dd('run');
-        $materials = $request->Materials_ID;
         $Pallet = $request->Pallet_ID;
-        $data =  ImportDetail::where('IsDelete',0)
+        $materials = $request->Materials_ID;
+        $Wire_Type = $request->Wire_Type;
+        $mater = MasterMaterials::where('IsDelete',0)
         ->when($materials, function($query, $materials)
 		{
-			return $query->where('Materials_ID', $materials);
+			return $query->where('ID', $materials);
 		})
-        ->when($Pallet, function($query, $Pallet)
+        ->when($Wire_Type, function($query, $Wire_Type)
 		{
-			return $query->where('Pallet_ID', $Pallet);
-		})
-        ->where('Command_ID',$request->ID)
-        // ->paginate(10);
-        ->get();
+			return $query->where('Wire_Type', $Wire_Type);
+		})->get();
+        $arr_mater = [];
+        foreach($mater as $value_mater)
+        {
+            array_push($arr_mater,$value_mater->ID);
+        }
+       
+        $Pallet = $request->Pallet_ID;
+        if($request->Status === '0')
+        {
+            $data =  ImportDetail::where('IsDelete',0)
+            ->when($Pallet, function($query, $Pallet)
+            {
+                return $query->where('Pallet_ID', $Pallet);
+            })
+            ->when($arr_mater, function($query, $arr_mater)
+            {
+                return $query->whereIn('Materials_ID', $arr_mater);
+            })
+            ->where('Status',$request->Status)
+            ->where('Command_ID',$request->ID)
+            ->select('Pallet_ID')
+            ->GroupBy('Pallet_ID')
+            ->paginate(10);
+        }
+        else
+        {
+            $data =  ImportDetail::where('IsDelete',0)
+            ->when($Pallet, function($query, $Pallet)
+            {
+                return $query->where('Pallet_ID', $Pallet);
+            })
+            ->when($arr_mater, function($query, $arr_mater)
+            {
+                return $query->whereIn('Materials_ID', $arr_mater);
+            })
+            ->where('Command_ID',$request->ID)
+            ->select('Pallet_ID')
+            ->GroupBy('Pallet_ID')
+            ->paginate(10);
+        }
+        
         // dd($data);
-
         // dd($request->Status);
-        $arr = [];
+        // $arr = [];
         foreach( $data as $value )
         {
-            if($request->Status === '0' ) 
-            {   
-                
-                if($value->materials && $value->Status == $request->Status)
-                {
-                    if(($request->Wire_Type ? ($request->Wire_Type == $value->materials->Wire_Type ? 1: 0 ) : 1) )
-                    {
-                        array_push($arr,$value);
-                    }
-                }
-            }
-            else 
-            {
-                if($request->Status)
-                {
-                    if($value->materials && $value->Status == $request->Status)
-                    {
-                        if(($request->Wire_Type ? ($request->Wire_Type == $value->materials->Wire_Type ? 1: 0 ) : 1) )
-                        {
-                            array_push($arr,$value);
-                        }
-                    }
-                }
-
-                else 
-                {
-                    if($value->materials)
-                    {
-                        if(($request->Wire_Type ? ($request->Wire_Type == $value->materials->Wire_Type ? 1: 0 ) : 1) )
-                        {
-                            array_push($arr,$value);
-                        }
-                    }
-                }
-
-               
-            }
             
+            $detail = ImportDetail::where('IsDelete',0)->where('Type',0)->where('Pallet_ID',$value->Pallet_ID)->first();
+            $count  = ImportDetail::where('IsDelete',0)->where('Type',0)->where('Pallet_ID',$value->Pallet_ID)->count();
+            $quan   = ImportDetail::where('IsDelete',0)->where('Type',0)->where('Pallet_ID',$value->Pallet_ID)->sum('Quantity');
+            if($detail)
+            {
+                $value->materials    = $detail->materials;
+                $value->supplier     = $detail->supplier;
+                $value->quan         = $quan;
+                $value->count        = $count;
+                $value->location     = $detail->location;
+                $value->user_created = $detail->user_created;
+                $value->Time_Created = $detail->Time_Created;
+                $value->user_updated = $detail->user_updated;
+                $value->Status       = $detail->Status;
+            }
         }
-        return collect($arr);
+        // dd($data);
+        return $data;
     }
     public function detail_all_list($request)
     {
@@ -193,6 +218,7 @@ class ImportLibraries
                             $arr4 = [
                                 'Pallet_ID' => $value3[0]->Pallet_ID,
                                 'Materials'=>$value3[0]->materials ? $value3[0]->materials->Symbols : '',
+                                'Supplier'=>$value3[0]->supplier ? $value3[0]->supplier->Symbols : '',
                                 'Inven' => $value3,
                                 'Time_Import' => $value3[0]->Time_Import,
                                 'Time_Updated' => $value3[0]->Time_Updated,
@@ -276,14 +302,20 @@ class ImportLibraries
 
 	public function get_list_command_import($request)
     {
-        $name = $request->name;
-        $from = $request->from;
-        $to   = $request->to;
+        $name     = $request->name;
+        $from     = $request->from;
+        $to       = $request->to;
+        $supplier = $request->supplier;
         return CommandImport::where('IsDelete',0)
         ->when($name, function($query, $name)
 		{
 			return $query->where('Name', $name);
-		})->when($from, function($query, $from )
+		})
+        ->when($supplier, function($query, $supplier)
+		{
+			return $query->where('Supplier_ID', $supplier);
+		})
+        ->when($from, function($query, $from )
 		{
 			return $query->where('Time_Created', '>=' , Carbon::create($from)->startOfDay()->toDateTimeString());
 		})
@@ -294,8 +326,6 @@ class ImportLibraries
         ->orderBy('Time_Created','desc')
         ->paginate(10);
     }
-
-
     public function import_file_excel($request)
     {
         $data = $this->read_file($request);
@@ -307,8 +337,9 @@ class ImportLibraries
             if($key>3)
             {
                 $mater = MasterMaterials::where('Wire_Type',$value[6])->where('Spec',trim($value[5]))->first();
+                $supplier = MasterSupplier::where('Symbols',$value[7])->first();
                 // dd($mater);
-               if($mater)
+               if($mater && $supplier)
                {
                    
                    $arr = [
@@ -319,6 +350,7 @@ class ImportLibraries
                        'Pallet_ID'        =>$value[3],
                        'Quantity'         =>$value[4],
                        'Packing_Date'     =>$value[8],
+                       'Supplier_ID'      =>$supplier->ID,
                        'Status'           =>0,
                        'Type'             =>0,
                        'User_Created'     => Auth::user()->id,
@@ -394,7 +426,7 @@ class ImportLibraries
                }
                else
                {
-                   $err1 = 'WIRE_TYPE '.($value[6]).','.$value[5].' Không Tồn Tại';
+                   $err1 = 'WIRE_TYPE '.($value[6]).','.$value[5].' Không Tồn Tại Hoặc NCC  :' . $value[7]. ' Không Tồn tại';
                    array_push($err,$err1);
                }
             }
@@ -406,11 +438,12 @@ class ImportLibraries
         ->count();
         // dd(array_unique($err));
         // dd($im);
-
-        if(count($im) > 0)
+       
+        if(count($im) > 0 && $supplier)
         {
             $cm = CommandImport::Create([
                 'Name'=>$date.''.($stt+1),
+                'Supplier_ID' => $supplier->ID,
                 'Note'=>$request->Note,
                 'User_Created'     => Auth::user()->id,
                 'User_Updated'     => Auth::user()->id,

@@ -63,3 +63,12 @@ Route::post('/import-packing-list', 'Api\ImportMaterialsController@import_packin
 // update location
 Route::get('/get-data-update-location', 'Api\ImportMaterialsController@get_data_update_location');
 Route::post('/update-location', 'Api\ImportMaterialsController@update_location');
+
+
+
+
+
+//api table master-data
+Route::prefix('/settings')->group(function () {
+    Route::get('/unit', 'Api\MasterDataController@unit');
+});

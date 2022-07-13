@@ -30,6 +30,7 @@ class ImportDetail extends Model
     ,'Inventory'
     ,'Status'
     ,'Type'
+    ,'Supplier_ID'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'
@@ -51,6 +52,10 @@ class ImportDetail extends Model
   public function materials()
   {
     return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_ID')->whereIsdelete(0);
+  }
+  public function supplier()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterSupplier', 'ID', 'Supplier_ID')->whereIsdelete(0);
   }
   public function location()
   {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Libraries\WarehouseSystem\ImportLibraries;
 use App\Libraries\MasterData\MasterMaterialsLibraries;
+use App\Libraries\MasterData\MasterSupplierLibraries;
 use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
 use App\Libraries\MasterData\MasterWarehouseLibraries;
 class ImportController extends Controller
@@ -16,7 +17,8 @@ class ImportController extends Controller
         ImportLibraries $ImportLibraries,
         MasterMaterialsLibraries $MasterMaterialsLibraries,
         MasterWarehouseDetailLibraries $masterWarehouseDetailLibraries,
-        MasterWarehouseLibraries $masterWarehouseLibraries
+        MasterWarehouseLibraries $masterWarehouseLibraries,
+        MasterSupplierLibraries $MasterSupplierLibraries
     )
     {
         $this->middleware('auth');
@@ -24,6 +26,7 @@ class ImportController extends Controller
         $this->materials = $MasterMaterialsLibraries;
         $this->warehouse_detail = $masterWarehouseDetailLibraries;
         $this->warehouse        = $masterWarehouseLibraries;
+        $this->supplier         = $MasterSupplierLibraries; 
     }
     
 
@@ -31,10 +34,12 @@ class ImportController extends Controller
     {
         $data = $this->command->get_list_command_import($request);
         $data_all = $this->command->get_list_all_command();
+        $supplier = $this->supplier->get_all_list_supplier();
         return view('warehouse_system.import.import',
         [
             'data'=>$data,
             'data_all'=>$data_all,
+            'supplier'=>$supplier,
             'request'=>$request
         ]);  
     }
@@ -58,14 +63,16 @@ class ImportController extends Controller
         $list_materials = $this->materials->get_all_list_materials($request);
         $data_all = $this->command->detail_all($request);
         $list_location = $this->warehouse_detail->get_all_list_warehouse_detail($request);
+        $data_cm = $this->command->get_one_command($request);
         # $this->warehouse_detail
         // dd($data->GroupBy('Materials_ID'));
         return view('warehouse_system.import.detail',
         [
-            'data'=>$data->GroupBy('Materials_ID'), 
+            'data'=>$data, 
             'list_materials'=>$list_materials,
             'data_all'=>$data_all,
             'list_location'=>$list_location,
+            'data_cm'=>$data_cm,
             'request'=>$request
         ]);
     }
@@ -73,15 +80,13 @@ class ImportController extends Controller
     public function add_stock(Request $request)
     {
         $data = $this->command->add_stock($request);
-      
         // dd($data);
         $list_location = $this->warehouse_detail->get_all_list_warehouse_detail($request);
-        
         return response()->json([
             'success' => true,
             'data'    => $data,
             'list_location'=>$list_location,
-        ]); 
+        ]);
     }
     public function get_list(Request $request)
     {

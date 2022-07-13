@@ -25,17 +25,6 @@
                   				{{__('Create')}} {{ __('Unit') }}
                   			</a>
                   			@endif
-
-                  			@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
-                   			<button class="btn btn-success btn-import" style="width: 180px">
-                            	{{__('Import By File Excel')}}
-                        	</button>
-                        	@endif
-                  			@if(Auth::user()->checkRole('export_master') || Auth::user()->level == 9999)
-                   			<a href="{{route('masterData.unit.export_file',['Name'=>$request->Name,'Symbols'=>$request->Symbols])}}" class="btn btn-info " style="width: 180px">
-                            	{{__('Export By File Excel')}}
-							</a>
-							@endif
 	                	</div>
 	                </div>
 	                <div class="card-body">
@@ -78,9 +67,8 @@
 	                	</form>
 		                @include('basic.alert')
 		            	</br>
-		                <table class="table table-striped table-hover" id="tableUnit" width="100%">
+		                <table class="table table-bordered  text-nowrap w-100" id="tableUnit" width="100%">
 		                	<thead>
-		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Name')}} {{ __('Unit') }}</th>
 		                		<th>{{__('Symbols')}} {{ __('Unit') }}</th>
 		                		<th>{{__('Note')}}</th>
@@ -93,7 +81,6 @@
 		                	<tbody>
 		                		@foreach($unit as $value)
 			                		<tr>
-			                			<th colspan="1">{{$value->ID}}</th>
 			                			<td>{{$value->Name}}</td>
 			                			<td>{{$value->Symbols}}</td>
 			                			<td>{{$value->Note}}</td>
@@ -128,67 +115,8 @@
 	</div>
 @endsection
 @push('scripts')
+	<script src="{{ asset('js/master-data/unit.js') }}"></script>
 	<script>
-		$('.select2').select2()
-
-		$('#tableUnit').DataTable({
-			language: __languages.table,
-			scrollX : '100%',
-			scrollY : '100%'
-		});
-
-		$(document).on('click', '.btn-delete', function()
-        {
-            let id = $(this).attr('id');
-            let name = $(this).parent().parent().children('td').first().text();
-
-            $('#modalRequestDel').modal();
-            $('#nameDel').text(name);
-            $('#idDel').val(id.split('-')[1]);
-        });
-
-        $('.btn-import').on('click', function()
-        {
-            $('#modalImport').modal();
-            $('#importFile').val('');
-            $('.input-text').text(__input.file);
-            $('.error-file').hide();
-            $('.btn-save-file').prop('disabled', false);
-            $('#product_id').val('');
-
-        });
-
-        $('#importFile').on('change', function()
-        {
-            check_file   = false;
-            let val      = $(this).val();
-            let name     = val.split('\\').pop();
-            let typeFile = name.split('.').pop().toLowerCase();
-            $('.input-text').text(name);
-            $('.error-file').hide();
-
-            if (typeFile != 'xlsx' && typeFile != 'xls' && typeFile != 'txt') 
-            {
-                $('.error-file').show();
-                $('.btn-save-file').prop('disabled', true);
-            } else
-            {
-                $('.btn-save-file').prop('disabled', false);
-                check_file = true;
-            }
-        });
-
-        $('.btn-save-file').on('click', function()
-        {
-            $('.error-file').hide();
-
-            if (check_file) 
-            {
-                $('.btn-submit-file').click();
-            } else
-            {
-                $('.error-file').show();
-            }
-        });
+		
 	</script>
 @endpush

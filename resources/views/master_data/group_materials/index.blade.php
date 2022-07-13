@@ -84,7 +84,7 @@
                         </form>
                         @include('basic.alert')
                         </br>
-                        <table class="table table-striped table-hover" id="tableGroupMaterials" width="100%">
+                        <table class="table table-bordered text-nowrap w-100" id="tableGroupMaterials" width="100%">
                             <thead>
                                 <th>{{ __('ID') }}</th>
                                 <th>{{ __('Group Materials') }}</th>

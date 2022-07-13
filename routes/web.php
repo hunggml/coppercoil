@@ -99,7 +99,7 @@ Route::group(['middleware' => 'language'], function () {
 			Route::get('/filter-detail', 'MasterData\MasterWarehouseController@filter_detail')->name('masterData.warehouses.filterDetail');
 			Route::get('/filter-detail-one', 'MasterData\MasterWarehouseController@filter_detail_one')->name('masterData.warehouses.filterDetailOne');
 			Route::post('/add-or-update', 'MasterData\MasterWarehouseController@add_or_update')->name('masterData.warehouses.addOrUpdate')->middleware(['role:create_master', 'role:update_master']);
-			Route::post('/add-or-update-detail', 'MasterData\MasterWarehouseController@add_or_update_detail')->name('masterData.warehouses.addOrUpdateDetail');
+			Route::get('/add-or-update-detail', 'MasterData\MasterWarehouseController@add_or_update_detail')->name('masterData.warehouses.addOrUpdateDetail');
 			// ->middleware(['role:create_master', 'role:update_master']);
 			Route::post('/add-or-update-type', 'MasterData\MasterWarehouseController@add_or_update_type')->name('masterData.warehouses.addOrUpdateType')->middleware(['role:create_master', 'role:update_master']);
 			Route::get('/destroy', 'MasterData\MasterWarehouseController@destroy')->name('masterData.warehouses.destroy')->middleware('role:delete_master');

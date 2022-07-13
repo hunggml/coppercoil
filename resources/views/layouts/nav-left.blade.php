@@ -98,10 +98,31 @@
               </a>
             </li>
             <li class="nav-item ">
-              <a href="{{ route('warehousesystem.import.location') }}" class="nav-link Stock">
+              <a href="#" class="nav-link Stock">
                 <i class="far fa-circle nav-icon"></i>
                 <p>{{__('Stock')}}</p>
+                <i class="fas fa-angle-left right"></i>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item has-treeview">
+                  <a href="{{ route('warehousesystem.import.location') }}" class="nav-link import">
+                    <i class="far fa-dot-circle nav-icon"></i>
+                    <p>{{__('Stock')}} {{__('Save')}}</p>
+                  </a>
+                </li>
+                <li class="nav-item ">
+                  <a href="#" class="nav-link Transfer">
+                    <i class="far fa-dot-circle nav-icon"></i>
+                    <p>{{__('Stock')}} {{__('Machine')}}</p>
+                  </a>
+                </li>
+                <li class="nav-item ">
+                  <a href="#" class="nav-link retype">
+                    <i class="far fa-dot-circle nav-icon"></i>
+                    <p>{{__('Stock')}} {{__('NG')}}</p>
+                  </a>
+                </li>
+              </ul>
             </li>
             <li class="nav-item ">
               <a href="{{route('warehousesystem.report')}}" class="nav-link report">

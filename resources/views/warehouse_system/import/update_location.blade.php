@@ -80,7 +80,7 @@
 					</form>
 					@include('basic.alert')
 				</br>
-				<table class="table table-striped table-hover"  width="100%" id ="tableUnit">
+				<table class="table table-bordered text-nowrap w-100"  width="100%" id ="tableUnit">
 					<thead>
 						<th>{{__('ID')}}</th>
 						<th>{{__('Symbols')}} {{ __('Materials') }}</th>
@@ -190,7 +190,6 @@
 			                @endforeach
 						</select>
 					</div>
-
 					<div class="choose-box hide">
 						<label>{{__('Choose')}} {{__('Box')}}</label>
 						<select class="custom-select box-To select2" name="Box_ID">
@@ -222,7 +221,6 @@
 		            <br>
 		            <label> {{__('Detail')}} </label>
 				</form>
-				
 			</div>
 		</div>
 	</div>

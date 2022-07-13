@@ -113,6 +113,29 @@
                         <input type="text" class="form-control" id="Email2" name="Email2"
                             placeholder="{{ __('Enter') }} {{ __('Email') }} 2">
                     </div>
+                    <div class="form-group col-md-4 row">
+				        <label for="Area" class="col-12">
+				                    	{{__('Area')}}
+				        </label>
+						<div class="area_select col-6">
+						    <select name="Area" class="form-control select2" id="area">
+								<option value="">
+										{{__('Choose')}} {{__('Area')}}
+								</option>
+								@foreach($area as $value)
+								    <option value="{{$value->ID}}" 
+										 class="">
+										{{$value->Name}}
+									</option>
+				                @endforeach
+				            </select>
+						</div>
+						<div class="area_input col-6 hide">
+							<input type="text"  class="form-control area_input hide" id="Area" value="" name="Area1" placeholder="{{__('Enter')}} {{__('Area')}}">
+						</div>
+						<button type="button" class="btn btn-success float-right col-4 btn-input" style="width: 100px">{{__('Create')}} {{__('Area')}}</button>
+						<button type="button" class="btn btn-success float-right col-4 btn-select hide" style="width: 100px">{{__('Choose')}} {{__('Area')}}</button>
+				    </div>
                     @if (false)
                         <div class="form-group col-md-8">
                             <label for="note">{{ __('Note') }}</label>

@@ -130,7 +130,7 @@
 							@endforeach
 						@endif
 		            	</br>
-		                <table class="table table-striped table-hover text-nowrap" id="tableMaterials" width="100%">
+		                <table class="table table-bordered text-nowrap w-100" id="tableMaterials" width="100%">
 		                	<thead>
 		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Part Type')}}</th>
@@ -140,8 +140,7 @@
 								<th>{{__('Wire Type')}}</th>
 		                		<th>{{__('Unit')}}</th>
 		                		<th>{{__('Difference')}}</th>
-		                		<th>{{__('User Created')}}</th>
-		                		<th>{{__('Time Created')}}</th>
+		                		
 		                		<th>{{__('User Updated')}}</th>
 		                		<th>{{__('Time Updated')}}</th>
 		                		<th>{{__('Action')}}</th>
@@ -163,13 +162,9 @@
 				                		
 				                		<td>{{floatval($value->Difference)}}%</td>
 										<td>
-											{{$value->user_created ? $value->user_created->name : ''}}
+											{{$value->user_updated ? $value->user_updated->name : '--'}}
 										</td>
-										<td>{{$value->Time_Created}}</td>
-										<td>
-											{{$value->user_updated ? $value->user_updated->name : ''}}
-										</td>
-			                			<td>{{$value->Time_Updated}}</td>
+			                			<td>{{$value->Time_Updated ? $value->Time_Updated : '--'}}</td>
 			                			<td>
 			               					@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
 			                				<a href="{{ route('masterData.materials.show', ['ID' => $value->ID])}}" class="btn btn-success" style="width: 80px">
@@ -210,9 +205,7 @@
 		});
 
 		let tabErr = "<?php echo(session()->has('table')) ?>";
-
 		let dataErr = '';
-		
 		if (tabErr)
 		{
 			dataErr = "<?php echo(session()->get('dataError')) ?>";
@@ -287,8 +280,6 @@
         	}, 300);
 
         });
-
-
         $(document).on('click', '.btn-delete', function()
 		{
 			let id = $(this).attr('id');

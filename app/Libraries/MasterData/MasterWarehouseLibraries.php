@@ -4,6 +4,7 @@ namespace App\Libraries\MasterData;
 
 use Illuminate\Validation\Rule;
 use App\Models\MasterData\MasterWarehouse;
+use App\Models\MasterData\MasterArea;
 use Carbon\Carbon;
 use Validator;
 use Auth;
@@ -23,12 +24,19 @@ class MasterWarehouseLibraries
 
 		return $data;
 	}
+	public function get_area()
+	{
+		$data = MasterArea::where('IsDelete', 0)->get();
+		// dd($data);
 
+		return $data;
+	}
 	public function filter($request)
 	{
 		$id      = $request->ID;
 		$name    = $request->Name;
 		$symbols = $request->Symbols;
+		$area = $request->Area;
 
 		$data = MasterWarehouse::where('IsDelete', 0)
 			->when($id, function ($q, $id) {
@@ -39,6 +47,9 @@ class MasterWarehouseLibraries
 			})
 			->when($symbols, function ($q, $symbols) {
 				return $q->where('Symbols', $symbols);
+			})
+			->when($area, function ($q, $area) {
+				return $q->where('Area', $area);
 			})
 			->with([
 				'detail',
@@ -84,7 +95,13 @@ class MasterWarehouseLibraries
 		$find = MasterWarehouse::where('IsDelete', 0)
 			->where('ID', $request->ID)
 			->first();
-
+		
+		if($request->Area1)
+		{
+			$area = MasterArea::Create([
+				'Name'=>$request->Area1
+			]);
+		}
 		if (!$find) {
 			if (!Auth::user()->checkRole('create_master') && Auth::user()->level != 9999) {
 				abort(401);
@@ -104,7 +121,8 @@ class MasterWarehouseLibraries
 				'Floor'              => $request->Floor,
 				'Accept'			 => $request->Accept,
 				'Email'				 => $request->Email,
-				'Email2'				 => $request->Email2,
+				'Email2'			 => $request->Email2,
+				'Area'				 => $request->Area ? $request->Area : (isset($area) ? $area->ID : ''),
 				'Note'               => $request->Note,
 				'User_Created'       => Auth::user()->id,
 				'User_Updated'       => Auth::user()->id,
@@ -112,7 +130,8 @@ class MasterWarehouseLibraries
 
 			$data = array();
 
-			for ($i = 1; $i <= $request->Quantity_Rows; $i++) {
+			for ($i = 1; $i <= $request->Quantity_Rows; $i++) 
+			{
 				for ($j = 1; $j <= $request->Quantity_Columns; $j++) {
 					array_push($data, [
 						'Name'               => $find->Symbols . '-' . $i . '-' . $j,
@@ -125,7 +144,8 @@ class MasterWarehouseLibraries
 						'Packing_ID'         => $find->Packing_ID,
 						'Accept'			 => $request->Accept,
 						'Email'				 => $request->Email,
-						'Email2'				 => $request->Email2,
+						'Area'				 => $request->Area ? $request->Area : (isset($area) ? $area->ID : ''),
+						'Email2'			 => $request->Email2,
 						'Group_Materials_ID' => $find->Group_Materials_ID,
 						'Floor'              => $request->Floor,
 					]);
@@ -169,6 +189,7 @@ class MasterWarehouseLibraries
 							'Accept'			 => $request->Accept,
 							'Email'				 => $request->Email,
 							'Email2'				 => $request->Email2,
+							'Area'				 => $request->Area ? $request->Area : (isset($area) ? $area->ID : ''),
 							'Group_Materials_ID' => $request->Group_Materials_ID,
 							'Floor'              => $request->Floor,
 							'IsDelete'           => 0
@@ -186,6 +207,7 @@ class MasterWarehouseLibraries
 							'Accept'			 => $request->Accept,
 							'Email'				 => $request->Email,
 							'Email2'				 => $request->Email2,
+							'Area'				 => $request->Area ? $request->Area : (isset($area) ? $area->ID : ''),
 							'Group_Materials_ID' => $request->Group_Materials_ID,
 							'Floor'              => $request->Floor,
 							'IsDelete'           => 0
@@ -209,6 +231,7 @@ class MasterWarehouseLibraries
 			$find->Email2              = $request->Email2;
 			$find->Note               = $request->Note;
 			$find->Floor              = $request->Floor;
+			$find->Area               = $request->Area ? $request->Area : (isset($area) ? $area->ID : '');
 			$find->User_Updated       = Auth::user()->id;
 			$find->IsDelete           = 0;
 			$find->save();
@@ -271,11 +294,11 @@ class MasterWarehouseLibraries
 	public function get_list_materials_in_warehouse($request)
 	{
 		$find = MasterWarehouse::where('IsDelete', 0)
-			->where('ID', $request->Warehouse_ID)
+			->where('Area', $request->Warehouse_ID)
 			->first();
 		$arr = [];
 
-		if ($find->detail) {
+		if ($find) {
 			foreach ($find->detail as $value) {
 
 				if ($value->inventory) {

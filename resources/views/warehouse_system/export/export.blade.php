@@ -152,14 +152,14 @@
 						@endforeach
 						@endif
 					</br>
-					<table class="table table-striped table-hover"  width="100%">
+					<table class="table table-bordered table-striped " width="100%" id="tableUnit">
 						<thead>
 							<th>{{__('ID')}}</th>
 							<th>{{__('Type')}}</th>
 							<th>{{__('Name')}}</th>
 							<th>{{__('Materials')}} </th>
 							<th>{{__('Warehouse')}} {{__('Go')}}</th>
-							<th>{{__('Warehouse')}} {{__('To')}}</th> 
+							<th>{{__('Warehouse')}} ({{__('Machine')}}) {{__('To')}}</th> 
 							<th>{{__('Quantity')}} {{__('To Be Exported')}}</th>
 							<th>{{__('Quantity')}} {{__('Exported')}}</th>
 							<th>{{__('Quantity')}} {{__('Is')}} {{__('Transfer')}}</th>
@@ -179,7 +179,7 @@
 								<td>{{$value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT')  ) }}-{{date_format(date_create($value->Time_Created),"YmdHis")}}</td>
 								<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
 								<td>{{$value->go ? $value->go->Name : '' }}</td>
-								<td>{{$value->to ? $value->to->Name : '' }}</td>
+								<td>{{$value->to ? $value->to->Name : ($value->machine ? $value->machine->Name : '--' ) }}</td>
 								<td id="com_{{$value->ID}}">{{$value->Count ? $value->Count : floatval($value->Quantity) }}</td>
 								<?php $a = $value->Count ? $value->Count : $value->Quantity; ?>
 								<?php $b = $value->Count ? (count($value->detail->where('Status',1))) : floatval(collect($value->detail->where('Status',1))->sum('Quantity')); ?>
@@ -233,7 +233,7 @@
 											<a href="{{route('warehousesystem.export.detail',['ID'=>$value->ID])}}" class="btn btn-info" >
 												{{ __('Detail') }}
 											</a>
-											@if((floatval($b)) > 0 && (($value->go ? $value->go->Symbols : '') != ($value->to ? $value->to->Symbols : '')))
+											@if(!$value->Machine_ID  && (floatval($b)) > 0 && (($value->go ? $value->go->Name : '') != ($value->to ? $value->to->Name : '')))
 												<button class="btn btn-light btn-Transfer" id="btn-{{$value->To}}-{{$value->ID}}" data-toggle="modal" data-target=".modal-tranfer" >
 													{{ __('Transfer') }} {{ __('Warehouse') }}
 												</button>
@@ -262,7 +262,6 @@
 					</div>
 				</div>
 			</div>
-
 			<!-- modal add export -->
 			<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-xl">
@@ -280,9 +279,9 @@
 									<option value="">
 										{{__('Choose')}} {{__('Warehouse')}}
 									</option>
-									@foreach($warehouse as $value)
+									@foreach($area as $value)
 									<option value="{{$value->ID}}">
-										{{$value->Symbols}}
+										{{$value->Name}}
 									</option>
 									@endforeach
 								</select>
@@ -298,10 +297,7 @@
 					</div>
 				</div>
 			</div>
-
-<!-- 
-	modal_cancel -->
-
+<!-- modal_cancel -->
 	<div class="modal fade" id="modalRequestCan" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -314,7 +310,7 @@
 				<form action="{{ route('warehousesystem.export.cancel') }}" method="get">
 					@csrf
 					<div class="modal-body">
-						<strong style="font-size: 23px">{{__('Do You Want To Cancel')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+						<strong style="font-size: 23px">{{__('Do You Want To Cancel')}} <span id="nameDel" style="color: blue"></span>?</strong>
 						<input type="text" name="ID" id="ID" class="form-control hide">
 						
 					</div>
@@ -386,10 +382,11 @@
 	<script>
 		$('.select2').select2()
 		$('#tableUnit').DataTable({
-			language: __languages.table,
-			scrollX : '100%',
-			scrollY : '100%'
-		});
+            language: __languages.table,
+            scrollX: '100%',
+            scrollY: '100%',
+            dom: '<"bottom"><"clear">',
+        });
 		$(document).on('click', '.btn-delete', function()
 		{
 			let id = $(this).attr('id');
@@ -463,23 +460,79 @@
 							<input type="Number" name="Count" id="idCan77" min='0' class="form-control  mater"  step="1">
 							<span style="color :red; font-size:10px" class=" err2 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
 							<div class="mater">
-							<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('To')}}</label>
-							<select class="custom-select ware1 select2" name="To">
-							<option value="">
-							{{__('Choose')}} {{__('Warehouse')}}
-							</option>
-							@foreach($warehouse as $value)
-							<option value="{{$value->ID}}">
-							{{$value->Symbols}}
-							</option>
-							@endforeach
-							</select>
+							<div class="choose-to">
+								<label>{{__('Choose')}} {{__('Type')}}  {{__('To')}}</label>
+								<select class="custom-select choosetype select2" name="Type">
+									<option value="">
+									{{__('Choose')}} {{__('Warehouse')}}
+									</option>
+									<option value="1">
+									{{__('To')}} {{__('Machine')}}
+									</option>
+									<option value="2">
+									{{__('To')}} {{__('Warehouse')}}
+									</option>
+								</select>
+							</div>
+							<div class="to-machine hide">
+								<label>{{__('Choose')}} {{__('Machine')}}  {{__('To')}}</label>
+								<select class="custom-select tomachine select2" name="Machine_ID">
+									<option value="">
+									{{__('Choose')}} {{__('Machine')}}
+									</option>
+									@foreach($machine as $value)
+									<option value="{{$value->ID}}">
+									{{$value->Name}}
+									</option>
+									@endforeach
+								</select>
+							</div>
+							<div class="to-warehouse hide">
+								<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('To')}}</label>
+								<select class="custom-select towarehouse select2" name="To">
+									<option value="">
+									{{__('Choose')}} {{__('Warehouse')}}
+									</option>
+									@foreach($area as $value)
+									<option value="{{$value->ID}}">
+									{{$value->Name}}
+									</option>
+									@endforeach
+								</select>
+							</div>
+
 							<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
 							</div>
 							</div>
 							`)   
-						$('.select2').select2()
+							$('.select2').select2()
                             //  $(".ware1 option[value='"+id+"']").remove();
+							$('.choose-to').on('input',function(){
+								let a = $('.choosetype').val()
+								console.log(a)
+								if(a == 1)
+								{
+									$('.to-machine').show()
+									$('.towarehouse').val('')
+									$('.to-warehouse').hide()
+									$('.btn-add').show()
+								}
+								else if(a == 2)
+								{
+									$('.tomachine').val('')
+									$('.to-machine').hide()
+									$('.to-warehouse').show()
+									$('.btn-add').show()
+								}
+								else
+								{
+									$('.tomachine').val('')
+									$('.to-machine').hide()
+									$('.towarehouse').val('')
+									$('.to-warehouse').hide()
+									$('.btn-add').hide()
+								}
+							})
                             $('.mater2').on('input',function(){
                             	let a = $('.mater :selected').text();
                             	let b = $('.mater :selected').attr('class');
@@ -540,7 +593,8 @@ $('.btn-add').on('click',function(){
 	let a = $('.ware').val()
 	let b = $('.mater2').val()
 	let c = $('#idCan7').val()
-	let d = $('.ware1').val()
+	let d = $('.towarehouse').val()
+	let f = $('.tomachine').val()
 	let e = $('#idCan77').val()
 	console.log(a,b,c,d,e)
 	$.ajax({
@@ -553,6 +607,7 @@ $('.btn-add').on('click',function(){
 			Quantity : c,
 			Count : e,
 			To  : d,
+			Machine_ID  : f,
 		},
 		success: function(data) 
 		{
@@ -585,7 +640,7 @@ $('.btn-Transfer').on('click',function(){
 		url: "{{route('masterData.warehouses.filter_warehouse')}}",
 		data: { 
 			'_token' : $('meta[name="csrf-token"]').attr('content'),
-			ID : id.split('-')[1],
+			Area : id.split('-')[1],
 			Export_ID : id.split('-')[2],
 		},
 		success: function(data) 
@@ -649,6 +704,7 @@ $('.btn-Transfer').on('click',function(){
 					<br>
 					`)   
 				$('.select2').select2()
+				
 				$('.box-To').on('input',function(){
 					$('.detail-box').remove()
 					let a = $('.box-To :selected').attr('class')

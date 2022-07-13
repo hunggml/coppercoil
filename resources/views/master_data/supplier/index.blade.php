@@ -76,9 +76,9 @@
 	                	</form>
 		                @include('basic.alert')
 		            	</br>
-		                <table class="table table-striped table-hover text-nowrap" id="tableSupplier" width="100%">
+		                <table class="table table-bordered text-nowrap w-100" id="tableSupplier" width="100%">
 		                	<thead>
-		                		<th>{{__('ID')}}</th>
+		                		<!-- <th>{{__('ID')}}</th> -->
 		                		<th>{{__('Name')}} {{ __('Supplier') }}</th>
 		                		<th>{{__('Symbols')}} {{ __('Supplier') }}</th>
 		                		<th>{{__('Address')}}</th>
@@ -95,7 +95,7 @@
 		                	<tbody>
 		                		@foreach($supplier as $value)
 			                		<tr>
-			                			<th colspan="1">{{$value->ID}}</th>
+			                			<!-- <th colspan="1">{{$value->ID}}</th> -->
 			                			<td>{{$value->Name}}</td>
 			                			<td>{{$value->Symbols}}</td>
 			                			<td>{{$value->Address}}</td>

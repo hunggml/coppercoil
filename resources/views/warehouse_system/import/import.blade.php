@@ -50,6 +50,19 @@
 										  @endforeach
 		                        	</select>
 	                      		</div>
+								  <div class="form-group col-md-2">
+		                        	<label>{{__('Choose')}} {{__('Symbols')}} {{ __('Supplier') }}</label>
+		                        	<select class="custom-select select2" name="supplier">
+		                          		<option value="">
+		                          			{{__('Choose')}} {{__('Symbols')}}
+		                          		</option>
+										  @foreach($supplier as $value)
+										   <option value="{{$value->ID}}"  {{$request->supplier ? ($request->supplier == $value->ID ? 'selected' : ''  ) : ''}}>
+										   		{{$value->Symbols}}
+		                          			</option>
+										  @endforeach
+		                        	</select>
+	                      		</div>
 	                      		<div class="form-group col-md-2">
 		                        	<label>{{ __('From') }}</label>
 		                        	<input type="date" value="{{$request->from}}" class="form-control datetime"  name="from"  >
@@ -74,7 +87,6 @@
 						@endif
 						@if(session()->has('danger'))
 							@foreach(session('danger') as $value)
-
 							<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
 								<strong>{{$value}}</strong>
 								<br>
@@ -85,11 +97,12 @@
 							@endforeach
 						@endif
 		            	</br>
-		                <table class="table table-striped table-hover"  width="100%">
+		                <table class="table table-bordered text-nowrap " width="100%" id="tableUnit">
 		                	<thead>
 		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Symbols')}} {{ __('Command') }}</th>
-								<th>{{__('Trạng Thái')}}</th>
+								<th>{{__('Supplier')}}</th>
+								<th>{{__('Status')}}</th>
 		                		<th>{{__('Note')}}</th>
 		                		<th>{{__('User Created')}}</th>
 		                		<th>{{__('Time Created')}}</th>
@@ -104,7 +117,18 @@
 								<tr>
 									<td>{{$dem}}</td>
 									<td>{{$value->Name}}</td>
-									<td>Trạng thái</td>
+									<td>{{$value->supplier ? $value->supplier->Symbols : '' }}</td>
+										<td>
+											<?php
+												$count_all = collect($value->detail)->count();
+												$count = collect($value->detail)->where('Status',1)->count();
+											?>
+											@if($count < $count_all)
+												{{__('Dont Success')}}
+											@else
+												{{__('Success')}}
+											@endif
+										</td>
 									<td>{{$value->Note}}</td>
 									<td>
 										{{$value->user_created ? $value->user_created->name : ''}}
@@ -139,7 +163,8 @@
 		$('#tableUnit').DataTable({
 			language: __languages.table,
 			scrollX : '100%',
-			scrollY : '100%'
+			scrollY : '100%',
+			dom: '<"bottom"><"clear">',
 		});
 
 		$(document).on('click', '.btn-delete', function()
@@ -176,7 +201,8 @@
             {
                 $('.error-file').show();
                 $('.btn-save-file').prop('disabled', true);
-            } else
+            }
+			else
             {
                 $('.btn-save-file').prop('disabled', false);
                 check_file = true;
@@ -190,7 +216,8 @@
             if (check_file) 
             {
                 $('.btn-submit-file').click();
-            } else
+            } 
+			else
             {
                 $('.error-file').show();
             }
