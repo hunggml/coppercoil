@@ -29,6 +29,7 @@ class ExportDetail extends Model
     ,'STT'
     ,'Type'
     ,'Transfer'
+    ,'Supplier_ID'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'

@@ -33,8 +33,8 @@ class ImportController extends Controller
     public function import(Request $request)
     {
         $data = $this->command->get_list_command_import($request);
-        $data_all = $this->command->get_list_all_command();
-        $supplier = $this->supplier->get_all_list_supplier();
+        $data_all = $this->command->get_list_allcommand();
+        $supplier = $this->supplier->get_all_lis_t_supplier();
         return view('warehouse_system.import.import',
         [
             'data'=>$data,
@@ -171,8 +171,18 @@ class ImportController extends Controller
         $list_materials = $this->materials->get_all_list_materials($request);
         $data_all = $this->command->detail_all_list($request);
         $list_pallet = $this->command->list_pallet();
-        $list_location = $this->warehouse_detail->get_all_list_warehouse_detail($request);
-        $list_ware =$this->warehouse->get_all_list_warehouse();
+        $list_location1 = $this->warehouse_detail->get_all_list_warehouse_detail($request);
+        $list_ware1 =$this->warehouse->get_all_list_warehouse();
+        if($request->Format == 1)
+        {
+            $list_location = $list_location1->where('Machine_ID',null);
+            $list_ware = $list_ware1->where('Area','>',0);
+        }
+        else if($request->Format == 2)
+        {
+            $list_location = $list_location1->where('Machine_ID','<>',null);
+            $list_ware = $list_ware1->where('Area',null);
+        }
         return view('master_data.warehouses.location.table',
         [
             'data'=>$data, 

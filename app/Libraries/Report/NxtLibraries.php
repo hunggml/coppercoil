@@ -33,15 +33,13 @@ class NxtLibraries
             ->when($ware, function ($query, $ware) {
                 return $query->where('ID', $ware);
             })
-            ->get();
+        ->get();
         $list_warehouse = [];
-        foreach ($list_ware as $value) {
-            foreach ($value->detail as $value1) {
-                array_push($list_warehouse, $value1->ID);
+            foreach ($list_ware as $value) {
+                foreach ($value->detail->where('Machine_ID',null) as $value1) {
+                    array_push($list_warehouse, $value1->ID);
+                }
             }
-        }
-        // dd($list_warehouse);
-        // dd($from,$to); 
         $list_mater = MasterMaterials::where('IsDelete', 0)
             ->when($mater, function ($query, $mater) {
                 return $query->where('ID', $mater);

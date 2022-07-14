@@ -154,7 +154,7 @@
 					</br>
 					<table class="table table-bordered table-striped " width="100%" id="tableUnit">
 						<thead>
-							<th>{{__('ID')}}</th>
+							<!-- <th>{{__('ID')}}</th> -->
 							<th>{{__('Type')}}</th>
 							<th>{{__('Name')}}</th>
 							<th>{{__('Materials')}} </th>
@@ -174,7 +174,7 @@
 							@foreach($data as $value)
 							<?php $dem++;  ?>
 							<tr>
-								<td>{{$dem}}</td>
+								<!-- <td>{{$dem}}</td> -->
 								<td>{{$value->Type == 0 ? __('Software') : ($value->Type == 1 ? __('PDA') : __('System')  ) }}</td>
 								<td>{{$value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT')  ) }}-{{date_format(date_create($value->Time_Created),"YmdHis")}}</td>
 								<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
@@ -323,8 +323,7 @@
 		</div>
 	</div>
 
-<!-- 
-	modal_accept -->
+<!-- modal_accept -->
 
 	<div class="modal fade" id="modalRequestAC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -431,14 +430,39 @@
 					{
 						$('.err').hide()
 						let a = ``
+						let b = ``
 						$.each(data.data , function (index,value){
 							a = a + `
 							<option value="`+value.Materials_ID+`" class="`+value.Quantity+`  `+value.Count+` ">`+value.Materials+`</option>
 							`
 						})
+
+						$.each(data.data , function (index,value){
+							if(value.product)
+							{
+								b = b + `
+								<option value="`+value.Materials_ID+`" class="`+value.product.Quantity+`">`+value.product.Name+`</option>
+								`
+							}
+						})
 						$('.warehouse').append(`
 							<div class="new">
-							<div class="mater  mater1">
+							<div class="row">
+								<div class="product col-6 mater1">
+									<label>{{__('Choose')}} {{__('Product')}} </label>
+									<select class="custom-select product product1 select2" name="Materials">
+									<option value="">
+									{{__('Choose')}} {{__('Product')}}
+									</option>
+									`+b+`
+									</select>
+								</div>
+								<div class="mater col-6 mater1">
+									<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
+									<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
+								</div>
+							</div>
+							<div class="mater mater1">
 							<label>{{__('Choose')}} {{__('Materials')}} </label>
 							<select class="custom-select mater2 select2" name="Materials">
 							<option value="">
@@ -533,7 +557,20 @@
 									$('.btn-add').hide()
 								}
 							})
-                            $('.mater2').on('input',function(){
+							$('.product').on('input',function(){
+								let a = $('.product1').val()
+								let b = $('.quantityproduction').val()
+								let c = $('.product :selected').attr('class');
+							
+								$('.mater2').val(a).change()
+								if(b)
+								{
+									$('#idCan7').val(parseFloat(b*c)).change()
+								}
+								
+							})
+							
+                            $('.mater2').on('change',function(){
                             	let a = $('.mater :selected').text();
                             	let b = $('.mater :selected').attr('class');
                             	let c = $('.mater :selected').val();
@@ -543,7 +580,14 @@
                             	$('#idCan7').attr('max',b)
                             	console.log(a,b.split(' '),c)
                             })
-                            $('#idCan7').on('input',function(){
+							$('#idCan7').on('input',function(){
+                            	
+                            	
+                            	let b = $('#idCan7').val()
+                            	
+                            	$('#idCan7').val(b).change()
+                            })
+                            $('#idCan7').on('change',function(){
                             	
                             	let a = $('#idCan6').val()
                             	let b = $('#idCan7').val()

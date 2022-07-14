@@ -310,6 +310,8 @@ class MasterWarehouseLibraries
 							$arr1 = [
 								'Materials_ID'  => $key,
 								'Materials'     => $value1[0]->materials ? $value1[0]->materials->Symbols : '',
+								'materials'     => $value1[0]->materials,
+								'product'     => $value1[0]->materials ? $value1[0]->materials->product :'',
 								'Quantity' => number_format(Collect($value1)->sum('Inventory'), 2, '.', ''),
 								'Count' => Count($value1)
 							];

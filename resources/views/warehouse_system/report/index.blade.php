@@ -90,7 +90,7 @@
                       		</div>
 	                	</form>
 		            	</br>
-		                <table class="table table-striped table-hover"  width="100%" id="table">
+		                <table class="table table-bordered text-nowrap " width="100%"  id="table">
 		                	<thead>
 		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Materials')}}</th>

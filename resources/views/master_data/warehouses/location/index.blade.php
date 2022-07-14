@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <a href="{{route('warehousesystem.import.detail.inventory')}}" class="btn btn-info" >{{__('List')}}</a>
+                            <a href="{{route('warehousesystem.import.detail.inventory',['Format'=>$request->Format])}}" class="btn btn-info" >{{__('List')}}</a>
                             
                         </div>
                     </div>
@@ -87,6 +87,18 @@
 @endsection
 @push('scripts')
     <script>
+    // $('#tableDetail').DataTable({
+    //         language: __languages.table,
+    //         scrollX: '100%',
+    //         scrollY: '100%',
+    //         dom: '<"bottom"><"clear">',
+    //     });
+    // $('#tableHistory').DataTable({
+    //         language: __languages.table,
+    //         scrollX: '100%',
+    //         scrollY: '100%',
+    //         dom: '<"bottom"><"clear">',
+    //     });
         function filter_detail(dataDetail)
         {
             return $.ajax({

@@ -14,14 +14,14 @@
                         {{ __('Stock') }} {{ __('Detail') }}
                     </span>
                     <div class="col-md-1" style="float:right;">
-                        <a href="{{route('warehousesystem.import.location')}}" class="btn btn-warning">{{__('Diagram')}}</a>
+                        <a href="{{route('warehousesystem.import.location',['Format'=>$request->Format])}}" class="btn btn-warning">{{__('Diagram')}}</a>
                     </div>
                     <div class="card-tools">
                     </div>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('warehousesystem.import.detail.inventory') }}" method="get">
-                        @csrf
+                        <input type="text" value="{{$request->Format}}" name="Format" class="hide">
                         <div class="row">
                             <div class="form-group col-md-2">
                                 <label>{{__('Choose')}} {{__('Symbols')}} {{ __('Materials') }}</label>
@@ -86,7 +86,7 @@
                         <thead>
                             <!-- <th>{{__('ID')}}</th> -->
                             <!-- <th>{{__('Name')}} {{__('Warehouse')}}</th>
-                          <th>{{__('Symbols')}} {{__('Warehouse')}}</th> -->
+                            <th>{{__('Symbols')}} {{__('Warehouse')}}</th> -->
                             <th>{{__('Location')}}</th>
                             <th>{{__('Pallet')}}</th>
                             <th>{{__('Materials')}}</th>
@@ -127,7 +127,6 @@
                                       <td colspan="2" style="background-color: #ccffff;">{{__('Quantity')}}(kg) : {{floatval($sum)}}</td>
                                   </tr>
                                 @endforeach
-
                               @endforeach
                             <tr>
                                 <td colspan="4" style="background-color: #99ff99;">{{__('Roll Number')}} : {{$dem_t}}</td>
@@ -136,7 +135,6 @@
                             @endforeach
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>

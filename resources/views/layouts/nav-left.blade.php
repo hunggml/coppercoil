@@ -105,13 +105,13 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item has-treeview">
-                  <a href="{{ route('warehousesystem.import.location') }}" class="nav-link import">
+                  <a href="{{ route('warehousesystem.import.location',['Format'=>1]) }}" class="nav-link import">
                     <i class="far fa-dot-circle nav-icon"></i>
                     <p>{{__('Stock')}} {{__('Save')}}</p>
                   </a>
                 </li>
                 <li class="nav-item ">
-                  <a href="#" class="nav-link Transfer">
+                  <a href="{{ route('warehousesystem.import.location',['Format'=>2]) }}" class="nav-link Transfer">
                     <i class="far fa-dot-circle nav-icon"></i>
                     <p>{{__('Stock')}} {{__('Machine')}}</p>
                   </a>

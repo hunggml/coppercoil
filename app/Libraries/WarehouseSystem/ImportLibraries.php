@@ -152,12 +152,15 @@ class ImportLibraries
         $location   = $request->location;
         $materials  = $request->Materials_ID;
         $Pallet     = $request->Pallet_ID;
-        $warehouse  = MasterWarehouse::where('IsDelete',0)
-        ->when($ware, function($query, $ware)
-		{
-			return $query->where('ID', $ware);
-		})
-        ->get();
+       
+            $warehouse  = MasterWarehouse::where('IsDelete',0)
+            ->when($ware, function($query, $ware)
+            {
+                return $query->where('ID', $ware);
+            })
+            ->get();
+        
+        
         $arr = [];
         foreach($warehouse as $value )
         { 
@@ -168,11 +171,21 @@ class ImportLibraries
                 'Symbols'=>$value->Symbols,
             ];
             $arr3 = [];
-           
-            foreach($value->detail->when($location, function($query, $location)
+            if($request->Format == 1)
             {
-                return $query->where('ID', $location);
-            }) as $value1)
+                $ware1 = $value->detail->where('Machine_ID',null)->when($location, function($query, $location)
+                {
+                    return $query->where('ID', $location);
+                });
+            }
+            else if($request->Format == 2)
+            {
+                $ware1 = $value->detail->where('Machine_ID','<>',null)->when($location, function($query, $location)
+                {
+                    return $query->where('ID', $location);
+                });
+            }
+            foreach($ware1  as $value1)
             {
                 $arr2 = [
                     'Name' => $value1->Name,
