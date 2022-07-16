@@ -127,6 +127,7 @@ Route::group(['middleware' => 'language'], function () {
 		Route::prefix('/Stock')->group(function () {
 			Route::get('/', 'MasterData\MasterWarehouseController@location')->name('warehousesystem.import.location');
 			Route::get('/list', 'WarehouseSystem\ImportController@inventory')->name('warehousesystem.import.detail.inventory');
+			Route::get('/get_list_stock_in_location', 'WarehouseSystem\ImportController@get_list_stock_in_location')->name('warehousesystem.import.detail.get_list_stock_in_location');
 		});
 
 		Route::prefix('/retype')->group(function () {

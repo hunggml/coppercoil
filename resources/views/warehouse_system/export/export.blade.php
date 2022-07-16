@@ -1,15 +1,8 @@
 @extends('layouts.main')
-
 @section('content')
-
 @if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
 @include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
 @endif
-
-	<!-- @if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
-	@include('basic.modal_import', ['route' => route('warehousesystem.import.import_file')])
-	@include('basic.modal_table_error')
-	@endif -->
 	<div class="container-fluid">
 		<div class="row justify-content-center">
 			<div class="col-md-12">
@@ -119,18 +112,15 @@
 										<option value="3" {{$request ? ($request->status == 3 ? 'selected' : ''): ''}}>
 											{{__('Success')}}
 										</option>
-										
 										<option value="4" {{$request ? ($request->status == 4 ? 'selected' : ''): ''}}>
 											{{__('Cancel')}}
 										</option>
-										
 									</select>
 								</div>
 								<div class="col-md-1" style="margin-top: 33px">
 									<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
 								</div>
 							</div>
-
 						</form>
 						@if(session()->has('success'))
 						<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -287,8 +277,6 @@
 								</select>
 								<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
 							</div>
-							
-							
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
@@ -322,9 +310,7 @@
 			</div>
 		</div>
 	</div>
-
-<!-- modal_accept -->
-
+	<!-- modal_accept -->
 	<div class="modal fade" id="modalRequestAC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -349,7 +335,6 @@
 			</div>
 		</div>
 	</div>
-
 	<!-- modal tranfer -->
 	<div class="modal fade modal-tranfer" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-xl">
@@ -363,9 +348,6 @@
 				</div>
 				<p class="err_tran hide" style="color:red; font-size:15px; text-align:center;font-weight: bold;">{{__('Uncomplete Export')}}</p>
 				<div class="modal-body transfer-body">
-					
-					
-					
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
@@ -374,11 +356,9 @@
 			</div>
 		</div>
 	</div>
-
-
 	@endsection
 	@push('scripts')
-	<script>
+<script>
 		$('.select2').select2()
 		$('#tableUnit').DataTable({
             language: __languages.table,
@@ -524,7 +504,6 @@
 									@endforeach
 								</select>
 							</div>
-
 							<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
 							</div>
 							</div>
@@ -631,169 +610,169 @@
                         	
                         }
                       });
-});
-$('.btn-add').on('click',function(){
-	
-	let a = $('.ware').val()
-	let b = $('.mater2').val()
-	let c = $('#idCan7').val()
-	let d = $('.towarehouse').val()
-	let f = $('.tomachine').val()
-	let e = $('#idCan77').val()
-	console.log(a,b,c,d,e)
-	$.ajax({
-		type: "get",
-		url: "{{route('warehousesystem.export.add')}}",
-		data: { 
-			'_token' : $('meta[name="csrf-token"]').attr('content'),
-			Go : a,
-			Materials_ID :b,
-			Quantity : c,
-			Count : e,
-			To  : d,
-			Machine_ID  : f,
-		},
-		success: function(data) 
-		{
-			if(data.data)
+		});
+		$('.btn-add').on('click',function(){
+			
+			let a = $('.ware').val()
+			let b = $('.mater2').val()
+			let c = $('#idCan7').val()
+			let d = $('.towarehouse').val()
+			let f = $('.tomachine').val()
+			let e = $('#idCan77').val()
+			console.log(a,b,c,d,e)
+			$.ajax({
+				type: "get",
+				url: "{{route('warehousesystem.export.add')}}",
+				data: { 
+					'_token' : $('meta[name="csrf-token"]').attr('content'),
+					Go : a,
+					Materials_ID :b,
+					Quantity : c,
+					Count : e,
+					To  : d,
+					Machine_ID  : f,
+				},
+				success: function(data) 
+				{
+					if(data.data)
+					{
+						location.reload();
+					}
+				},
+				error: function() {
+				}
+			});
+		})
+		$('.btn-Transfer').on('click',function(){
+			let id = $(this).attr('id')
+			$('.transfer-box').remove()
+			$('.table-box').remove()
+			$('.transfer-ware').remove()
+			let com = $('#com_'+id.split('-')[2]).text()
+			let tran = $('#trans_'+id.split('-')[2]).text()
+			if( com > tran )
 			{
-				location.reload();
+				$('.err_tran').show()
 			}
-		},
-		error: function() {
-		}
-	});
-})
-$('.btn-Transfer').on('click',function(){
-	let id = $(this).attr('id')
-	$('.transfer-box').remove()
-	$('.table-box').remove()
-	$('.transfer-ware').remove()
-	let com = $('#com_'+id.split('-')[2]).text()
-	let tran = $('#trans_'+id.split('-')[2]).text()
-	if( com > tran )
-	{
-		$('.err_tran').show()
-	}
-	else
-	{
-		$('.err_tran').hide()
-	}
-	$.ajax({
-		type: "get",
-		url: "{{route('masterData.warehouses.filter_warehouse')}}",
-		data: { 
-			'_token' : $('meta[name="csrf-token"]').attr('content'),
-			Area : id.split('-')[1],
-			Export_ID : id.split('-')[2],
-		},
-		success: function(data) 
-		{
-			console.log(data.data)
-			if(data.data.length > 0)
+			else
 			{
-				let a =''
-				let b =''
-				$.each(data.data[0].detail , function (index,value){
-					a = a + `
-					<option value="`+value.ID+`" >`+value.Symbols+`</option>
-					`
-				})
-				$.each(data.list_Box , function (index,value){
-                        // console.log(value)
-                        if (value.Transfer == 0) 
-                        {
-                        	b = b + `
-                        	<option value="`+value.ID+`" 
-                        	class="`+value.Box_ID+`/`+value.Pallet_ID+`/`+value.materials.Symbols+`/`+value.materials.Spec+`/`+value.Quantity+`/`+value.location.Symbols+`">`
-                        	+value.Box_ID+
-                        	`</option>
-                        	`
-                        }
-                      })
-				$('.transfer-body').append(`
-					<input type="text" name="ID" value="`+id.split('-')[2]+`" id=Export_ID" class="form-control hide" >
-					<div class="transfer-box">
-					<label>{{__('Choose')}} {{__('Box')}}</label>
-					<select class="custom-select box-To select2" name="box-To">
-					<option value="">
-					{{__('Choose')}} {{__('Box')}}
-					</option>
-					`+b+`
-					</select>
-					</div>
-					<br>
-					<div class="table-box" >
-					<table class="table table-striped table-hover"  >
-					<thead>
-					<th>{{__('BOXID')}} </th>
-					<th>{{__('Pallet')}}</th>
-					<th>{{__('Materials')}}</th>
-					<th>{{__('Spec')}}</th>
-					<th>{{__('Quantity')}}(kg)</th>
-					<th>{{__('Location')}}</th>
-					</thead>
-					<tbody class="table-detail-box">
-					</tbody>
-					</div>
-					<div class="transfer-ware">
-					<label>{{__('Choose')}} {{__('Warehouse')}} {{__('To')}} </label>
-					<select class="custom-select Location-To select2" name="Location-To">
-					<option value="">
-					{{__('Choose')}} {{__('Location')}}
-					</option>
-					`+a+`
-					</select>
-					</div>
-					<br>
-					`)   
-				$('.select2').select2()
-				
-				$('.box-To').on('input',function(){
-					$('.detail-box').remove()
-					let a = $('.box-To :selected').attr('class')
-					console.log(a)
-					$('.table-detail-box').append(`
-						<tr class="detail-box">
-						<td>`+a.split('/')[0]+`</td>
-						<td>`+a.split('/')[1]+`</td>
-						<td>`+a.split('/')[2]+`</td>
-						<td>`+a.split('/')[3]+`</td>
-						<td>`+parseFloat(a.split('/')[4])+`</td>
-						<td>`+a.split('/')[5]+`</td>
-						</tr>
-						`)
-				})
+				$('.err_tran').hide()
 			}
-		},
-		error: function() {
-		}
-	});
-})
-$('.btn-save-transfer').on('click', function(){
-	let a = $('#Export_ID').val()
-	let c = $('.box-To').val()
-	let b = $('.Location-To').val()
-	console.log(a,b)
-	$.ajax({
-		type: "get",
-		url: "{{route('warehousesystem.transfer.add_transfer')}}",
-		data: { 
-			'_token' : $('meta[name="csrf-token"]').attr('content'),
-			Export_ID : a,
-			Detail_ID :c,
-			To : b,
-		},
-		success: function(data) 
-		{
-			if(data.data)
-			{
-				location.reload();
-			}
-		},
-		error: function() {
-		}
-	});
-})
+			$.ajax({
+				type: "get",
+				url: "{{route('masterData.warehouses.filter_warehouse')}}",
+				data: { 
+					'_token' : $('meta[name="csrf-token"]').attr('content'),
+					Area : id.split('-')[1],
+					Export_ID : id.split('-')[2],
+				},
+				success: function(data) 
+				{
+					console.log(data.data)
+					if(data.data.length > 0)
+					{
+						let a =''
+						let b =''
+						$.each(data.data[0].detail , function (index,value){
+							a = a + `
+							<option value="`+value.ID+`" >`+value.Symbols+`</option>
+							`
+						})
+						$.each(data.list_Box , function (index,value){
+								// console.log(value)
+								if (value.Transfer == 0) 
+								{
+									b = b + `
+									<option value="`+value.ID+`" 
+									class="`+value.Box_ID+`/`+value.Pallet_ID+`/`+value.materials.Symbols+`/`+value.materials.Spec+`/`+value.Quantity+`/`+value.location.Symbols+`">`
+									+value.Box_ID+
+									`</option>
+									`
+								}
+							})
+						$('.transfer-body').append(`
+							<input type="text" name="ID" value="`+id.split('-')[2]+`" id=Export_ID" class="form-control hide" >
+							<div class="transfer-box">
+							<label>{{__('Choose')}} {{__('Box')}}</label>
+							<select class="custom-select box-To select2" name="box-To">
+							<option value="">
+							{{__('Choose')}} {{__('Box')}}
+							</option>
+							`+b+`
+							</select>
+							</div>
+							<br>
+							<div class="table-box" >
+								<table class="table table-striped table-hover"  >
+									<thead>
+										<th>{{__('BOXID')}} </th>
+										<th>{{__('Pallet')}}</th>
+										<th>{{__('Materials')}}</th>
+										<th>{{__('Spec')}}</th>
+										<th>{{__('Quantity')}}(kg)</th>
+										<th>{{__('Location')}}</th>
+									</thead>
+									<tbody class="table-detail-box">
+									</tbody>
+								</div>
+								<div class="transfer-ware">
+								<label>{{__('Choose')}} {{__('Warehouse')}} {{__('To')}} </label>
+								<select class="custom-select Location-To select2" name="Location-To">
+									<option value="">
+										{{__('Choose')}} {{__('Location')}}
+									</option>
+									`+a+`
+								</select>
+							</div>
+							<br>
+							`)   
+						$('.select2').select2()
+						
+						$('.box-To').on('input',function(){
+							$('.detail-box').remove()
+							let a = $('.box-To :selected').attr('class')
+							console.log(a)
+							$('.table-detail-box').append(`
+								<tr class="detail-box">
+								<td>`+a.split('/')[0]+`</td>
+								<td>`+a.split('/')[1]+`</td>
+								<td>`+a.split('/')[2]+`</td>
+								<td>`+a.split('/')[3]+`</td>
+								<td>`+parseFloat(a.split('/')[4])+`</td>
+								<td>`+a.split('/')[5]+`</td>
+								</tr>
+								`)
+						})
+					}
+				},
+				error: function() {
+				}
+			});
+		})
+		$('.btn-save-transfer').on('click', function(){
+			let a = $('#Export_ID').val()
+			let c = $('.box-To').val()
+			let b = $('.Location-To').val()
+			console.log(a,b)
+			$.ajax({
+				type: "get",
+				url: "{{route('warehousesystem.transfer.add_transfer')}}",
+				data: { 
+					'_token' : $('meta[name="csrf-token"]').attr('content'),
+					Export_ID : a,
+					Detail_ID :c,
+					To : b,
+				},
+				success: function(data) 
+				{
+					if(data.data)
+					{
+						location.reload();
+					}
+				},
+				error: function() {
+				}
+			});
+		})
 </script>
 @endpush

@@ -1,7 +1,6 @@
 @extends('layouts.main')
 
 @section('content')
-
 	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
 	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
 	@endif
@@ -95,7 +94,6 @@
 	                      			<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
 	                      		</div>
                       		</div>
-
 	                	</form>
 		                @if(session()->has('success'))
 							<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -162,74 +160,68 @@
 	    </div>
 	</div>
 
-<div class="modal fade modal-update" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{__('Update')}} {{__('Report')}} {{__('Productivity')}}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <form action="{{route('warehousesystem.productivity.update')}}" method="post">
-        @csrf
-        <div class="modal-body">
-            <div class="form-group row">
-				<div class="col-12">
-					<label>{{ __('Order') }}</label>
-					<select class="custom-select order select2" name="Order">
-						<option value="">
-							{{__('Choose')}} {{__('Type')}}
-						</option>
-					@foreach($data_all as $value)
-						<option value="{{$value->ID}}">
-						{{$value->Order_ID}}
-						</option>
-					@endforeach        
-					</select>
+	<div class="modal fade modal-update" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">{{__('Update')}} {{__('Report')}} {{__('Productivity')}}</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
-		        <div class="col-3">
-					<label> ID </label>
-					<input type="text" name="ID" id="ID" class="form-control" readonly>
+				<form action="{{route('warehousesystem.productivity.update')}}" method="post">
+				@csrf
+				<div class="modal-body">
+					<div class="form-group row">
+						<div class="col-12 machine">
+							<label>{{ __('Machine') }}</label>
+							<select class="custom-select mac select2" name="Machine_ID">
+								<option value="">
+									{{__('Choose')}} {{__('Machine')}}
+								</option>
+								@foreach($machine as $value)
+									@if($value->warehouse)
+										<option value="{{$value->warehouse->ID}}">
+										{{$value->Name}}
+										</option>
+									@endif
+								@endforeach        
+							</select>
+							<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
+						</div>
+					
+						<div class="col-4">
+							<label> {{__('Product')}} </label>
+							<input type="text" name="Product" id="Product" class="form-control" readonly>
+						</div>
+						<div class="col-4">
+							<label> {{__('OK')}} </label>
+							<input type="number"  name="OK" id="OK" class="form-control quanproduction" >
+						</div>				
+						<div class="col-4 ">
+							<label> {{__('NG')}} </label>
+							<input type="number" name="NG" id="NG" class="form-control quanproduction" >
+						</div>
+						<div class="col-12  ">
+							
+						</div>
+					</div>
+					
 				</div>
-				
-				<div class="col-3">
-					<label> {{__('Product')}} </label>
-					<input type="text" name="Product" id="Product" class="form-control" readonly>
-				</div>
-				<div class="col-3">
-					<label> {{__('Materials')}} </label>
-					<input type="text" name="Materials" id="Materials" class="form-control" readonly>
-				</div>
-				<div class="col-3">
-					<label> {{__('Quantity')}} </label>
-					<input type="text" name="Quantity" id="Quantity" class="form-control" readonly>
-				</div>
-				<div class="col-6">
-					<label> {{__('OK')}} </label>
-					<input type="number"  name="OK" id="OK" class="form-control" >
-				</div>				
-				<div class="col-6">
-					<label> {{__('NG')}} </label>
-					<input type="number" name="NG" id="NG" class="form-control" >
-				</div>
-	        </div>
-			
-        </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-        <button type="submit" class="btn btn-success hide btn-add">{{__('Save')}}</button>
-      </div>
-      </form>
-    </div>
-  </div>
-</div>
-
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+				<button type="submit" class="btn btn-success hide btn-add">{{__('Save')}}</button>
+			</div>
+			</form>
+			</div>
+		</div>
+	</div>
 @endsection
 @push('scripts')
 	<script>
 		$('.select2').select2()
-        $('.duallistbox').bootstrapDualListbox({
+        $('.duallistbox').bootstrapDualListbox
+		({
 			nonSelectedListLabel: __warehouses.no_select_com,
 			selectedListLabel   : __warehouses.select_com,
 			infoText            : __group.show+' {0}',
@@ -237,13 +229,14 @@
 			showFilterInputs    : true,
 			filterPlaceHolder   : __filter.symbols
 		});
-		$('#tableUnit').DataTable({
+		$('#tableUnit').DataTable
+		({
 			language: __languages.table,
 			scrollX : '100%',
 			scrollY : '100%'
 		});
-
-		$('.order').on('input',function(){
+		$('.order').on('input',function()
+		{
                 let a = $(this).val()
               	console.log(a)
 				$.ajax({
@@ -284,8 +277,6 @@
 			});
                 
         })
-
-
         $('.btn-import').on('click', function()
         {
             $('#modalImport').modal();
@@ -296,7 +287,6 @@
             $('#product_id').val('');
 
         });
-
         $('#importFile').on('change', function()
         {
             check_file   = false;
@@ -316,7 +306,6 @@
                 check_file = true;
             }
         });
-
         $('.btn-save-file').on('click', function()
         {
             $('.error-file').hide();
@@ -329,5 +318,123 @@
                 $('.error-file').show();
             }
         });
+		$(document).on('input','.mac', function()
+		{
+			let id = $('.mac').val();
+			$('.new').remove();
+			var pro = '';
+			$.ajax({
+				type: "GET",
+				url: "{{route('warehousesystem.import.detail.get_list_stock_in_location')}}",
+				data: { 
+					ware_detail_id : id
+				},
+				success: function(data) 
+				{
+					if(data.success)
+					{
+						$('.err').hide()
+						let a = ``
+						
+						$.each(data.data , function (index,value){
+							if(value.materials)
+							{
+								if(value.materials.product)
+								{
+									a = a + `
+									<option value="`+value.Box_ID+`" class="`+value.Inventory+`__-`+value.materials.Name+`__-`+value.materials.product.Name+`__-`+value.materials.product.Quantity+`">`+value.Box_ID+`</option>
+									`
+								}
+								
+							}
+							
+						})
+						$('.machine').append(`
+							<div class="new row">
+								<div class="row choose-box col-12">
+									<div class="product col-11 mater1">
+										<label>{{__('Choose')}} {{__('Box_ID')}} {{__('Use')}}</label>
+										<select class="custom-select box product1 select2" name="Materials">
+										<option value="">
+										{{__('Choose')}} {{__('Box_ID')}} {{__('Use')}}
+										</option>
+										`+a+`
+										</select>
+									</div>
+									<div class="product col-1 mater1">
+										<button type="button" class="btn btn-success btn-add" style="margin-top:40%">{{__('Add')}}</button>
+									</div>
+								</div>
+							</div>
+							`)   
+							let arr = [];
+							$('.select2').select2()
+							$('.btn-add').on('click',function(){
+								let a = $('.box :selected').val();
+								let b = $('.box :selected').attr('class');
+								// console.log
+								let check = false
+								if(pro == '')
+								{
+									check = true
+								}
+								else
+								{
+									if(pro == b.split('__-')[2] )
+									{
+										check = true
+									}
+								}
+								if(a !== '' && $.inArray(a, arr ) == '-1' && check)
+								{
+									arr.push(a);
+									$('.choose-box').append(`
+										<div class="col-2 tr-`+a+`">
+											<label class="mater"> {{__('Box_ID')}}</label>
+											<input type="text" name="Count" id="idCan66" value="`+a+`" class="form-control" readonly>
+										</div>
+										<div class="col-3 tr-`+a+`">
+											<label class="mater"> {{__('Materials')}}</label>
+											<input type="text" name="Count" id="idCan66" value="`+b.split('__-')[1]+`" class="form-control" readonly>
+										</div>
+										<div class="col-2 tr-`+a+`">
+											<label class="mater"> {{__('Quantity')}} {{__('Stock')}}</label>
+											<input type="text" name="Count" id="idCan66" value="`+parseFloat(b.split('__-')[0])+`" class="form-control" readonly>
+										</div>
+										<div class="col-3 tr-`+a+`">
+											<label class="mater"> {{__('Quantity')}} {{__('Use')}}</label>
+											<input type="text" name="QuantityUse" id="qtyuse-`+a+`" class="form-control qtyuse">
+										</div>
+										<div class="col-2 tr-`+a+`">
+											<button type="button" id="`+a+`" class="btn btn-danger btn-delete-box" style="margin-top:18%">
+												{{__('Delete')}}
+											</button>
+										</div>
+									`) 
+									$('#Product').val(b.split('__-')[2])
+									$('.btn-delete-box').on('click',function(){
+										$('.tr-'+$(this).attr('id')+'').remove()
+										arr.splice($.inArray($(this).attr('id'), arr),1);
+										
+									})
+									$('.quanproduction').on('input',function(){
+										 let e = $('#OK').val()
+										 let f = $('#NG').val()
+										 let g = b.split('__-')[3]
+										 let h = parseFloat(e ? e : 0)+parseFloat( f ? f : 0)
+										 let i = (parseFloat(h)*parseFloat(g))/arr.length
+										 
+										 $('.qtyuse').val(parseFloat(i))
+									})
+								}
+								
+							})
+						}
+                },
+                error: function() {
+                        	
+                    }
+       		 });
+		});
 	</script>
-@endpush
+@endpush  

@@ -51,7 +51,6 @@ class ImportLibraries
             return ['danger' => __('Error Something')];
         }
     }
-
     public function get_list_all_command()
     {
         return CommandImport::where('IsDelete',0)
@@ -311,8 +310,6 @@ class ImportLibraries
         
         
     }
-
-
 	public function get_list_command_import($request)
     {
         $name     = $request->name;
@@ -482,7 +479,6 @@ class ImportLibraries
         }
        return array_unique($err);
     }   
-
     public function get_list_retype($request)
     {
         $materials = $request->Materials_ID;
@@ -520,10 +516,6 @@ class ImportLibraries
         ->orderBy('ID','DESC')
         ->paginate(10);
     }
-
-
-
-
     public function cancel($request)
     {
         return ImportDetail::where('IsDelete',0)
@@ -566,7 +558,6 @@ class ImportLibraries
             'IsDelete'         => 1
         ]);
     }
-
     public function check_infor($request)
     {
         // dd($run);
@@ -622,7 +613,6 @@ class ImportLibraries
         }
         
     }
-
     public function get_list_with_materials($request)
     {
         return ImportDetail::where('IsDelete',0)
@@ -632,7 +622,6 @@ class ImportLibraries
         ->orderBy('Time_Import')
         ->get();
     }
-
     public function add_pallet($request)
     {
         if($request->Pallet_ID)
@@ -687,7 +676,17 @@ class ImportLibraries
             return false;
         }
     }
-
+    public function get_list_stock_in_location($request)
+    {
+        return ImportDetail::where('IsDelete',0)
+        ->where('Warehouse_Detail_ID',$request->ware_detail_id)
+        ->where('Inventory','>',0)
+        ->with([
+            'materials',
+            'materials.product'
+        ])
+        ->get();
+    }
 
     
 }      

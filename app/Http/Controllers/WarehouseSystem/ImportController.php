@@ -28,13 +28,11 @@ class ImportController extends Controller
         $this->warehouse        = $masterWarehouseLibraries;
         $this->supplier         = $MasterSupplierLibraries; 
     }
-    
-
     public function import(Request $request)
     {
         $data = $this->command->get_list_command_import($request);
-        $data_all = $this->command->get_list_allcommand();
-        $supplier = $this->supplier->get_all_lis_t_supplier();
+        $data_all = $this->command->get_list_all_command();
+        $supplier = $this->supplier->get_all_list_supplier();
         return view('warehouse_system.import.import',
         [
             'data'=>$data,
@@ -48,15 +46,13 @@ class ImportController extends Controller
         $data = $this->command->import_file_excel($request);
         if(count($data) > 0)
         {
-            return redirect()->back()->with('danger',$data); 
+            return redirect()->back()->with('danger',$data);
         }
         else
         {
-            return redirect()->back()->with('success',__('Success')); 
+            return redirect()->back()->with('success',__('Success'));
         }
-        
     }
-
     public function detail(Request $request)
     {
         $data = $this->command->detail($request);
@@ -76,7 +72,6 @@ class ImportController extends Controller
             'request'=>$request
         ]);
     }
-    
     public function add_stock(Request $request)
     {
         $data = $this->command->add_stock($request);
@@ -124,9 +119,6 @@ class ImportController extends Controller
         $data = $this->command->destroy($request);
         return redirect()->back()->with('success',__('Success')); 
     }
-
-
-
     public function retype(Request $request)
     {
         $data = $this->command->get_list_retype($request);
@@ -225,6 +217,16 @@ class ImportController extends Controller
         {
             return redirect()->back()->with('danger',__('Fail')); 
         }
+    }
+
+    public function get_list_stock_in_location(Request $request)
+    {
+        $data = $this->command->get_list_stock_in_location($request);
+        // $arr = [$val];
+        return response()->json([
+            'success' =>   true,
+            'data'    => $data
+        ]);
     }
  
 }

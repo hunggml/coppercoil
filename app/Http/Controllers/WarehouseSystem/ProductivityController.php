@@ -10,28 +10,33 @@ use App\Libraries\MasterData\MasterWarehouseLibraries;
 use App\Libraries\WarehouseSystem\ProductReportLibaries;
 use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
 use App\Exports\Quality_Warehouses\ProductReport;
+use App\Libraries\MasterData\MasterMachineLibraries;
 class ProductivityController extends Controller
 {
 	
 
 	public function __construct(
         ProductReportLibaries $ProductReportLibaries,
-        ProductReport    $ProductReport
+        ProductReport    $ProductReport,
+        MasterMachineLibraries   $MasterMachineLibraries
 	)
     {
 		$this->middleware('auth');
-        $this->report = $ProductReportLibaries;
-        $this->export = $ProductReport;
+        $this->report    = $ProductReportLibaries;
+        $this->export    = $ProductReport;
+        $this->machine   = $MasterMachineLibraries;
 	}
     
     public function productivity(Request $request)
     {
         $data_all = $this->report->get_all_list();
         $data = $this->report->get_all_list_paginate($request);
+        $machine = $this->machine->get_all_list_machine();
         return view('warehouse_system.productivity.productivity',
         [
             'data'      =>$data,
             'data_all'  =>$data_all,
+            'machine'   =>$machine,
             'request'   =>$request
         ]); 
     }

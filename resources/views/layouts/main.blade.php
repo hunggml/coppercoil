@@ -69,6 +69,7 @@
       color: black;
       border: 2px solid #6c757d;
     }
+    
   </style>
   @stack('myCss')
 

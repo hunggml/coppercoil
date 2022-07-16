@@ -36,4 +36,9 @@ class MasterMachine extends Model
   {
     return $this->hasOne('App\Models\User', 'id', 'User_Updated')->whereIsdelete(0);
   }
+  public function warehouse()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail',  'Machine_ID','ID')->whereIsdelete(0);
+  }
+
 }
