@@ -33,6 +33,10 @@
 					<span style="font-size: 15px">
 						{{__('Unit')}}: {{$command->Count ? 'Box' :'Kg' }}
 					</span>
+					<br>
+					<span style="font-size: 15px">
+						{{__('Type')}} {{__('Export')}} : {{$command->materials ? __('Export')  : '' }} {{$command->materials ? ($command->materials->Export_Type == 0 ? __('Even') :  __('Odd') ) : '' }}
+					</span>
 					<div class="card-tools">
 						@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
 
@@ -120,7 +124,7 @@
 					@endforeach
 					@endif
 				</br>
-				<table class="table table-striped table-hover"  width="100%" id="table">
+				<table class="table table-bordered table-striped "  width="100%" id="table">
 					<thead>
 						<th>{{__('ID')}}</th>
 						<th>{{__('Location')}}</th>
@@ -223,10 +227,14 @@
 				<div class="modal-body">
 					<strong style="font-size: 23px">{{__('Do You Want To Export')}}  Box <span id="nameDel" style="color: blue"></span> ?</strong>
 					<input type="text" name="Command_ID" value="{{$command->ID}}" class="form-control hide">
-
 					<input type="text" name="Pallet_ID" id="Pallet_ID" class="form-control hide">
 					<input type="text" name="Box_ID" id="Box_ID" class="form-control hide">
 					<input type="text" name="Location" id="Location" class="form-control hide">
+					<hr>
+					<div class="">
+						<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
+						<input type="Number" name="Quantity" min='0' class="form-control quan" step="0.01" {{$command->materials ? ($command->materials->Export_Type == 0 ? 'readonly' : '' ) : '' }}>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
@@ -254,11 +262,14 @@
 		let id = $(this).attr('id');
 		let name = $('.box_id-'+id.split('/')[1]).html();
 		console.log(name)
+		var currentRow = $(this).closest("tr");
+    	var col4 = currentRow.find("td:eq(4)").text();
 		$('#modalRequestEx').modal();
 		$('#nameDel').text(name);
 		$('#Box_ID').val(id.split('/')[2]);
 		$('#Location').val(id.split('/')[3]);
 		$('#Pallet_ID').val(id.split('/')[4]);
+		$('.quan').val(col4);
 	});
 </script>
 @endpush

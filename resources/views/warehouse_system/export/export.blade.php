@@ -144,7 +144,6 @@
 					</br>
 					<table class="table table-bordered table-striped " width="100%" id="tableUnit">
 						<thead>
-							<!-- <th>{{__('ID')}}</th> -->
 							<th>{{__('Type')}}</th>
 							<th>{{__('Name')}}</th>
 							<th>{{__('Materials')}} </th>
@@ -162,9 +161,8 @@
 						<tbody>
 							<?php $dem = 0 ?>
 							@foreach($data as $value)
-							<?php $dem++;  ?>
+							<?php $dem++; ?>
 							<tr>
-								<!-- <td>{{$dem}}</td> -->
 								<td>{{$value->Type == 0 ? __('Software') : ($value->Type == 1 ? __('PDA') : __('System')  ) }}</td>
 								<td>{{$value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT')  ) }}-{{date_format(date_create($value->Time_Created),"YmdHis")}}</td>
 								<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
@@ -174,7 +172,7 @@
 								<?php $a = $value->Count ? $value->Count : $value->Quantity; ?>
 								<?php $b = $value->Count ? (count($value->detail->where('Status',1))) : floatval(collect($value->detail->where('Status',1))->sum('Quantity')); ?>
 								<td id="trans_{{$value->ID}}">{{$value->Count ? (count($value->detail->where('Status',1))) : floatval(collect($value->detail->where('Status',1))->sum('Quantity')) }}</td>
-								@if($value->Go == $value->To ) 
+								@if($value->Go == $value->To )
 								<td>0</td>
 								@else
 								<td>{{$value->Count ? (count($value->detail->where('Transfer',1))) : floatval(collect($value->detail->where('Transfer',1))->sum('Quantity')) }}</td>
@@ -199,42 +197,41 @@
 											{{$value->user_created ? $value->user_created->name : ''}}
 										</td>
 										<td>{{$value->Time_Created}}</td>
-										
 										@if($value->Status == 0)
 										<td>
-											<button class="btn btn-warning btn-accept" id="btn-{{$value->ID}}" >
+											<button class="btn btn-warning btn-accept" id="btn-{{$value->ID}}">
 												{{ __('Accept') }}
 											</button>
-											<button class="btn btn-danger btn-cancel" id="btn-{{$value->ID}}" >
+											<button class="btn btn-danger btn-cancel" id="btn-{{$value->ID}}">
 												{{ __('Cancel') }}
 											</button>
 										</td>
 										@elseif($value->Status == 1)
 										<td>
-											<button class="btn btn-warning btn-accept" id="btn-{{$value->ID}}" >
+											<button class="btn btn-warning btn-accept" id="btn-{{$value->ID}}">
 												{{ __('Accept') }}
 											</button>
-											<button class="btn btn-danger btn-cancel" id="btn-{{$value->ID}}" >
+											<button class="btn btn-danger btn-cancel" id="btn-{{$value->ID}}">
 												{{ __('Cancel') }}
 											</button>
 										</td>
 										@elseif($value->Status == 2)
 										<td>
-											<a href="{{route('warehousesystem.export.detail',['ID'=>$value->ID])}}" class="btn btn-info" >
+											<a href="{{route('warehousesystem.export.detail',['ID'=>$value->ID])}}" class="btn btn-info">
 												{{ __('Detail') }}
 											</a>
 											@if(!$value->Machine_ID  && (floatval($b)) > 0 && (($value->go ? $value->go->Name : '') != ($value->to ? $value->to->Name : '')))
-												<button class="btn btn-light btn-Transfer" id="btn-{{$value->To}}-{{$value->ID}}" data-toggle="modal" data-target=".modal-tranfer" >
+												<button class="btn btn-light btn-Transfer" id="btn-{{$value->To}}-{{$value->ID}}" data-toggle="modal" data-target=".modal-tranfer">
 													{{ __('Transfer') }} {{ __('Warehouse') }}
 												</button>
 												@endif
-												<a href="{{route('warehousesystem.export.success',['ID'=>$value->ID])}}" class="btn btn-success" >
+												<a href="{{route('warehousesystem.export.success',['ID'=>$value->ID])}}" class="btn btn-success">
 													{{ __('Success') }}
 												</a>
 											</td>
 											@else
 											<td>
-												<a href="{{route('warehousesystem.export.detail',['ID'=>$value->ID])}}" class="btn btn-info"  >
+												<a href="{{route('warehousesystem.export.detail',['ID'=>$value->ID])}}" class="btn btn-info">
 													{{ __('Detail') }}
 												</a>
 											</td>
@@ -263,18 +260,60 @@
 							</button>
 						</div>
 						<div class="modal-body">
-							<div class="warehouse">
-								<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('Go')}}</label>
-								<select class="custom-select ware select2" name="Warehouse_Detail_ID">
-									<option value="">
+							<div class="warehouse row">
+								<div class="col-4">
+									<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('Go')}}</label>
+									<select class="custom-select ware select2" name="Warehouse_Detail_ID">
+										<option value="">
+											{{__('Choose')}} {{__('Warehouse')}}
+										</option>
+										@foreach($area as $value)
+										<option value="{{$value->ID}}">
+											{{$value->Name}}
+										</option>
+										@endforeach
+									</select>
+								</div>
+								<div class="choose-to col-4">
+									<label>{{__('Choose')}} {{__('Type')}}  {{__('To')}}</label>
+									<select class="custom-select choosetype select2" name="Type">
+										<option value="">
 										{{__('Choose')}} {{__('Warehouse')}}
-									</option>
-									@foreach($area as $value)
-									<option value="{{$value->ID}}">
+										</option>
+										<option value="1">
+										{{__('To')}} {{__('Machine')}}
+										</option>
+										<option value="2">
+										{{__('To')}} {{__('Warehouse')}}
+										</option>
+									</select>
+								</div>
+								<div class="to-machine hide col-4">
+									<label>{{__('Choose')}} {{__('Machine')}}  {{__('To')}}</label>
+									<select class="custom-select ware tomachine select2" name="Machine_ID">
+										<option value="">
+										{{__('Choose')}} {{__('Machine')}}
+										</option>
+										@foreach($machine as $value)
+										<option value="{{$value->ID}}">
 										{{$value->Name}}
-									</option>
-									@endforeach
-								</select>
+										</option>
+										@endforeach
+									</select>
+								</div>
+								<div class="to-warehouse hide col-4">
+									<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('To')}}</label>
+									<select class="custom-select ware towarehouse select2" name="To">
+										<option value="">
+										{{__('Choose')}} {{__('Warehouse')}}
+										</option>
+										@foreach($area as $value)
+										<option value="{{$value->ID}}">
+										{{$value->Name}}
+										</option>
+										@endforeach
+									</select>
+								</div>
 								<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
 							</div>
 						</div>
@@ -285,77 +324,77 @@
 					</div>
 				</div>
 			</div>
-<!-- modal_cancel -->
-	<div class="modal fade" id="modalRequestCan" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="title">{{__('Cancel')}}</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
+		<!-- modal_cancel -->
+		<div class="modal fade" id="modalRequestCan" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="title">{{__('Cancel')}}</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form action="{{ route('warehousesystem.export.cancel') }}" method="get">
+						@csrf
+						<div class="modal-body">
+							<strong style="font-size: 23px">{{__('Do You Want To Cancel')}} <span id="nameDel" style="color: blue"></span>?</strong>
+							<input type="text" name="ID" id="ID" class="form-control hide">
+							
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+							<button type="submit" class="btn btn-danger">{{__('Cancel')}}</button>
+						</div>
+					</form>
 				</div>
-				<form action="{{ route('warehousesystem.export.cancel') }}" method="get">
-					@csrf
-					<div class="modal-body">
-						<strong style="font-size: 23px">{{__('Do You Want To Cancel')}} <span id="nameDel" style="color: blue"></span>?</strong>
-						<input type="text" name="ID" id="ID" class="form-control hide">
+			</div>
+		</div>
+		<!-- modal_accept -->
+		<div class="modal fade" id="modalRequestAC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="title">{{__('Accept')}}</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form action="{{ route('warehousesystem.export.accept') }}" method="get">
+						@csrf
+						<div class="modal-body">
+							<strong style="font-size: 23px">{{__('Do You Want To Accept')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+							<input type="text" name="ID" id="ID1" class="form-control hide">
+							
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+							<button type="submit" class="btn btn-danger">{{__('Accept')}}</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- modal tranfer -->
+		<div class="modal fade modal-tranfer" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">{{__('Transfer')}}  {{__('Warehouse')}}</h5>
 						
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<p class="err_tran hide" style="color:red; font-size:15px; text-align:center;font-weight: bold;">{{__('Uncomplete Export')}}</p>
+					<div class="modal-body transfer-body">
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-						<button type="submit" class="btn btn-danger">{{__('Cancel')}}</button>
+						<button type="button" class="btn  btn-save-transfer float-right btn-warning ">{{__('Transfer')}}  {{__('Warehouse')}}</button>
 					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-	<!-- modal_accept -->
-	<div class="modal fade" id="modalRequestAC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="title">{{__('Accept')}}</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<form action="{{ route('warehousesystem.export.accept') }}" method="get">
-					@csrf
-					<div class="modal-body">
-						<strong style="font-size: 23px">{{__('Do You Want To Accept')}} <span id="nameDel" style="color: blue"></span> ?</strong>
-						<input type="text" name="ID" id="ID1" class="form-control hide">
-						
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-						<button type="submit" class="btn btn-danger">{{__('Accept')}}</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-	<!-- modal tranfer -->
-	<div class="modal fade modal-tranfer" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">{{__('Transfer')}}  {{__('Warehouse')}}</h5>
-					
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<p class="err_tran hide" style="color:red; font-size:15px; text-align:center;font-weight: bold;">{{__('Uncomplete Export')}}</p>
-				<div class="modal-body transfer-body">
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-					<button type="button" class="btn  btn-save-transfer float-right btn-warning ">{{__('Transfer')}}  {{__('Warehouse')}}</button>
 				</div>
 			</div>
 		</div>
-	</div>
 	@endsection
 	@push('scripts')
 <script>
@@ -394,7 +433,33 @@
 			$('#ID1').val(id.split('-')[1]);
 			
 		});
-		$(document).on('input', '.ware', function()
+		$('.choose-to').on('input',function(){
+			let a = $('.choosetype').val()
+			console.log(a)
+			if(a == 1)
+			{
+				$('.to-machine').show()
+				$('.towarehouse').val('').change()
+				$('.to-warehouse').hide()
+				$('.btn-add').show()
+			}
+			else if(a == 2)
+			{
+				$('.tomachine').val('').change()
+				$('.to-machine').hide()
+				$('.to-warehouse').show()
+				$('.btn-add').show()
+			}
+			else
+			{
+				$('.tomachine').val('').change()
+				$('.to-machine').hide()
+				$('.towarehouse').val('').change()
+				$('.to-warehouse').hide()
+				$('.btn-add').hide()
+			}
+		})
+		$(document).on('change', '.ware', function()
 		{
 			let id = $('.ware').val();
 			$('.new').remove();
@@ -425,191 +490,217 @@
 								`
 							}
 						})
-						$('.warehouse').append(`
-							<div class="new">
-							<div class="row">
-								<div class="product col-6 mater1">
-									<label>{{__('Choose')}} {{__('Product')}} </label>
-									<select class="custom-select product product1 select2" name="Materials">
-									<option value="">
-									{{__('Choose')}} {{__('Product')}}
-									</option>
-									`+b+`
-									</select>
+						
+						let type = $('.choosetype').val()
+						if(type == 1)
+						{
+							$('.warehouse').append(`
+								<div class="new col-12">
+									<hr>
+									<div class="row new2">
+										<div class="product col-6 mater1">
+											<label>{{__('Choose')}} {{__('Product')}} </label>
+											<select class="custom-select  product1 select2" name="Materials">
+											<option value="">
+											{{__('Choose')}} {{__('Product')}}
+											@foreach($product as $value)
+											<option value="{{$value->ID}}" class="bom-%@foreach($value->boms as $value1){{$value1->Materials_ID}}-%{{$value1->materials ? $value1->materials->Symbols : 'NULL' }}-%{{$value1->Quantity_Materials}}@endforeach ">
+											{{$value->Symbols}}
+											</option>
+											@endforeach
+											</select>
+										</div>
+										<div class="mater col-6 mater1">
+											<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
+											<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
+										</div>
+									</div>
+									<hr>
+									<div class="">
+											<div class="mater mater1">
+											<label>{{__('Choose')}} {{__('Materials')}} </label>
+											<select class="custom-select mater2 select2" name="Materials">
+											<option value="">
+											{{__('Choose')}} {{__('Materials')}}
+											</option>
+											`+a+`
+											</select>
+											</div>
+											<input type="text" name="Materials_ID" id="idCan5" class="form-control hide mater" readonly>
+											<label class="mater"> {{__('Quantity')}} {{__('Stock')}}</label>
+											<input type="text" name="Inventory" id="idCan6" class="form-control  mater" readonly>
+											<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
+											<input type="Number" name="Quantity" id="idCan7" min='0' class="form-control  mater"  step="0.01">
+											<span style="color :red; font-size:10px" class=" err1 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+											<br>
+											<label class="mater"> {{__('Roll Number')}} {{__('Stock')}}</label>
+											<input type="text" name="Count" id="idCan66" class="form-control " readonly>
+											<label class="mater">{{__('Export')}} {{__('Roll Number')}}</label>
+											<input type="Number" name="Count" id="idCan77" min='0' class="form-control  mater"  step="1">
+											<span style="color :red; font-size:10px" class=" err2 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+										</div>
 								</div>
-								<div class="mater col-6 mater1">
-									<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
-									<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
-								</div>
-							</div>
-							<div class="mater mater1">
-							<label>{{__('Choose')}} {{__('Materials')}} </label>
-							<select class="custom-select mater2 select2" name="Materials">
-							<option value="">
-							{{__('Choose')}} {{__('Materials')}}
-							</option>
-							`+a+`
-							</select>
-							</div>
-							<input type="text" name="Materials_ID" id="idCan5" class="form-control hide mater" readonly>
-							<label class="mater"> {{__('Quantity')}} {{__('Stock')}}</label>
-							<input type="text" name="Inventory" id="idCan6" class="form-control  mater" readonly>
-							<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
-							<input type="Number" name="Quantity" id="idCan7" min='0' class="form-control  mater"  step="0.01">
-							<span style="color :red; font-size:10px" class=" err1 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
-							<br>
-							<label class="mater"> {{__('Roll Number')}} {{__('Stock')}}</label>
-							<input type="text" name="Count" id="idCan66" class="form-control " readonly>
-							<label class="mater">{{__('Export')}} {{__('Roll Number')}}</label>
-							<input type="Number" name="Count" id="idCan77" min='0' class="form-control  mater"  step="1">
-							<span style="color :red; font-size:10px" class=" err2 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
-							<div class="mater">
-							<div class="choose-to">
-								<label>{{__('Choose')}} {{__('Type')}}  {{__('To')}}</label>
-								<select class="custom-select choosetype select2" name="Type">
-									<option value="">
-									{{__('Choose')}} {{__('Warehouse')}}
-									</option>
-									<option value="1">
-									{{__('To')}} {{__('Machine')}}
-									</option>
-									<option value="2">
-									{{__('To')}} {{__('Warehouse')}}
-									</option>
-								</select>
-							</div>
-							<div class="to-machine hide">
-								<label>{{__('Choose')}} {{__('Machine')}}  {{__('To')}}</label>
-								<select class="custom-select tomachine select2" name="Machine_ID">
-									<option value="">
-									{{__('Choose')}} {{__('Machine')}}
-									</option>
-									@foreach($machine as $value)
-									<option value="{{$value->ID}}">
-									{{$value->Name}}
-									</option>
-									@endforeach
-								</select>
-							</div>
-							<div class="to-warehouse hide">
-								<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('To')}}</label>
-								<select class="custom-select towarehouse select2" name="To">
-									<option value="">
-									{{__('Choose')}} {{__('Warehouse')}}
-									</option>
-									@foreach($area as $value)
-									<option value="{{$value->ID}}">
-									{{$value->Name}}
-									</option>
-									@endforeach
-								</select>
-							</div>
-							<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
-							</div>
-							</div>
-							`)   
-							$('.select2').select2()
-                            //  $(".ware1 option[value='"+id+"']").remove();
-							$('.choose-to').on('input',function(){
-								let a = $('.choosetype').val()
-								console.log(a)
-								if(a == 1)
+							`) 
+							$('.product1').on('change',function(){
+								$('.new1').remove();
+								
+								if($('.product1').val() != '')
 								{
-									$('.to-machine').show()
-									$('.towarehouse').val('')
-									$('.to-warehouse').hide()
-									$('.btn-add').show()
-								}
-								else if(a == 2)
-								{
-									$('.tomachine').val('')
-									$('.to-machine').hide()
-									$('.to-warehouse').show()
-									$('.btn-add').show()
-								}
-								else
-								{
-									$('.tomachine').val('')
-									$('.to-machine').hide()
-									$('.towarehouse').val('')
-									$('.to-warehouse').hide()
-									$('.btn-add').hide()
-								}
-							})
-							$('.product').on('input',function(){
-								let a = $('.product1').val()
-								let b = $('.quantityproduction').val()
-								let c = $('.product :selected').attr('class');
-							
-								$('.mater2').val(a).change()
-								if(b)
-								{
-									$('#idCan7').val(parseFloat(b*c)).change()
+									$('.mater2').val('').change();
+									$('.new2').append(`
+									<div class="new1 col-12">
+										<div class="row">
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Materials')}}</label>
+												<input type="Text" name="Materials"  min='0' class="form-control materials  mater"  value="NVL1" readonly>
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Stock')}} {{__('Save')}}</label>
+												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="10.2" readonly >
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Stock')}} {{__('Production')}}</label>
+												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="3.2" readonly >
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
+												<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
+											</div>
+										</div>
+										<div class="row">
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Materials')}}</label>
+												<input type="Text" name="Materials"  min='0' class="form-control materials  mater"  value="NVL2" readonly>
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Stock')}} {{__('Save')}}</label>
+												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="15.2" readonly >
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Stock')}} {{__('Production')}}</label>
+												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="0" readonly >
+											</div>
+											<div class="mater col-3 mater1">
+												<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
+												<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
+											</div>
+										</div>
+									</div>
+									`) 
 								}
 								
 							})
-							
-                            $('.mater2').on('change',function(){
+						}
+						else if(type == 2)
+						{
+							$('.warehouse').append(`
+								<div class="new col-12">
+									<hr>
+									<div class="mater mater1">
+									<label>{{__('Choose')}} {{__('Materials')}} </label>
+									<select class="custom-select mater2 select2" name="Materials">
+									<option value="">
+									{{__('Choose')}} {{__('Materials')}}
+									</option>
+									`+a+`
+									</select>
+									</div>
+									<input type="text" name="Materials_ID" id="idCan5" class="form-control hide mater" readonly>
+									<label class="mater"> {{__('Quantity')}} {{__('Stock')}}</label>
+									<input type="text" name="Inventory" id="idCan6" class="form-control  mater" readonly>
+									<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
+									<input type="Number" name="Quantity" id="idCan7" min='0' class="form-control  mater"  step="0.01">
+									<span style="color :red; font-size:10px" class=" err1 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+									<br>
+									<label class="mater"> {{__('Roll Number')}} {{__('Stock')}}</label>
+									<input type="text" name="Count" id="idCan66" class="form-control " readonly>
+									<label class="mater">{{__('Export')}} {{__('Roll Number')}}</label>
+									<input type="Number" name="Count" id="idCan77" min='0' class="form-control  mater"  step="1">
+									<span style="color :red; font-size:10px" class=" err2 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+								</div>
+							`) 
+						}
+						$('.select2').select2()
+                            //  $(".ware1 option[value='"+id+"']").remove();
+						// $('.product').on('input',function(){
+						// 		let a = $('.product1').val()
+						// 		let b = $('.quantityproduction').val()
+						// 		let c = $('.product :selected').attr('class');
+						// 		$('.mater2').val(a).change()
+						// 		if(b)
+						// 		{
+						// 			$('#idCan7').val(parseFloat(b*c)).change()
+						// 		}
+								
+						// })
+                        $('.mater2').on('change',function(){
                             	let a = $('.mater :selected').text();
                             	let b = $('.mater :selected').attr('class');
                             	let c = $('.mater :selected').val();
-                            	$('#idCan5').val(c)
-                            	$('#idCan6').val(b.split(' ')[0])
-                            	$('#idCan66').val(b.split(' ')[2])
-                            	$('#idCan7').attr('max',b)
-                            	console.log(a,b.split(' '),c)
-                            })
-							$('#idCan7').on('input',function(){
+								if(c != '')
+								{
+									$('#idCan5').val(c)
+									$('#idCan6').val(b.split(' ')[0])
+									$('#idCan66').val(b.split(' ')[2])
+									$('#idCan7').attr('max',b)
+									console.log(a,b.split(' '),c)
+									$('.product1').val('').change();
+								}
+								else
+								{
+									$('#idCan5').val('')
+									$('#idCan6').val('')
+									$('#idCan66').val('')
+									$('#idCan7').attr('max',0)
+								}
                             	
-                            	
-                            	let b = $('#idCan7').val()
-                            	
-                            	$('#idCan7').val(b).change()
-                            })
-                            $('#idCan7').on('change',function(){
-                            	
+                        })
+						$('#idCan7').on('input',function(){
+                            let b = $('#idCan7').val()
+                            $('#idCan7').val(b).change()
+                        })
+                        $('#idCan7').on('change',function(){
                             	let a = $('#idCan6').val()
                             	let b = $('#idCan7').val()
                             	
-                            	if(Number(b)>Number(a))
-                            	{
-                            		$('.btn-add').hide()
-                            		$('.err1').show()
-                            	}
-                            	else
-                            	{
-                            		$('.btn-add').show()
-                            		$('.err1').hide()
-                            	}
-                            })
-                            $('#idCan77').on('input',function(){
+                            if(Number(b)>Number(a))
+                            {
+                            	$('.btn-add').hide()
+                            	$('.err1').show()
+                            }
+                            else
+                            {
+                            	$('.btn-add').show()
+                            	$('.err1').hide()
+                            }
+                        })
+                        $('#idCan77').on('input',function(){
+                            let a = $('#idCan66').val()
+                            let b = $('#idCan77').val()
                             	
-                            	let a = $('#idCan66').val()
-                            	let b = $('#idCan77').val()
-                            	
-                            	if(Number(b)>Number(a))
-                            	{
-                            		$('.btn-add').hide()
-                            		$('.err2').show()
-                            	}
-                            	else
-                            	{
-                            		$('.btn-add').show()
-                            		$('.err2').hide()
-                            	}
-                            })
-                          }
-                          else
-                          {
-                          	$('.btn-add').hide()
-                          	$('.mater').remove()
-                          	$('.err').show()
-                          }    
-                        },
-                        error: function() {
+                            if(Number(b)>Number(a))
+                            {
+                            	$('.btn-add').hide()
+                            	$('.err2').show()
+                            }
+                            else
+                            {
+                            	$('.btn-add').show()
+                            	$('.err2').hide()
+                            }
+                        })
+                    }
+                    else
+                    {
+                        $('.btn-add').hide()
+                        $('.mater').remove()
+                        $('.err').show()
+                    }    
+                },
+                error: function() {
                         	
-                        }
-                      });
+                }
+            });
 		});
 		$('.btn-add').on('click',function(){
 			

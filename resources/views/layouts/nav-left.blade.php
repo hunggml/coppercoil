@@ -117,7 +117,7 @@
                   </a>
                 </li>
                 <li class="nav-item ">
-                  <a href="#" class="nav-link retype">
+                  <a href="{{ route('warehousesystem.import.location',['Format'=>3]) }}" class="nav-link retype">
                     <i class="far fa-dot-circle nav-icon"></i>
                     <p>{{__('Stock')}} {{__('NG')}}</p>
                   </a>
@@ -150,7 +150,6 @@
                 <p>{{__('Unit')}}</p>
               </a>
             </li>
-
             <li class="nav-item">
               <a href="{{ route('masterData.supplier') }}" class="nav-link setting-supplier">
                 <i class="far fa-circle nav-icon"></i>
@@ -174,6 +173,20 @@
                 <i class="far fa-circle nav-icon"></i>
                 <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
                 <p>{{__('Materials')}}</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{route('masterData.error')}}" class="nav-link setting-materials">
+                <i class="far fa-circle nav-icon"></i>
+                <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
+                <p>{{__('Error')}} NG</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link setting-materials">
+                <i class="far fa-circle nav-icon"></i>
+                <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
+                <p>{{__('Handle')}} NG</p>
               </a>
             </li>
             <li class="nav-item">

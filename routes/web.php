@@ -85,10 +85,8 @@ Route::group(['middleware' => 'language'], function () {
 			Route::post('/add-or-update', 'MasterData\MasterProductController@add_or_update')->name('masterData.product.addOrUpdate')->middleware(['role:create_master', 'role:update_master']);
 			Route::get('/destroy', 'MasterData\MasterProductController@destroy')->name('masterData.product.destroy')->middleware('role:delete_master');
 			Route::post('/import_file', 'MasterData\MasterProductController@import_file')->name('masterData.product.import_file');
-
 			Route::get('/export_file', 'MasterData\MasterProductController@export_file')->name('masterData.product.export_file')->middleware(['role:create_master', 'role:export_master']);
 		});
-
 
 		// Setting Warehouse
 		Route::prefix('/setting-warehouse')->group(function () {
@@ -108,6 +106,16 @@ Route::group(['middleware' => 'language'], function () {
 			Route::get('/filter_warehouse', 'MasterData\MasterWarehouseController@filter_warehouse')->name('masterData.warehouses.filter_warehouse');
 			Route::get('/get_list_materials_in_warehouse', 'MasterData\MasterWarehouseController@get_list_materials_in_warehouse')->name('masterData.warehouses.get_list_materials_in_warehouse');
 			Route::get('/filter-history', 'WarehouseSystem\TransferController@filter_history')->name('masterData.warehouses.filter_history');
+		});
+
+		//error NG
+		Route::prefix('/setting-error')->group(function () {
+			Route::get('/', 'MasterData\MasterErrorController@index')->name('masterData.error');
+			Route::get('/show', 'MasterData\MasterErrorController@show')->name('masterData.error.show')->middleware(['role:create_master', 'role:update_master']);
+		});
+		Route::prefix('/setting-handle')->group(function () {
+			Route::get('/', 'MasterData\MasterHandleController@index')->name('masterData.handle');
+			Route::get('/show', 'MasterData\MasterHandleController@show')->name('masterData.handle.show')->middleware(['role:create_master', 'role:update_master']);
 		});
 	});
 	Route::prefix('/warehouse-system')->group(function () {

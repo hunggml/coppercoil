@@ -216,8 +216,6 @@ class ExportLibraries
             $dem = 0;
             foreach ($list as $value) {
                 // dd($value);
-
-
                 if ($quan > 0) {
                     // foreach($value as $value1)
                     // {
@@ -227,16 +225,15 @@ class ExportLibraries
                         'Box_ID'    => $value->Box_ID,
                         'Materials_ID' => $value->Materials_ID,
                         'Warehouse_Detail_ID' => $value->Warehouse_Detail_ID,
-                        'Quantity' => $value->Quantity,
-                        'Status' => 0,
-                        'Type' => 0,
-                        'Supplier_ID' => $value->Supplier_ID,
-                        'STT' => $dem,
-                        'User_Created'     => Auth::user()->id,
-                        'User_Updated'     => Auth::user()->id,
-                        'IsDelete'         => 0
+                        'Quantity'            => $value->Inventory,
+                        'Status'              => 0,
+                        'Type'                => 0,
+                        'Supplier_ID'         => $value->Supplier_ID,
+                        'STT'                 => $dem,
+                        'User_Created'        => Auth::user()->id,
+                        'User_Updated'        => Auth::user()->id,
+                        'IsDelete'            => 0
                     ];
-
                     array_push($arr, $arr1);
                     // }
                 }
@@ -354,13 +351,14 @@ class ExportLibraries
                                 ExportDetail::where('IsDelete', 0)
                                 ->where('ID', $data->ID)
                                 ->update([
-                                        'Status' => 1,
+                                        'Quantity'         => $request->Quantity,
+                                        'Status'           => 1,
                                         'User_Updated'     => Auth::user()->id
                                 ]);
                                 ImportDetail::where('IsDelete', 0)
                                 ->where('ID', $data1->ID)
                                 ->update([
-                                        'Inventory' => 0,
+                                        'Inventory'        => $data1->Inventory - $request->Quantity,
                                         'User_Updated'     => Auth::user()->id
                                 ]);
                                 if($data->export->Machine_ID)
@@ -377,8 +375,8 @@ class ExportLibraries
                                             'Supplier_ID'      => $data1->Supplier_ID,
                                             'Time_Import'      => Carbon::now(), 
                                             'Pallet_ID'        => '',
-                                            'Quantity'         => $data1->Quantity,
-                                            'Inventory'        => $data1->Quantity,
+                                            'Quantity'         => $request->Quantity,
+                                            'Inventory'        => $request->Quantity,
                                             'Warehouse_Detail_ID' => $warehouse->ID,
                                             'Status'           => 1,
                                             'Type'             => 0,
@@ -395,10 +393,12 @@ class ExportLibraries
                             }
                         } else {
                             $quan1 = floatval(collect($command->detail->where('Status', 1))->sum('Quantity'));
-                            if ($quan1 < $data->Quantity) {
-                                $data =  ExportDetail::where('IsDelete', 0)
+                            // dd($quan1,$data->Quantity);
+                            if ($quan1 < $data->export->Quantity) {
+                                ExportDetail::where('IsDelete', 0)
                                     ->where('ID', $data->ID)
                                     ->update([
+                                        'Quantity'         => $request->Quantity,
                                         'Status' => 1,
                                         'User_Updated'     => Auth::user()->id
                                     ]);
@@ -406,9 +406,10 @@ class ExportLibraries
                                 ImportDetail::where('IsDelete', 0)
                                     ->where('ID', $data1->ID)
                                     ->update([
-                                        'Inventory' => 0,
+                                        'Inventory'        => $data1->Inventory - $request->Quantity,
                                         'User_Updated'     => Auth::user()->id
                                     ]);
+                                
                                     if($data->export->Machine_ID)
                                     {
                                         $warehouse = MasterWarehouseDetail::where('IsDelete',0)->where('Machine_ID',$data->export->Machine_ID)->first();
@@ -423,8 +424,8 @@ class ExportLibraries
                                                 'Supplier_ID'      => $data1->Supplier_ID,
                                                 'Time_Import'      => Carbon::now(), 
                                                 'Pallet_ID'        => '',
-                                                'Quantity'         => $data1->Quantity,
-                                                'Inventory'        => $data1->Quantity,
+                                                'Quantity'         => $request->Quantity,
+                                                'Inventory'        => $request->Quantity,
                                                 'Warehouse_Detail_ID' => $warehouse->ID,
                                                 'Status'           => 1,
                                                 'Type'             => 0,
@@ -437,8 +438,7 @@ class ExportLibraries
                                     }    
                                 return __('Success');
                             } 
-                            else 
-                            {
+                            else {
                                 return __('Quantity Requested Greater Than Allowed Quantity');
                             }
                         }
@@ -454,7 +454,6 @@ class ExportLibraries
             else {
                 return __('Box') . ' ' . __('Was') . ' ' . __('Export');
             }
-            // dd($data);
         } 
         else {
             return __('Location Not Define');

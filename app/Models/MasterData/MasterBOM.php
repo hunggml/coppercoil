@@ -45,4 +45,8 @@ class MasterBOM extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterProduct', 'ID', 'Product_ID')->whereIsdelete(0);
   }
+  public function materials()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_ID')->whereIsdelete(0);
+  }
 }

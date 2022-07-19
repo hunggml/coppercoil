@@ -104,18 +104,32 @@ class MasterWarehouseController extends Controller
         if($request->Format == 1)
         {
             $data = $data1->where('Area','>',0);
+            return view(
+                'master_data.warehouses.location.index',
+                [
+                    'warehouses' => $data,
+                    'request'    => $request
+                ]
+            );
         }
         else if($request->Format == 2)
         {
             $data = $data1->where('Area',null);
+            return view(
+                'master_data.warehouses.location.index',
+                [
+                    'warehouses' => $data,
+                    'request'    => $request
+                ]
+            );
         }
-        return view(
-            'master_data.warehouses.location.index',
-            [
-                'warehouses' => $data,
-                'request'    => $request
-            ]
-        );
+        else if($request->Format == 3)
+        {
+            return view(
+                'master_data.warehouses.location.ng'
+            );
+        }
+        
     }
 
     public function add_or_update_type(Request $request)
