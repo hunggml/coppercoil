@@ -17,13 +17,12 @@ class MasterBOM extends Model
     return $date->format('Y-m-d H:i:s');
   }
 	protected $fillable   = [
-  	'Product_ID'
-  	,'Part_Name'
-  	,'Norm'
-  	,'Position_A'
-  	,'Face_A'
-  	,'Position_B'
-  	,'Face_B'
+  	'Product_BOM_ID'
+  	,'Materials_BOM_ID'
+  	,'Product_ID'
+  	,'Quantity_Product'
+  	,'Materials_ID'
+  	,'Quantity_Materials'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'
@@ -46,9 +45,8 @@ class MasterBOM extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterProduct', 'ID', 'Product_ID')->whereIsdelete(0);
   }
-
-  public function or_part()
+  public function materials()
   {
-    return $this->hasMany('App\Models\MasterData\MasterOrPart', 'BOM_ID', 'ID')->whereIsdelete(0);
+    return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_ID')->whereIsdelete(0);
   }
 }

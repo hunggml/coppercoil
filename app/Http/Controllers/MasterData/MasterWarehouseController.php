@@ -98,16 +98,38 @@ class MasterWarehouseController extends Controller
     }
 
 
-    public function location()
+    public function location(Request $request)
     {
-        $data     = $this->warehouse->get_all_list_warehouse();
-
-        return view(
-            'master_data.warehouses.location.index',
-            [
-                'warehouses' => $data,
-            ]
-        );
+        $data1     = $this->warehouse->get_all_list_warehouse();
+        if($request->Format == 1)
+        {
+            $data = $data1->where('Area','>',0);
+            return view(
+                'master_data.warehouses.location.index',
+                [
+                    'warehouses' => $data,
+                    'request'    => $request
+                ]
+            );
+        }
+        else if($request->Format == 2)
+        {
+            $data = $data1->where('Area',null);
+            return view(
+                'master_data.warehouses.location.index',
+                [
+                    'warehouses' => $data,
+                    'request'    => $request
+                ]
+            );
+        }
+        else if($request->Format == 3)
+        {
+            return view(
+                'master_data.warehouses.location.ng'
+            );
+        }
+        
     }
 
     public function add_or_update_type(Request $request)

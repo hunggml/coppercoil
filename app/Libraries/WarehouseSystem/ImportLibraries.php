@@ -51,7 +51,6 @@ class ImportLibraries
             return ['danger' => __('Error Something')];
         }
     }
-
     public function get_list_all_command()
     {
         return CommandImport::where('IsDelete',0)
@@ -152,12 +151,15 @@ class ImportLibraries
         $location   = $request->location;
         $materials  = $request->Materials_ID;
         $Pallet     = $request->Pallet_ID;
-        $warehouse  = MasterWarehouse::where('IsDelete',0)
-        ->when($ware, function($query, $ware)
-		{
-			return $query->where('ID', $ware);
-		})
-        ->get();
+       
+            $warehouse  = MasterWarehouse::where('IsDelete',0)
+            ->when($ware, function($query, $ware)
+            {
+                return $query->where('ID', $ware);
+            })
+            ->get();
+        
+        
         $arr = [];
         foreach($warehouse as $value )
         { 
@@ -168,11 +170,21 @@ class ImportLibraries
                 'Symbols'=>$value->Symbols,
             ];
             $arr3 = [];
-           
-            foreach($value->detail->when($location, function($query, $location)
+            if($request->Format == 1)
             {
-                return $query->where('ID', $location);
-            }) as $value1)
+                $ware1 = $value->detail->where('Machine_ID',null)->when($location, function($query, $location)
+                {
+                    return $query->where('ID', $location);
+                });
+            }
+            else if($request->Format == 2)
+            {
+                $ware1 = $value->detail->where('Machine_ID','<>',null)->when($location, function($query, $location)
+                {
+                    return $query->where('ID', $location);
+                });
+            }
+            foreach($ware1  as $value1)
             {
                 $arr2 = [
                     'Name' => $value1->Name,
@@ -298,8 +310,6 @@ class ImportLibraries
         
         
     }
-
-
 	public function get_list_command_import($request)
     {
         $name     = $request->name;
@@ -469,7 +479,6 @@ class ImportLibraries
         }
        return array_unique($err);
     }   
-
     public function get_list_retype($request)
     {
         $materials = $request->Materials_ID;
@@ -507,10 +516,6 @@ class ImportLibraries
         ->orderBy('ID','DESC')
         ->paginate(10);
     }
-
-
-
-
     public function cancel($request)
     {
         return ImportDetail::where('IsDelete',0)
@@ -553,7 +558,6 @@ class ImportLibraries
             'IsDelete'         => 1
         ]);
     }
-
     public function check_infor($request)
     {
         // dd($run);
@@ -609,7 +613,6 @@ class ImportLibraries
         }
         
     }
-
     public function get_list_with_materials($request)
     {
         return ImportDetail::where('IsDelete',0)
@@ -619,7 +622,6 @@ class ImportLibraries
         ->orderBy('Time_Import')
         ->get();
     }
-
     public function add_pallet($request)
     {
         if($request->Pallet_ID)
@@ -674,7 +676,17 @@ class ImportLibraries
             return false;
         }
     }
-
+    public function get_list_stock_in_location($request)
+    {
+        return ImportDetail::where('IsDelete',0)
+        ->where('Warehouse_Detail_ID',$request->ware_detail_id)
+        ->where('Inventory','>',0)
+        ->with([
+            'materials',
+            'materials.product'
+        ])
+        ->get();
+    }
 
     
 }      

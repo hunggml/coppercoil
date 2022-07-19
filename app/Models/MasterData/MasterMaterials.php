@@ -56,7 +56,10 @@ class MasterMaterials extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterPacking', 'ID', 'Packing_ID')->whereIsdelete(0);
   }
-
+  public function product()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterProduct', 'Materials_ID', 'ID')->whereIsdelete(0);
+  }
   public function supplier()
   {
     return $this->hasOne('App\Models\MasterData\MasterSupplier', 'ID', 'Supplier_ID')->whereIsdelete(0);

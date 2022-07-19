@@ -167,7 +167,7 @@ class ExportLibraries
             ->first();
         $a = count(collect($data->detail)->where('Status', 1));
         $b = count(collect($data->detail)->where('Transfer', 1));
-        if ($a > $b && $data->Go != $data->To) {
+        if ($a > $b && $data->Go != $data->To && !$data->Machine_ID) {
             $num1 = $a;
             $num2 = $b;
             $command1 =  $data->Type == 0 ? __('PM') : ($data->Type == 1 ? __('PDA') : __('HT'));
@@ -216,8 +216,6 @@ class ExportLibraries
             $dem = 0;
             foreach ($list as $value) {
                 // dd($value);
-
-
                 if ($quan > 0) {
                     // foreach($value as $value1)
                     // {
@@ -227,15 +225,15 @@ class ExportLibraries
                         'Box_ID'    => $value->Box_ID,
                         'Materials_ID' => $value->Materials_ID,
                         'Warehouse_Detail_ID' => $value->Warehouse_Detail_ID,
-                        'Quantity' => $value->Quantity,
-                        'Status' => 0,
-                        'Type' => 0,
-                        'STT' => $dem,
-                        'User_Created'     => Auth::user()->id,
-                        'User_Updated'     => Auth::user()->id,
-                        'IsDelete'         => 0
+                        'Quantity'            => $value->Inventory,
+                        'Status'              => 0,
+                        'Type'                => 0,
+                        'Supplier_ID'         => $value->Supplier_ID,
+                        'STT'                 => $dem,
+                        'User_Created'        => Auth::user()->id,
+                        'User_Updated'        => Auth::user()->id,
+                        'IsDelete'            => 0
                     ];
-
                     array_push($arr, $arr1);
                     // }
                 }
@@ -353,19 +351,19 @@ class ExportLibraries
                                 ExportDetail::where('IsDelete', 0)
                                 ->where('ID', $data->ID)
                                 ->update([
-                                        'Status' => 1,
+                                        'Quantity'         => $request->Quantity,
+                                        'Status'           => 1,
                                         'User_Updated'     => Auth::user()->id
                                 ]);
                                 ImportDetail::where('IsDelete', 0)
                                 ->where('ID', $data1->ID)
                                 ->update([
-                                        'Inventory' => 0,
+                                        'Inventory'        => $data1->Inventory - $request->Quantity,
                                         'User_Updated'     => Auth::user()->id
                                 ]);
                                 if($data->export->Machine_ID)
                                 {
                                     $warehouse = MasterWarehouseDetail::where('IsDelete',0)->where('Machine_ID',$data->export->Machine_ID)->first();
-                                    // dd($warehouse);
                                     if($warehouse)
                                     {
                                         $arr = [
@@ -377,8 +375,8 @@ class ExportLibraries
                                             'Supplier_ID'      => $data1->Supplier_ID,
                                             'Time_Import'      => Carbon::now(), 
                                             'Pallet_ID'        => '',
-                                            'Quantity'         => $data1->Quantity,
-                                            'Inventory'        => $data1->Quantity,
+                                            'Quantity'         => $request->Quantity,
+                                            'Inventory'        => $request->Quantity,
                                             'Warehouse_Detail_ID' => $warehouse->ID,
                                             'Status'           => 1,
                                             'Type'             => 0,
@@ -388,7 +386,6 @@ class ExportLibraries
                                         ];
                                         ImportDetail::create($arr);
                                     }
-                                    
                                 }
                                 return __('Success');
                             } else {
@@ -396,10 +393,12 @@ class ExportLibraries
                             }
                         } else {
                             $quan1 = floatval(collect($command->detail->where('Status', 1))->sum('Quantity'));
-                            if ($quan1 < $data->Quantity) {
-                                $data =  ExportDetail::where('IsDelete', 0)
+                            // dd($quan1,$data->Quantity);
+                            if ($quan1 < $data->export->Quantity) {
+                                ExportDetail::where('IsDelete', 0)
                                     ->where('ID', $data->ID)
                                     ->update([
+                                        'Quantity'         => $request->Quantity,
                                         'Status' => 1,
                                         'User_Updated'     => Auth::user()->id
                                     ]);
@@ -407,25 +406,56 @@ class ExportLibraries
                                 ImportDetail::where('IsDelete', 0)
                                     ->where('ID', $data1->ID)
                                     ->update([
-                                        'Inventory' => 0,
+                                        'Inventory'        => $data1->Inventory - $request->Quantity,
                                         'User_Updated'     => Auth::user()->id
                                     ]);
+                                
+                                    if($data->export->Machine_ID)
+                                    {
+                                        $warehouse = MasterWarehouseDetail::where('IsDelete',0)->where('Machine_ID',$data->export->Machine_ID)->first();
+                                        if($warehouse)
+                                        {
+                                            $arr = [
+                                                'Command_ID'       => '',
+                                                'Materials_ID'     => $data1->Materials_ID,
+                                                'Box_ID'           => $data1->Box_ID,
+                                                'Case_No'          => $data1->Case_No,
+                                                'Lot_No'           => $data1->Lot_No,
+                                                'Supplier_ID'      => $data1->Supplier_ID,
+                                                'Time_Import'      => Carbon::now(), 
+                                                'Pallet_ID'        => '',
+                                                'Quantity'         => $request->Quantity,
+                                                'Inventory'        => $request->Quantity,
+                                                'Warehouse_Detail_ID' => $warehouse->ID,
+                                                'Status'           => 1,
+                                                'Type'             => 0,
+                                                'User_Created'     => Auth::user()->id,
+                                                'User_Updated'     => Auth::user()->id,
+                                                'IsDelete'         => 0
+                                            ];
+                                            ImportDetail::create($arr);
+                                        }
+                                    }    
                                 return __('Success');
-                            } else {
+                            } 
+                            else {
                                 return __('Quantity Requested Greater Than Allowed Quantity');
                             }
                         }
-                    } else {
+                    } 
+                    else {
                         return __('Command Not Define');
                     }
-                } else {
+                } 
+                else {
                     return __('Pallet or Box Not Define');
                 }
-            } else {
+            } 
+            else {
                 return __('Box') . ' ' . __('Was') . ' ' . __('Export');
             }
-            // dd($data);
-        } else {
+        } 
+        else {
             return __('Location Not Define');
         }
     }

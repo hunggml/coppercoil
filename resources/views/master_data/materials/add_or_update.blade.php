@@ -91,7 +91,7 @@
 	                                    </span>
 				                    @endif 
 				                </div>
-								<div class="form-group col-md-6">
+								<div class="form-group col-md-4">
 				                    <label for="
 				                    noteMaterials">{{__('Spec')}}</label>
 				                    <input type="number" value="{{old('Spec')? old('Spec') : ($materials ? $materials->Spec : '') }}" class="form-control" id="
@@ -102,7 +102,7 @@
 	                                    </span>
 				                    @endif
 				                </div>
-								<div class="form-group col-md-6">
+								<div class="form-group col-md-4">
 				                    <label for="
 				                    noteMaterials">{{__('Wire Type')}}</label>
 				                    <input type="text" value="{{old('Wire_Type')? old('Wire_Type') : ($materials ? $materials->Wire_Type : '') }}" class="form-control" id="
@@ -112,6 +112,21 @@
 	                                        <strong style="color: red">{{$errors->first('Spec')}}</strong>
 	                                    </span>
 				                    @endif
+				                </div>
+								<div class="form-group col-md-4">
+									<label for="export_type"> {{__('Type')}} {{__('Export')}}</label>
+									<select name="Export_Type" class="form-control select2" required>
+										<option value="0" {{old('Export_Type') ? 
+				                    		(old('Export_Type') == $value->ID ? 'selected' : '') :
+				                    		($materials ? ($materials->Export_Type === 0 ? 'selected' : '') : '')}}>
+											{{__('Export')}} {{__('Even')}}
+										</option>
+										<option value="1" {{old('Export_Type') ? 
+				                    		(old('Export_Type') == $value->ID ? 'selected' : '') :
+				                    		($materials ? ($materials->Export_Type === 1 ? 'selected' : '') : '')}}>
+											{{__('Export')}} {{__('Odd')}}
+										</option>
+									</select>
 				                </div>
 			                </div>         
 		                </div>

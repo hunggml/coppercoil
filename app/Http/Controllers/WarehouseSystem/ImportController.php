@@ -28,8 +28,6 @@ class ImportController extends Controller
         $this->warehouse        = $masterWarehouseLibraries;
         $this->supplier         = $MasterSupplierLibraries; 
     }
-    
-
     public function import(Request $request)
     {
         $data = $this->command->get_list_command_import($request);
@@ -48,15 +46,13 @@ class ImportController extends Controller
         $data = $this->command->import_file_excel($request);
         if(count($data) > 0)
         {
-            return redirect()->back()->with('danger',$data); 
+            return redirect()->back()->with('danger',$data);
         }
         else
         {
-            return redirect()->back()->with('success',__('Success')); 
+            return redirect()->back()->with('success',__('Success'));
         }
-        
     }
-
     public function detail(Request $request)
     {
         $data = $this->command->detail($request);
@@ -76,7 +72,6 @@ class ImportController extends Controller
             'request'=>$request
         ]);
     }
-    
     public function add_stock(Request $request)
     {
         $data = $this->command->add_stock($request);
@@ -124,9 +119,6 @@ class ImportController extends Controller
         $data = $this->command->destroy($request);
         return redirect()->back()->with('success',__('Success')); 
     }
-
-
-
     public function retype(Request $request)
     {
         $data = $this->command->get_list_retype($request);
@@ -171,8 +163,18 @@ class ImportController extends Controller
         $list_materials = $this->materials->get_all_list_materials($request);
         $data_all = $this->command->detail_all_list($request);
         $list_pallet = $this->command->list_pallet();
-        $list_location = $this->warehouse_detail->get_all_list_warehouse_detail($request);
-        $list_ware =$this->warehouse->get_all_list_warehouse();
+        $list_location1 = $this->warehouse_detail->get_all_list_warehouse_detail($request);
+        $list_ware1 =$this->warehouse->get_all_list_warehouse();
+        if($request->Format == 1)
+        {
+            $list_location = $list_location1->where('Machine_ID',null);
+            $list_ware = $list_ware1->where('Area','>',0);
+        }
+        else if($request->Format == 2)
+        {
+            $list_location = $list_location1->where('Machine_ID','<>',null);
+            $list_ware = $list_ware1->where('Area',null);
+        }
         return view('master_data.warehouses.location.table',
         [
             'data'=>$data, 
@@ -215,6 +217,16 @@ class ImportController extends Controller
         {
             return redirect()->back()->with('danger',__('Fail')); 
         }
+    }
+
+    public function get_list_stock_in_location(Request $request)
+    {
+        $data = $this->command->get_list_stock_in_location($request);
+        // $arr = [$val];
+        return response()->json([
+            'success' =>   true,
+            'data'    => $data
+        ]);
     }
  
 }

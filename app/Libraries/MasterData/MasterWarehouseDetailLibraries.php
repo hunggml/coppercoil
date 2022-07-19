@@ -255,7 +255,7 @@ class MasterWarehouseDetailLibraries
 		$name    = $request->Name;
 		$symbols = $request->Symbols;
 		$mac 	 = $request->MAC;
-
+		
 		$datas = MasterWarehouseDetail::where('IsDelete', 0)
 		->when($id, function($q, $id)
 		{
@@ -288,12 +288,12 @@ class MasterWarehouseDetailLibraries
 			'inventory1'
 		])
 		->get();
-		
+		// dd($datas);
 		foreach($datas as $value)
 		{		
 				$arr = [];
 				$value1 = $value->inventory;
-				foreach($value1->GroupBy('Pallet_ID') as $key =>$value2)
+				foreach($value1->where('Pallet_ID','<>',null)->GroupBy('Pallet_ID') as $key =>$value2)
 				{
 				
 					foreach($value2->GroupBy('Materials_ID') as $key =>$value3)
@@ -304,8 +304,14 @@ class MasterWarehouseDetailLibraries
                         {
                             $value3[0]['Box_ID']= '';
                         }
+						
 						array_push($arr,$value3[0]);
 					}
+				}
+				foreach($value1->where('Pallet_ID',null) as $key =>$value3)
+				{
+					$value3['Count']= 1;
+					array_push($arr,$value3);
 				}
 				// dd($arr);	
 			$value['inventory_nl'] = $arr;

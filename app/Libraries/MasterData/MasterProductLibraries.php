@@ -5,6 +5,7 @@ use Illuminate\Validation\Rule;
 use App\Models\MasterData\MasterProduct;
 use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\MasterUnit;
+use App\Models\MasterData\MasterBOM;
 use Validator;
 use ExportLibraries;
 use Maatwebsite\Excel\Facades\Excel;
@@ -69,6 +70,7 @@ class MasterProductLibraries
 		$id = $request->ID;
 		$user_created = Auth::user()->id;
 		$user_updated = Auth::user()->id;
+		dd($request);
 		if (isset($id) && $id != '') 
 		{
 			if (!Auth::user()->checkRole('update_master') && Auth::user()->level != 9999) 

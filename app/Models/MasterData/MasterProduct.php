@@ -50,9 +50,9 @@ class MasterProduct extends Model
     return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_ID')->whereIsdelete(0);
   }
 
-  public function bom()
+  public function boms()
   {
-    return $this->hasMany('App\Models\MasterData\MasterBOM', 'Product_ID', 'ID')->whereIsdelete(0);
+    return $this->hasMany('App\Models\MasterData\MasterBOM', 'Product_BOM_ID', 'ID')->whereIsdelete(0);
   }
 
 }

@@ -109,6 +109,7 @@ class MasterMaterialsLibraries
 				'Difference'       => $request->Difference,
 				'Spec'			   => $request->Spec,
 				'Wire_Type'        => $request->Wire_Type,
+				'Export_Type'	   => $request->Export_Type,
  				'Note'             => $request->Note,
 				'User_Updated'     => $user_updated
 			]);
@@ -138,6 +139,7 @@ class MasterMaterialsLibraries
 				'Difference'       => $request->Difference,
 				'Spec'			   => $request->Spec,
 				'Wire_Type'        => $request->Wire_Type,
+				'Export_Type'	   => $request->Export_Type,
 				'User_Created'     => $user_created,
 				'User_Updated'     => $user_updated,
 				'IsDelete'         => 0

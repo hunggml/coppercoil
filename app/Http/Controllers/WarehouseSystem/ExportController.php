@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Libraries\WarehouseSystem\ExportLibraries;
 use App\Libraries\MasterData\MasterMaterialsLibraries;
 use App\Libraries\MasterData\MasterMachineLibraries;
+use App\Libraries\MasterData\MasterProductLibraries;
 use App\Libraries\MasterData\MasterWarehouseLibraries; 
 class ExportController extends Controller
 {
@@ -16,7 +17,8 @@ class ExportController extends Controller
         ExportLibraries $ExportLibraries,
         MasterWarehouseLibraries $masterWarehouseLibraries,
         MasterMaterialsLibraries $masterMaterialsLibraries,
-        MasterMachineLibraries   $MasterMachineLibraries
+        MasterMachineLibraries   $MasterMachineLibraries,
+        MasterProductLibraries   $MasterProductLibraries
 	)
     {
 		$this->middleware('auth');
@@ -24,6 +26,7 @@ class ExportController extends Controller
         $this->warehouse = $masterWarehouseLibraries;
         $this->materials = $masterMaterialsLibraries;
         $this->machine   = $MasterMachineLibraries;
+        $this->product   = $MasterProductLibraries;
 	}
     
     public function export(Request $request)
@@ -33,6 +36,7 @@ class ExportController extends Controller
         $data      = $this->export->get_all_list($request);
         $materials      = $this->materials->get_all_list_materials();
         $machine = $this->machine->get_all_list_machine();
+        $product = $this->product->get_all_list_product();
         return view('warehouse_system.export.export',
         [
             'warehouse'=>$warehouse,
@@ -40,6 +44,7 @@ class ExportController extends Controller
             'materials'=>$materials,
             'machine'  => $machine,
             'area'     =>$area,
+            'product'  =>$product,
             'request'=>$request
         ]);
     }

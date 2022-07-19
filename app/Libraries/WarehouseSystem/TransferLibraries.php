@@ -374,7 +374,7 @@ class TransferLibraries
             // {
             //     array_push($arr,$value1);
             // }
-            foreach ($data->GroupBy('Pallet_ID') as $key => $value2) {
+            foreach ($data->where('Pallet_ID','<>',null)->GroupBy('Pallet_ID') as $key => $value2) {
 
                 foreach ($value2->GroupBy('Materials_ID') as $key => $value3) {
                     foreach ($value3->GroupBy('Type') as $key => $value4) {
@@ -393,10 +393,14 @@ class TransferLibraries
                     }
                 }
             }
-
+            foreach($data->where('Pallet_ID',null) as $key =>$value3)
+            {
+                $value3['Count']= 1;
+                array_push($arr,$value3);
+            }
             $data1 = ExportDetail::where('IsDelete', 0)->where('Warehouse_Detail_ID', $value->ID)
                 ->where('Status', 1)
-                ->with('materials', 'location','supplier')
+                ->with('materials', 'location')
                 ->get();
             // dd($data1);
             foreach ($data1 as $value2) {
