@@ -1,9 +1,6 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
-<<<<<<< HEAD
     "/js/master-data/supplier.js": "/js/master-data/supplier.js",
-=======
->>>>>>> ac6326cc4ac17c09168a3da964348ab4740293d0
     "/js/master-data/unit.js": "/js/master-data/unit.js"
 }
