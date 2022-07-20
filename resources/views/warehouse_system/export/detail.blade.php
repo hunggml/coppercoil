@@ -1,8 +1,6 @@
 @extends('layouts.main')
 
 @section('content')
-
-
 <div class="container-fluid">
 	<div class="row justify-content-center">
 		<div class="col-md-12">
@@ -42,11 +40,11 @@
 
 						@endif
 						@if(session()->has('table'))
-						@if(session()->get('table') && count(session()->get('danger')) >0 )
-						<button type="button" class="btn btn-danger btn-detail-error">
-							{{__('Detail')}} {{__('Error')}}
-						</button>
-						@endif
+							@if(session()->get('table') && count(session()->get('danger')) >0 )
+								<button type="button" class="btn btn-danger btn-detail-error">
+									{{__('Detail')}} {{__('Error')}}
+								</button>
+							@endif
 						@endif
 					</div>
 				</div>
@@ -102,7 +100,6 @@
 								<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
 							</div>
 						</div>
-
 					</form>
 					@if(session()->has('success'))
 					<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -113,15 +110,15 @@
 					</div>
 					@endif
 					@if(session()->has('danger'))
-					@foreach(session('danger') as $value)
-					<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-						<strong>{{$value}}</strong>
-						<br>
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					@endforeach
+						@foreach(session('danger') as $value)
+						<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+							<strong>{{$value}}</strong>
+							<br>
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						@endforeach
 					@endif
 				</br>
 				<table class="table table-bordered table-striped "  width="100%" id="table">
@@ -188,7 +185,7 @@
 							</td>
 							@elseif($value->Status == 1)
 							<td>
-								<button class="btn btn-success btn-accept"  >
+								<button class="btn btn-success btn-accept">
 									{{ __('Success') }}
 								</button>       
 							</td>
@@ -203,50 +200,14 @@
 						@endforeach
 					</tbody>
 				</table>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
-</div>
-
-
+ 
 <!-- modal export -->
-
-
-<div class="modal fade" id="modalRequestEx" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="title">{{__('Export')}}</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form action="{{ route('warehousesystem.export.detail.ex') }}" method="get">
-				@csrf
-				<div class="modal-body">
-					<strong style="font-size: 23px">{{__('Do You Want To Export')}}  Box <span id="nameDel" style="color: blue"></span> ?</strong>
-					<input type="text" name="Command_ID" value="{{$command->ID}}" class="form-control hide">
-					<input type="text" name="Pallet_ID" id="Pallet_ID" class="form-control hide">
-					<input type="text" name="Box_ID" id="Box_ID" class="form-control hide">
-					<input type="text" name="Location" id="Location" class="form-control hide">
-					<hr>
-					<div class="">
-						<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
-						<input type="Number" name="Quantity" min='0' class="form-control quan" step="0.01" {{$command->materials ? ($command->materials->Export_Type == 0 ? 'readonly' : '' ) : '' }}>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-					<button type="submit" class="btn btn-danger">{{__('Export')}}</button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-
-
-
+ 
 @endsection
 @push('scripts')
 <script>
@@ -256,12 +217,10 @@
 		scrollX : '100%',
 		scrollY : '100%'
 	});
-
 	$(document).on('click', '.btn-export', function()
 	{
 		let id = $(this).attr('id');
 		let name = $('.box_id-'+id.split('/')[1]).html();
-		console.log(name)
 		var currentRow = $(this).closest("tr");
     	var col4 = currentRow.find("td:eq(4)").text();
 		$('#modalRequestEx').modal();

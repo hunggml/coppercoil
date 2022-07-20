@@ -111,7 +111,7 @@
                   </a>
                 </li>
                 <li class="nav-item ">
-                  <a href="{{ route('warehousesystem.import.location',['Format'=>2]) }}" class="nav-link Transfer">
+                  <a href="{{route('warehousesystem.import.detail.inventory',['Format'=>2])}}" class="nav-link Transfer">
                     <i class="far fa-dot-circle nav-icon"></i>
                     <p>{{__('Stock')}} {{__('Machine')}}</p>
                   </a>
