@@ -18,6 +18,7 @@ class ProductReport extends Model
   }
 	protected $fillable   = [
   	'Order_ID'
+    ,'Machine_ID'
     ,'Product_ID'
   	,'Materials_Stock_ID'
     ,'Quantity'
@@ -49,5 +50,9 @@ class ProductReport extends Model
   public function product()
   {
     return $this->hasOne('App\Models\MasterData\MasterProduct', 'ID', 'Product_ID')->whereIsdelete(0);
+  }
+  public function machine()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterMachine', 'ID', 'Machine_ID')->whereIsdelete(0);
   }
 }

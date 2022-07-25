@@ -5,6 +5,7 @@ namespace App\Libraries\WarehouseSystem;
 use Illuminate\Validation\Rule;
 use Validator;
 use App\Models\WarehouseSystem\ExportMaterials;
+use App\Models\WarehouseSystem\StockMachine;
 use App\Models\WarehouseSystem\ExportDetail;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -367,24 +368,17 @@ class ExportLibraries
                                     if($warehouse)
                                     {
                                         $arr = [
-                                            'Command_ID'       => '',
                                             'Materials_ID'     => $data1->Materials_ID,
                                             'Box_ID'           => $data1->Box_ID,
-                                            'Case_No'          => $data1->Case_No,
-                                            'Lot_No'           => $data1->Lot_No,
                                             'Supplier_ID'      => $data1->Supplier_ID,
-                                            'Time_Import'      => Carbon::now(), 
-                                            'Pallet_ID'        => '',
                                             'Quantity'         => $request->Quantity,
-                                            'Inventory'        => $request->Quantity,
                                             'Warehouse_Detail_ID' => $warehouse->ID,
-                                            'Status'           => 1,
-                                            'Type'             => 0,
+                                            'Machine_ID'       => $warehouse->Machine_ID,
                                             'User_Created'     => Auth::user()->id,
                                             'User_Updated'     => Auth::user()->id,
                                             'IsDelete'         => 0
                                         ];
-                                        ImportDetail::create($arr);
+                                        StockMachine::create($arr);
                                     }
                                 }
                                 return __('Success');
@@ -416,24 +410,17 @@ class ExportLibraries
                                         if($warehouse)
                                         {
                                             $arr = [
-                                                'Command_ID'       => '',
                                                 'Materials_ID'     => $data1->Materials_ID,
                                                 'Box_ID'           => $data1->Box_ID,
-                                                'Case_No'          => $data1->Case_No,
-                                                'Lot_No'           => $data1->Lot_No,
                                                 'Supplier_ID'      => $data1->Supplier_ID,
-                                                'Time_Import'      => Carbon::now(), 
-                                                'Pallet_ID'        => '',
                                                 'Quantity'         => $request->Quantity,
-                                                'Inventory'        => $request->Quantity,
                                                 'Warehouse_Detail_ID' => $warehouse->ID,
-                                                'Status'           => 1,
-                                                'Type'             => 0,
+                                                'Machine_ID'       => $warehouse->Machine_ID,
                                                 'User_Created'     => Auth::user()->id,
                                                 'User_Updated'     => Auth::user()->id,
                                                 'IsDelete'         => 0
                                             ];
-                                            ImportDetail::create($arr);
+                                            StockMachine::create($arr);
                                         }
                                     }    
                                 return __('Success');

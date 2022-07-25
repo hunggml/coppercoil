@@ -15,9 +15,11 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use App\Models\MasterData\MasterMaterials;
 use App\Models\MasterData\MasterWarehouse;
 use App\Models\MasterData\MasterProduct;
+use App\Models\MasterData\MasterBOM;
 use Auth;
 use Carbon\Carbon;
 use App\Models\WarehouseSystem\ProductReport;
+use App\Models\WarehouseSystem\StockMachine;
 class ProductReportLibaries
 {
 
@@ -187,28 +189,108 @@ class ProductReportLibaries
     }
     public function update($request)
     {
+        // dd($request);
         $order = ProductReport::where('IsDelete',0)
-        ->where('ID',$request->ID)->first();
+        ->where('Order_ID',$request->Order)
+        ->where('Machine_ID',$request->Machine_ID)
+        ->first();
         $total = ($request->OK + $request->NG);
         // dd($total);
         $err = [];
-
-        if ($order->Quantity >= $total) 
+        if($order)
         {
-           return ProductReport::where('IsDelete',0)
-            ->where('ID',$request->ID)
-            ->update([
-                'OK'=>$request->OK,
-                'NG'=>$request->NG,
+
+                ProductReport::where('IsDelete',0)
+                ->where('ID',$order->ID)
+                ->update([
+                    'Quantity'=> $order->Quantity +  $total,
+                    'OK'      => $order->OK + $request->OK,
+                    'NG'      => $order->NG + $request->NG,
+                    'User_Updated'     => Auth::user()->id,
+                ]);
+        }
+        else
+        {
+            ProductReport::create([
+                'Order_ID'  => $request->Order,
+                'Machine_ID'=> $request->Machine_ID,
+                'Product_ID'=>$request->Product_ID,
+                'Quantity'  =>$total,
+                'OK'        =>$request->OK,
+                'NG'        =>$request->NG,
+                'User_Created'     => Auth::user()->id,
+                'User_Updated'     => Auth::user()->id,
+                'IsDelete'         => 0
+            ]);
+        }
+        $check_pro = StockMachine::where('IsDelete',0)
+        ->where('Machine_ID',$request->Machine_ID)
+        ->where('Product_ID',$request->Product_ID)
+        ->where('Quantity','>',0)
+        ->first();
+        if($check_pro)
+        {
+            StockMachine::where('ID',$check_pro->ID)
+            ->Update([
+                'Quantity'=>$check_pro->Quantity + $total,
                 'User_Updated'     => Auth::user()->id,
             ]);
         }
         else
         {
-            $err1 = __('Update').' '.__('Fail');
-            array_push($err,$err1);
-            return $err;
+            StockMachine::create([
+                'Machine_ID'=>$request->Machine_ID,
+                'Warehouse_Detail_ID'=>$request->Machine,
+                'Product_ID'        => $request->Product_ID,
+                'Quantity'          => $total,
+                'User_Created'     => Auth::user()->id,
+                'User_Updated'     => Auth::user()->id,
+                'IsDelete'         => 0
+            ]);
+        }
+        $use = $request->QuantityUse;
+        foreach($request->Box as $key => $value)
+        {
+            $check = StockMachine::where('IsDelete',0)->where('Machine_ID',$request->Machine_ID)->where('Box_ID',$value)->where('Quantity','>',0)->first();
+            if($check)
+            {
+                StockMachine::where('ID',$check->ID)
+                ->Update([
+                    'Quantity'=>$check->Quantity - $use[$key],
+                    'User_Updated'     => Auth::user()->id,
+                ]);
+            }
         }
         
+    }
+
+    public function calculate($request)
+    {
+        $data = StockMachine::where('IsDelete',0)->WhereIn('Box_ID',$request->Box_ID)->get();
+        $arr = [];
+        $check = true;
+        foreach($data->groupBy('Materials_ID') as $key => $value)
+        {
+            $pro = MasterBOM::where('IsDelete',0)->where('Product_BOM_ID',$request->Product_ID)->where('Materials_ID',$key)->first();
+            if($pro)
+            {
+                
+              
+                foreach($value as $value1)
+                {
+                    $value1['QuantityProduction'] = ( $request->OK + $request->NG ) * $pro->Quantity_Materials / count($value);
+                    if($value1['QuantityProduction'] > $value1->Quantity)
+                    {
+                        $check = false;
+                    }
+                    array_push($arr,$value1);
+                }
+            }  
+        }
+
+       return (object)[
+        'check'=>$check,
+        'data' => $arr
+       ];
     }
 }      

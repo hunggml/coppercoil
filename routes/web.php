@@ -102,7 +102,6 @@ Route::group(['middleware' => 'language'], function () {
 			Route::post('/add-or-update-type', 'MasterData\MasterWarehouseController@add_or_update_type')->name('masterData.warehouses.addOrUpdateType')->middleware(['role:create_master', 'role:update_master']);
 			Route::get('/destroy', 'MasterData\MasterWarehouseController@destroy')->name('masterData.warehouses.destroy')->middleware('role:delete_master');
 			Route::get('/filter-detail1', 'MasterData\MasterWarehouseController@filter_detail1')->name('masterData.warehouses.filterDetail1');
-
 			Route::get('/filter_warehouse', 'MasterData\MasterWarehouseController@filter_warehouse')->name('masterData.warehouses.filter_warehouse');
 			Route::get('/get_list_materials_in_warehouse', 'MasterData\MasterWarehouseController@get_list_materials_in_warehouse')->name('masterData.warehouses.get_list_materials_in_warehouse');
 			Route::get('/filter-history', 'WarehouseSystem\TransferController@filter_history')->name('masterData.warehouses.filter_history');
@@ -112,6 +111,9 @@ Route::group(['middleware' => 'language'], function () {
 		Route::prefix('/setting-error')->group(function () {
 			Route::get('/', 'MasterData\MasterErrorController@index')->name('masterData.error');
 			Route::get('/show', 'MasterData\MasterErrorController@show')->name('masterData.error.show')->middleware(['role:create_master', 'role:update_master']);
+			Route::post('/add-or-update', 'MasterData\MasterErrorController@add_or_update')->name('masterData.error.addOrUpdate')->middleware(['role:create_master', 'role:update_master']);
+			Route::post('/filter', 'MasterData\MasterErrorController@filter')->name('masterData.error.filter');
+			Route::get('/destroy', 'MasterData\MasterErrorController@destroy')->name('masterData.error.destroy')->middleware('role:delete_master');
 		});
 		Route::prefix('/setting-handle')->group(function () {
 			Route::get('/', 'MasterData\MasterHandleController@index')->name('masterData.handle');
@@ -137,7 +139,7 @@ Route::group(['middleware' => 'language'], function () {
 			Route::get('/list', 'WarehouseSystem\ImportController@inventory')->name('warehousesystem.import.detail.inventory');
 			Route::get('/get_list_stock_in_location', 'WarehouseSystem\ImportController@get_list_stock_in_location')->name('warehousesystem.import.detail.get_list_stock_in_location');
 		});
-
+		Route::get('/list-bom-and-stock', 'Api\ApiSystemController@list_bom_and_stock')->name('warehousesystem.api.list_bom_and_stock');
 		Route::prefix('/retype')->group(function () {
 			Route::get('/', 'WarehouseSystem\ImportController@retype')->name('warehousesystem.retype');
 			Route::post('/add', 'WarehouseSystem\ImportController@retype_add')->name('warehousesystem.retype.add');
@@ -146,7 +148,7 @@ Route::group(['middleware' => 'language'], function () {
 
 		Route::prefix('/export')->group(function () {
 			Route::get('/', 'WarehouseSystem\ExportController@export')->name('warehousesystem.export');
-			Route::get('/add', 'WarehouseSystem\ExportController@export_add')->name('warehousesystem.export.add');
+			Route::post('/add', 'WarehouseSystem\ExportController@export_add')->name('warehousesystem.export.add');
 			Route::get('/cancel', 'WarehouseSystem\ExportController@cancel')->name('warehousesystem.export.cancel');
 			Route::get('/accept', 'WarehouseSystem\ExportController@accept')->name('warehousesystem.export.accept');
 			Route::get('/success', 'WarehouseSystem\ExportController@success')->name('warehousesystem.export.success');
@@ -184,6 +186,7 @@ Route::group(['middleware' => 'language'], function () {
 			Route::get('/show', 'WarehouseSystem\ProductivityController@show')->name('warehousesystem.productivity.show');
 			Route::get('/export_file', 'WarehouseSystem\ProductivityController@export_file')->name('warehousesystem.productivity.export_file');
 			Route::post('/update', 'WarehouseSystem\ProductivityController@update')->name('warehousesystem.productivity.update');
+			Route::get('/calculate', 'WarehouseSystem\ProductivityController@calculate')->name('warehousesystem.productivity.calculate');
 		});
 
 		Route::prefix('/report')->group(function () {

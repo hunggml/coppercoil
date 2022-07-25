@@ -194,6 +194,7 @@ class MasterWarehouseDetailLibraries
 		})
 		->with([
 			'inventory.materials',
+			'inventory_mac',
 			'group_materials',
 			// 'inventory.supplier',
 			// 'inventory:ID,Inventory,User_Created,Time_Created,User_Updated,Time_Updated,Warehouse_Detail_ID',
@@ -278,6 +279,10 @@ class MasterWarehouseDetailLibraries
 			'inventory.supplier',
 			'group_materials',
 			'inventory',
+			'inventory_mac',
+			'inventory_mac.materials',
+			'inventory_mac.supplier',
+			'inventory_mac.product',
 			'inventory_null.user_created:id,name,username',
 			'inventory_null',
 			'inventory.user_created:id,name,username',
@@ -309,6 +314,12 @@ class MasterWarehouseDetailLibraries
 					}
 				}
 				foreach($value1->where('Pallet_ID',null) as $key =>$value3)
+				{
+					$value3['Count']= 1;
+					array_push($arr,$value3);
+				}
+				$value2= $value->inventory_mac;
+				foreach($value2 as $key =>$value3)
 				{
 					$value3['Count']= 1;
 					array_push($arr,$value3);

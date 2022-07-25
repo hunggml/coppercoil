@@ -61,14 +61,12 @@
 				                </div>
 								<div class="form-group col-md-4">
 				                    <label for="MaterialsProduct">{{__('Materials')}}</label>
-				                    <select name="Materials_ID" class="form-control select2 mater" required>
+				                    <select name="Materials_ID" class="form-control select2 mater" >
 				                    	<option value="">
 				                    		{{__('Choose')}} {{__('Materials')}}
 				                    	</option>
 				                    	@foreach($materials as $value)
-				                    	<option value="{{$value->ID}}" {{old('Materials_ID') ? 
-				                    		(old('Materials_ID') == $value->ID ? 'selected' : '') :
-				                    		($product ? ($product->Materials_ID == $value->ID ? 'selected' : '') : '')}}>
+				                    	<option value="{{$value->ID}}" >
 				                    		{{$value->Symbols}}
 				                    	</option>
 				                    	@endforeach
@@ -81,7 +79,7 @@
 				                </div>
 				                <div class="form-group col-md-3 ">
 				                    <label for="symbolsProduct">{{__('Quantity')}}</label>
-				                    <input type="number" step="0.01" value="{{old('Quantity') ? old('Quantity') : ($product ? $product->Quantity : '') }}" class="form-control quantity" id="QuantityProduct" name="Quantity" placeholder="{{__('Enter')}} {{__('Quantity')}}" @if($show == null){ readonly }@endif required>
+				                    <input type="number" step="0.01" value="" class="form-control quantity" id="QuantityProduct" name="Quantity" placeholder="{{__('Enter')}} {{__('Quantity')}}" @if($show == null){ readonly }@endif >
 				                    @if($errors->any())
 				                    	<span role="alert">
 	                                        <strong style="color: red">{{$errors->first('Quantity')}}</strong>
@@ -89,8 +87,29 @@
 				                    @endif
 				                </div>
 								<div class="col-1 quan">
-										<button type="button" class="btn btn-success btn-add" style="margin-top:22%">{{__('Add')}}</button>
-								</div>			
+									<button type="button" class="btn btn-success btn-add" style="margin-top:22%">{{__('Add')}}</button>
+								</div>
+								@if($product)
+									@foreach($product->boms as $bom)
+									<div class="col-3 tr-{{$bom->Materials_ID}}">
+										<label class="mater"> {{__('Materials')}} ID</label>
+										<input type="text" name="Materials_ID[]" id="idCan66" value="{{$bom->Materials_ID}}" class="form-control" readonly>
+									</div>
+									<div class="col-4 tr-{{$bom->Materials_ID}}">
+										<label class="mater"> {{__('Materials')}}</label>
+										<input type="text" name="Count" id="idCan66" value="{{$bom->materials ? $bom->materials->Symbols : '' }}" class="form-control" readonly>
+									</div>
+									<div class="col-3 tr-{{$bom->Materials_ID}}">
+										<label class="mater"> {{__('Quantity')}} {{__('Use')}}</label>
+										<input type="text" value="{{floatval($bom->Quantity_Materials)}}" name="QuantityUse[]" id="qtyuse-{{$bom->Materials_ID}}" class="form-control qtyuse">
+									</div>
+									<div class="col-2 tr-{{$bom->Materials_ID}} ">
+										<button type="button" id="{{$bom->Materials_ID}}" class="btn btn-danger btn-delete-box" style="margin-top:10%">
+												{{__('Delete')}}
+										</button>
+									</div>	
+									@endforeach
+								@endif		
 				                <div class="form-group col-md-8">
 				                    <label for="symbolsProduct">{{__('Note')}}</label>
 				                    <input type="text" value="{{old('Note') ? old('Note') : ($product ? $product->Note : '') }}" class="form-control" id="NoteProduct" name="Note" placeholder="{{__('Enter')}} {{__('Note')}}" @if($show == null){ readonly }@endif >
@@ -116,6 +135,13 @@
 	<script>
 		$('.select2').select2()
 		let arr = [];
+		
+		@if($product)
+		@foreach($product->boms as $bom)
+			arr.push({{$bom->Materials_ID}});						
+		@endforeach
+		@endif
+		
 		$('.btn-add').on('click',function(){
 			let a = $('.mater :selected').val();
 			let b = $('.mater :selected').text();
@@ -148,6 +174,11 @@
 					arr.splice($.inArray($(this).attr('id'), arr),1);				
 				})
 			}
+		})
+		$('.btn-delete-box').on('click',function(){
+			console.log('run');
+			$('.tr-'+$(this).attr('id')+'').remove()
+			arr.splice($.inArray($(this).attr('id'), arr),1);				
 		})
 	</script>
 @endpush

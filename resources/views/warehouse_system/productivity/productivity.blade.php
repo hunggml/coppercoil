@@ -1,5 +1,4 @@
 @extends('layouts.main')
-
 @section('content')
 	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
 	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
@@ -63,7 +62,7 @@
 		                          			{{__('Choose')}} {{__('Product')}}
 		                          		</option>
 										  @foreach($data_all->GroupBy('Product_ID') as $key => $value)
-										  	<option value="{{$key}}" {{$request->Product == $key ? 'selected' : ''}}>
+											<option value="{{$key}}" {{$request->Product == $key ? 'selected' : ''}}>
 		                          			{{ $value[0]->product ? $value[0]->product->Symbols : '' }}
 		                          			</option>
 										  @endforeach
@@ -105,55 +104,17 @@
 						@endif
 						@if(session()->has('danger'))
 							@foreach(session('danger') as $value)
-							<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-								<strong>{{$value}}</strong>
-								<br>
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
+								<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+									<strong>{{$value}}</strong>
+									<br>
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
 							@endforeach
 						@endif
 		            	</br>
-		                <table class="table table-striped table-hover"  width="100%">
-		                	<thead>
-		                		<th>{{__('ID')}}</th>
-		                		<th>{{__('Name')}} {{ __('Order') }}</th>
-								<th>{{__('Product')}}</th>
-		                		<th>{{__('Materials')}}</th>
-								<th>{{__('Roll Number')}}</th>
-								<th>{{__('OK')}}</th>
-								<th>{{__('Quantity')}} {{__('OK')}} (kg)</th>
-								<th>{{__('NG')}}</th>
-								<th>{{__('Quantity')}} {{__('NG')}} (kg)</th>
-								<th>{{__('Total')}} {{__('Quantity')}} (kg)</th>
-		                		<th>{{__('User Updated')}}</th>
-		                		<th>{{__('Time Updated')}}</th>
-		                	</thead>
-		                	<tbody>
-								<?php $dem = 0 ?>
-		                		@foreach($data as $value)
-								<?php $dem ++ ?>
-									<tr>
-										<td>{{$dem}}</td>
-										<td>{{$value->Order_ID}}</td>
-										<td>{{$value->product ? $value->product->Symbols : ''}}</td>
-										<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
-										<td>{{floatval($value->Quantity)}}</td>
-										<td>{{floatval($value->OK)}}</td>
-										<td>{{floatval((($value->product ? $value->product->Quantity : 0) * ($value->OK)))}}</td>
-										<td>{{floatval($value->NG)}}</td>
-										<td>{{floatval((($value->product ? $value->product->Quantity : 0) * ($value->NG)))}}</td>
-										<td>{{floatval((($value->product ? $value->product->Quantity : 0) * ($value->OK))) + floatval((($value->product ? $value->product->Quantity : 0) * ($value->NG)))}}</td>
-										<td>
-											{{$value->user_updated ? $value->user_updated->name : ''}}
-										</td>
-										<td>{{$value->Time_Updated}}</td>
-									</tr>
-								@endforeach	
-		                	</tbody>
-		                </table>
-						{{ $data->links() }}
+		                 
 	                </div>
 	            </div>
 	        </div>
@@ -173,55 +134,68 @@
 				@csrf
 				<div class="modal-body">
 					<div class="form-group row">
-						<div class="col-12 machine">
+						<div class="col-12">
+							<label> {{__('Order')}} </label>
+							<input type="Text"  name="Order" id="Order" class="form-control" placeholder="{{__('Enter')}} {{__('Symbols')}} {{__('Order')}}" required>
+						</div>
+						<div class="col-12">
 							<label>{{ __('Machine') }}</label>
-							<select class="custom-select mac select2" name="Machine_ID">
+							<select class="custom-select mac select2" name="Machine">
 								<option value="">
 									{{__('Choose')}} {{__('Machine')}}
 								</option>
 								@foreach($machine as $value)
 									@if($value->warehouse)
-										<option value="{{$value->warehouse->ID}}">
+										<option value="{{$value->warehouse->ID}}" class="{{$value->ID}}">
 										{{$value->Name}}
 										</option>
 									@endif
 								@endforeach        
 							</select>
+							<input type="number"  name="Machine_ID" id="Machine_ID" class="form-control hide" >
 							<span style="color :red; font-size:10px" class=" err hide">{{__('Warehouse No More')}} {{__('Materials')}}</span>
 						</div>
-					
-						<div class="col-4">
-							<label> {{__('Product')}} </label>
-							<input type="text" name="Product" id="Product" class="form-control" readonly>
+
+						<div class="col-12">
+							<label>{{ __('Product') }}</label>
+							<select class="custom-select pro select2" name="Product_ID">
+								<option value="">
+									{{__('Choose')}} {{__('Machine')}}
+								</option>
+								@foreach($product as $value)
+									<option value="{{$value->ID}}" >
+										{{$value->Name}}
+									</option>
+								@endforeach        
+							</select>
 						</div>
-						<div class="col-4">
+						<div class="col-12  machine">
+								
+						</div>
+						<div class="col-6">
 							<label> {{__('OK')}} </label>
 							<input type="number"  name="OK" id="OK" class="form-control quanproduction" >
 						</div>				
-						<div class="col-4 ">
+						<div class="col-6 ">
 							<label> {{__('NG')}} </label>
 							<input type="number" name="NG" id="NG" class="form-control quanproduction" >
-						</div>
-						<div class="col-12  ">
-							
 						</div>
 					</div>
 					
 				</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-				<button type="submit" class="btn btn-success hide btn-add">{{__('Save')}}</button>
-			</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+					<button type="submit" class="btn btn-success btn-add">{{__('Save')}}</button>
+				</div>
 			</form>
 			</div>
 		</div>
 	</div>
 @endsection
 @push('scripts')
-	<script>
+	<script> 
 		$('.select2').select2()
-        $('.duallistbox').bootstrapDualListbox
-		({
+        $('.duallistbox').bootstrapDualListbox({
 			nonSelectedListLabel: __warehouses.no_select_com,
 			selectedListLabel   : __warehouses.select_com,
 			infoText            : __group.show+' {0}',
@@ -229,8 +203,7 @@
 			showFilterInputs    : true,
 			filterPlaceHolder   : __filter.symbols
 		});
-		$('#tableUnit').DataTable
-		({
+		$('#tableUnit').DataTable({
 			language: __languages.table,
 			scrollX : '100%',
 			scrollY : '100%'
@@ -318,16 +291,19 @@
                 $('.error-file').show();
             }
         });
-		$(document).on('input','.mac', function()
+		$(document).on('input','.pro', function()
 		{
 			let id = $('.mac').val();
+			let product = $('.pro').val();
+			$('#Machine_ID').val( $('.mac :selected').attr('class'))
 			$('.new').remove();
 			var pro = '';
 			$.ajax({
 				type: "GET",
 				url: "{{route('warehousesystem.import.detail.get_list_stock_in_location')}}",
 				data: { 
-					ware_detail_id : id
+					ware_detail_id : id,
+					Product_ID : product
 				},
 				success: function(data) 
 				{
@@ -342,7 +318,7 @@
 								if(value.materials.product)
 								{
 									a = a + `
-									<option value="`+value.Box_ID+`" class="`+value.Inventory+`__-`+value.materials.Name+`__-`+value.materials.product.Name+`__-`+value.materials.product.Quantity+`">`+value.Box_ID+`</option>
+									<option value="`+value.Box_ID+`" class="`+value.Quantity+`__-`+value.materials.Symbols+`__-`+value.materials.product.Name+`__-`+value.materials.product.Quantity+`">`+value.Box_ID+`</option>
 									`
 								}
 								
@@ -391,7 +367,7 @@
 									$('.choose-box').append(`
 										<div class="col-2 tr-`+a+`">
 											<label class="mater"> {{__('Box_ID')}}</label>
-											<input type="text" name="Count" id="idCan66" value="`+a+`" class="form-control" readonly>
+											<input type="text" name="Box[]" value="`+a+`" class="form-control" readonly>
 										</div>
 										<div class="col-3 tr-`+a+`">
 											<label class="mater"> {{__('Materials')}}</label>
@@ -403,7 +379,7 @@
 										</div>
 										<div class="col-3 tr-`+a+`">
 											<label class="mater"> {{__('Quantity')}} {{__('Use')}}</label>
-											<input type="text" name="QuantityUse" id="qtyuse-`+a+`" class="form-control qtyuse">
+											<input type="text" name="QuantityUse[]"  id="id-`+a+`" class="form-control qtyuse">
 										</div>
 										<div class="col-2 tr-`+a+`">
 											<button type="button" id="`+a+`" class="btn btn-danger btn-delete-box" style="margin-top:18%">
@@ -413,27 +389,49 @@
 									`) 
 									$('#Product').val(b.split('__-')[2])
 									$('.btn-delete-box').on('click',function(){
-										$('.tr-'+$(this).attr('id')+'').remove()
 										arr.splice($.inArray($(this).attr('id'), arr),1);
-										
+										console.log(arr);
+										$('.tr-'+$(this).attr('id')+'').remove()
 									})
 									$('.quanproduction').on('input',function(){
-										 let e = $('#OK').val()
-										 let f = $('#NG').val()
-										 let g = b.split('__-')[3]
-										 let h = parseFloat(e ? e : 0)+parseFloat( f ? f : 0)
-										 let i = (parseFloat(h)*parseFloat(g))/arr.length
-										 
-										 $('.qtyuse').val(parseFloat(i))
+											let e = $('#OK').val()
+											let f = $('#NG').val()
+											var box = $('input[name^=Box]').map(function(idx, elem) {
+												return $(elem).val();
+											}).get();
+											console.log(box)
+											$.ajax({
+											type: "GET",
+											url: "{{route('warehousesystem.productivity.calculate')}}",
+											data: { 
+												Product_ID : product,
+												Machine_ID : $('.mac').val(),
+												Box_ID     : box,
+												OK : e,
+												NG : f
+											},
+											success: function(data) 
+											{	
+												if(data.data.check)
+												{
+													$.each(data.data.data , function (index,value){
+														$('#id-'+value.Box_ID).val(value.QuantityProduction)
+													})
+												}
+											},
+											error: function() {
+														
+											}
+										});
 									})
 								}
-								
 							})
 						}
                 },
-                error: function() {
+                error: function() 
+				{
                         	
-                    }
+                }
        		 });
 		});
 	</script>

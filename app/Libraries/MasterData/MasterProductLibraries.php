@@ -67,10 +67,11 @@ class MasterProductLibraries
 
 	public function add_or_update($request)
 	{
+		// dd($request);
 		$id = $request->ID;
 		$user_created = Auth::user()->id;
 		$user_updated = Auth::user()->id;
-		dd($request);
+
 		if (isset($id) && $id != '') 
 		{
 			if (!Auth::user()->checkRole('update_master') && Auth::user()->level != 9999) 
@@ -82,16 +83,31 @@ class MasterProductLibraries
 				'Name'         => $request->Name,
 				'Symbols'      => $request->Symbols,
 				'Unit_ID'      => $request->Unit_ID,
-				'Materials_ID' => $request->Materials_ID,
 				'Note'		   => $request->Note,
 				'Quantity'	   => $request->Quantity,
 				'User_Updated' => $user_updated
 			]);
-
+            MasterBOM::where('Product_BOM_ID',$id)->update([
+				'IsDelete'=>1
+			]);
+			$quanuse = $request->QuantityUse;
+			// dd($quanuse);
+			foreach($request->Materials_ID as $key => $mater)
+			{
+				MasterBOM::create([
+					'Product_BOM_ID'=>$id,
+					'Materials_ID'=>$mater,
+					'Quantity_Materials'=>$quanuse[$key],
+					'User_Created'	=> $user_created,
+				    'User_Updated'	=> $user_updated,
+					'IsDelete'=>0
+				]);
+			}
 			return (object)[
 				'status' => __('Update').' '.__('Success'),
 				'data'	 => $product
 			];
+
 		} else
 		{
 			if (!Auth::user()->checkRole('create_master') && Auth::user()->level != 9999) 
@@ -103,14 +119,24 @@ class MasterProductLibraries
 				'Name' 			=> $request->Name,
 				'Symbols'		=> $request->Symbols,
 				'Unit_ID'		=> $request->Unit_ID,
-				'Materials_ID'  => $request->Materials_ID,
 				'Note'			=> $request->Note,
 				'Quantity'	   	=> $request->Quantity,
 				'User_Created'	=> $user_created,
 				'User_Updated'	=> $user_updated,
 				'IsDelete'		=> 0
 			]);
-
+			$quanuse = $request->QuantityUse;
+			foreach($request->Materials_ID as $key => $mater)
+			{
+				MasterBOM::create([
+					'Product_BOM_ID'=>$product->ID,
+					'Materials_ID'=>$mater,
+					'Quantity_Materials'=>$quanuse[$key],
+					'User_Created'	=> $user_created,
+				    'User_Updated'	=> $user_updated,
+					'IsDelete'=>0
+				]);
+			}
 			return (object)[
 				'status' => __('Create').' '.__('Success'),
 				'data'	 => $product
@@ -222,13 +248,8 @@ class MasterProductLibraries
 						}
 					}
 				}
-				
-            	
 			}
         }
-       
-       
        return $err;
     }  
-
 }

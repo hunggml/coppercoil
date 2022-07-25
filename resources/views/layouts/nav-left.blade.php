@@ -1,5 +1,4 @@
 <aside class="main-sidebar sidebar-light-Success elevation-4">
-  <!-- Brand Logo -->
   <a href="{{ route('home') }}" class="brand-link">
     <img src="{{ asset('dist/img/sti.png')}}"
     alt="AdminLTE Logo"
@@ -7,9 +6,7 @@
     style="opacity: .8">
     <span class="brand-text font-weight-light">STI-MES</span>
   </a>
-  <!-- Sidebar -->
   <div class="sidebar">
-    <!-- Sidebar user (optional) -->
     <div class="user-panel mt-4 pb-4 mb-4 d-flex">
       <div class="image">
         <img src="{{asset('dist/img/')}}/{{Auth::user()->avatar}}" class="img-circle elevation-2" alt="User Image">
@@ -18,11 +15,10 @@
         <a href="#" class="d-block id-user" style="text-transform: capitalize; font-weight: bold;">{{Auth::user()->name}}</a>
       </div>
     </div>
-    <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item has-treeview">
-          <a href="{{ route('home') }}" class="nav-link home"> <!-- active -->
+          <a href="{{ route('home') }}" class="nav-link home">
             <i class="nav-icon fas fa-home"></i>
             <p>
               {{__('Dashboard')}}
@@ -33,7 +29,6 @@
         <li class="nav-item has-treeview">
           <a href="#" class="nav-link warehouse-system">
             <i class="nav-icon fas fa-pallet"></i>
-            <!-- <img src="{{ asset('dist/icon/schedules.png') }}" class="icon-color"> -->
             <p>
               {{__('Warehouse System')}}
               <i class="fas fa-angle-left right"></i>
@@ -111,7 +106,7 @@
                   </a>
                 </li>
                 <li class="nav-item ">
-                  <a href="{{route('warehousesystem.import.detail.inventory',['Format'=>2])}}" class="nav-link Transfer">
+                  <a href="{{route('warehousesystem.import.location',['Format'=>2])}}" class="nav-link Transfer">
                     <i class="far fa-dot-circle nav-icon"></i>
                     <p>{{__('Stock')}} {{__('Machine')}}</p>
                   </a>
@@ -136,7 +131,6 @@
         <li class="nav-item has-treeview">
           <a href="#" class="nav-link setting ">
             <i class="nav-icon fas fa-cogs"></i>
-            <!-- <img src="{{ asset('dist/icon/schedules.png') }}" class="icon-color"> -->
             <p>
               {{__('Setting')}}
               <i class="fas fa-angle-left right"></i>
@@ -145,7 +139,6 @@
           <ul class="nav nav-treeview">
             <li class="nav-item">
               <a href="{{ route('masterData.unit') }}" class="nav-link setting-unit">
-                <!-- <img src="{{ asset('dist/icon/import_product.png') }}" class="icon-color"> -->
                 <i class="far fa-circle nav-icon"></i>
                 <p>{{__('Unit')}}</p>
               </a>
@@ -171,24 +164,21 @@
             <li class="nav-item">
               <a href="{{route('masterData.materials')}}" class="nav-link setting-materials">
                 <i class="far fa-circle nav-icon"></i>
-                <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
                 <p>{{__('Materials')}}</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{route('masterData.error')}}" class="nav-link setting-materials">
                 <i class="far fa-circle nav-icon"></i>
-                <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
                 <p>{{__('Error')}} NG</p>
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a href="#" class="nav-link setting-materials">
                 <i class="far fa-circle nav-icon"></i>
-                <!-- <img src="{{ asset('dist/icon/forecast.png') }}" class="icon-color"> -->
                 <p>{{__('Handle')}} NG</p>
               </a>
-            </li>
+            </li> -->
             <li class="nav-item">
               <a href="{{ route('masterData.warehouses') }}" class="nav-link setting-warehouse">
                 <i class="far fa-circle nav-icon"></i>
@@ -212,7 +202,5 @@
         @endif
       </ul>
     </nav>
-    <!-- /.sidebar-menu -->
   </div>
-  <!-- /.sidebar -->
 </aside>

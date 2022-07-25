@@ -311,6 +311,7 @@
     "Request": "Yêu cầu",
     "Must be": "Phải là",
     "Number": "Số",
+    "Amount": "Số Lượng",
     "And": "Và",
     "Real": "Thực",
     "Create Command Export Success": "Tạo Lệnh Xuất Thành Công",
@@ -328,5 +329,6 @@
     "Handle": "Xử Lý",
     "Even": "Chẵn",
     "Odd": "Lẻ",
-    "Incurred": "Phát Sinh"
+    "Incurred": "Phát Sinh",
+    "Calculate": "Tính Toán"
 }

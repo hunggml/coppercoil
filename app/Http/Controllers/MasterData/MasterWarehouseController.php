@@ -116,7 +116,7 @@ class MasterWarehouseController extends Controller
         {
             $data = $data1->where('Area',null);
             return view(
-                'master_data.warehouses.location.index',
+                'master_data.warehouses.location.machine',
                 [
                     'warehouses' => $data,
                     'request'    => $request

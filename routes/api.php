@@ -68,7 +68,5 @@ Route::post('/update-location', 'Api\ImportMaterialsController@update_location')
 
 
 
-//api table master-data
-Route::prefix('/settings')->group(function () {
-    Route::get('/unit', 'Api\MasterDataController@unit');
-});
+//api export in system
+Route::post('/list-bom-and-stock', 'Api\ApiSystemController@list_bom_and_stock')->name('api.list_bom_and_stock');

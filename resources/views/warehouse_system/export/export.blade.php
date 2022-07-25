@@ -259,11 +259,13 @@
 								<span aria-hidden="true">&times;</span>
 							</button>
 						</div>
+						<form action="{{route('warehousesystem.export.add')}}" method="post">
+						@csrf
 						<div class="modal-body">
 							<div class="warehouse row">
 								<div class="col-4">
 									<label>{{__('Choose')}} {{__('Warehouse')}}  {{__('Go')}}</label>
-									<select class="custom-select ware select2" name="Warehouse_Detail_ID">
+									<select class="custom-select ware select2" name="Go">
 										<option value="">
 											{{__('Choose')}} {{__('Warehouse')}}
 										</option>
@@ -319,8 +321,9 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-							<button type="button" class="btn btn-add hide float-right btn-warning ">{{__('Export')}}</button>
+							<button type="submit" class="btn btn-add hide float-right btn-warning ">{{__('Export')}}</button>
 						</div>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -510,9 +513,14 @@
 											@endforeach
 											</select>
 										</div>
-										<div class="mater col-6 mater1">
+										<div class="mater col-3 mater1">
 											<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
-											<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
+											<input type="Number" name="QuantityProduction"  min='0' class="form-control product  product1 quantityproduction  mater"  step="0.01">
+										</div>
+										<div class="mater col-2 mater1">
+										<button type="button" class="btn btn-danger btn-calculate" style="margin-top:18%">
+												{{__('Calculate')}}
+											</button>
 										</div>
 									</div>
 									<hr>
@@ -531,7 +539,7 @@
 											<input type="text" name="Inventory" id="idCan6" class="form-control  mater" readonly>
 											<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
 											<input type="Number" name="Quantity" id="idCan7" min='0' class="form-control  mater"  step="0.01">
-											<span style="color :red; font-size:10px" class=" err1 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+											<span style="color :red; font-size:10px" class="err1 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
 											<br>
 											<label class="mater"> {{__('Roll Number')}} {{__('Stock')}}</label>
 											<input type="text" name="Count" id="idCan66" class="form-control " readonly>
@@ -540,55 +548,68 @@
 											<span style="color :red; font-size:10px" class=" err2 hide mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
 										</div>
 								</div>
-							`) 
-							$('.product1').on('change',function(){
+							`)
+							$('.btn-calculate').on('click',function(){
 								$('.new1').remove();
 								
-								if($('.product1').val() != '')
-								{
+								if($('.product1').val() != '' &&  $('.tomachine').val() != '' && $('.quantityproduction').val() > 0)
+								{ 
+									console.log('run2')
+									let product = $('.product1').val()
 									$('.mater2').val('').change();
-									$('.new2').append(`
-									<div class="new1 col-12">
-										<div class="row">
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Materials')}}</label>
-												<input type="Text" name="Materials"  min='0' class="form-control materials  mater"  value="NVL1" readonly>
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Stock')}} {{__('Save')}}</label>
-												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="10.2" readonly >
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Stock')}} {{__('Production')}}</label>
-												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="3.2" readonly >
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
-												<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
-											</div>
-										</div>
-										<div class="row">
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Materials')}}</label>
-												<input type="Text" name="Materials"  min='0' class="form-control materials  mater"  value="NVL2" readonly>
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Stock')}} {{__('Save')}}</label>
-												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="15.2" readonly >
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Stock')}} {{__('Production')}}</label>
-												<input type="Number" name=""  min='0' class="form-control product   mater"  step="0.01" value="0" readonly >
-											</div>
-											<div class="mater col-3 mater1">
-												<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
-												<input type="Number" name="QuantityProduction"  min='0' class="form-control product  quantityproduction  mater"  step="0.01">
-											</div>
-										</div>
-									</div>
-									`) 
-								}
+									$.ajax({
+									type: "GET",
+									url: "{{route('warehousesystem.api.list_bom_and_stock')}}",
+									data: { 
+										Product_ID : product,
+										Machine_ID : $('.tomachine').val(),
+										Quantityproduction : $('.quantityproduction').val()
+									},
+									success: function(data) 
+									{
+										if(data.success)
+										{
+											$.each(data.data , function (index,value){
+												$('.new2').append(`
+													<div class="new1 col-12">
+														<div class="row">
+															<div class="mater col-3 mater1">
+																<label  class="mater"> {{__('Materials')}}</label>
+																<input type="Text" name="Materials_pro[]"  min='0' class="form-control hide"  value="`+value.ID+`" readonly>
+																<input type="Text"   min='0' class="form-control materials  mater"  value="`+value.Symbols+`" readonly>
+															</div>
+															<div class="mater col-3 mater1">
+																<label  class="mater"> {{__('Stock')}} {{__('Save')}}</label>
+																<input type="Number" name=""  min='0' class="form-control product mater"  step="0.01" value="`+parseFloat(value.save)+`" readonly >
+															</div>
+															<div class="mater col-3 mater1">
+																<label  class="mater"> {{__('Stock')}} {{__('Production')}}</label>
+																<input type="Number" name=""  min='0' class="form-control product mater"   step="0.01" value="`+parseFloat(value.machine)+`" readonly >
+															</div>
+															<div class="mater col-3 mater1">
+																<label  class="mater"> {{__('Quantity')}} {{__('Production')}}</label>
+																<input type="Number" name="Quantity_pro[]"  min='0' class="form-control quantityproduction "  value="`+parseFloat(value.quantity)+`" step="0.01">
+															</div>
+														</div>
+													</div>
+												`)
+											})
+										}
+										else
+										{
+											$('.new2').append(`
+													<div class="new1 col-12">
+															<span style="color :red; font-size:10px" class=" err2  mater">{{__('Quantity Requested Greater Than Allowed Quantity')}}</span>
+													</div>
+													`)
+										}
+									},
+									error: function() {
+												
+									}
+								});
 								
+								}
 							})
 						}
 						else if(type == 2)
@@ -598,7 +619,7 @@
 									<hr>
 									<div class="mater mater1">
 									<label>{{__('Choose')}} {{__('Materials')}} </label>
-									<select class="custom-select mater2 select2" name="Materials">
+									<select class="custom-select mater2 select2" name="Materials_ID">
 									<option value="">
 									{{__('Choose')}} {{__('Materials')}}
 									</option>
@@ -645,6 +666,7 @@
 									$('#idCan7').attr('max',b)
 									console.log(a,b.split(' '),c)
 									$('.product1').val('').change();
+									$('.new1').remove();
 								}
 								else
 								{
@@ -702,38 +724,38 @@
                 }
             });
 		});
-		$('.btn-add').on('click',function(){
+		// $('.btn-add').on('click',function(){
 			
-			let a = $('.ware').val()
-			let b = $('.mater2').val()
-			let c = $('#idCan7').val()
-			let d = $('.towarehouse').val()
-			let f = $('.tomachine').val()
-			let e = $('#idCan77').val()
-			console.log(a,b,c,d,e)
-			$.ajax({
-				type: "get",
-				url: "{{route('warehousesystem.export.add')}}",
-				data: { 
-					'_token' : $('meta[name="csrf-token"]').attr('content'),
-					Go : a,
-					Materials_ID :b,
-					Quantity : c,
-					Count : e,
-					To  : d,
-					Machine_ID  : f,
-				},
-				success: function(data) 
-				{
-					if(data.data)
-					{
-						location.reload();
-					}
-				},
-				error: function() {
-				}
-			});
-		})
+		// 	let a = $('.ware').val()
+		// 	let b = $('.mater2').val()
+		// 	let c = $('#idCan7').val()
+		// 	let d = $('.towarehouse').val()
+		// 	let f = $('.tomachine').val()
+		// 	let e = $('#idCan77').val()
+		// 	console.log(a,b,c,d,e)
+		// 	$.ajax({
+		// 		type: "get",
+		// 		url: "{{route('warehousesystem.export.add')}}",
+		// 		data: { 
+		// 			'_token' : $('meta[name="csrf-token"]').attr('content'),
+		// 			Go : a,
+		// 			Materials_ID :b,
+		// 			Quantity : c,
+		// 			Count : e,
+		// 			To  : d,
+		// 			Machine_ID  : f,
+		// 		},
+		// 		success: function(data) 
+		// 		{
+		// 			if(data.data)
+		// 			{
+		// 				location.reload();
+		// 			}
+		// 		},
+		// 		error: function() {
+		// 		}
+		// 	});
+		// })
 		$('.btn-Transfer').on('click',function(){
 			let id = $(this).attr('id')
 			$('.transfer-box').remove()
