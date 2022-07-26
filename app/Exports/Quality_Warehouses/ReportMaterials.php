@@ -35,30 +35,30 @@ class ReportMaterials
             {
                 $dem++;
                 $active_sheet->setCellValue('A' . $count, $dem);
-                $active_sheet->setCellValue('B' . $count, $value->Symbols);
-                $active_sheet->setCellValue('C' . $count, $value->Spec);
-                $active_sheet->setCellValue('D' . $count, $value->first1);
-                $active_sheet->setCellValue('E' . $count, $value->imm1);
-                $active_sheet->setCellValue('F' . $count, $value->imm2);
-                $active_sheet->setCellValue('G' . $count, $value->imm3);
-                $active_sheet->setCellValue('H' . $count, $value->exx1);
-                $active_sheet->setCellValue('I' . $count, $value->exx2);
-                $active_sheet->setCellValue('J' . $count, ($value->first1 + $value->imm1 + $value->imm2 + $value->imm3 - $value->exx1 -$value->exx2 ) < 0.000000001 ? 0 : ($value->first1 + $value->imm1 + $value->imm2 + $value->imm3 - $value->exx1 -$value->exx2 ) );
+                $active_sheet->setCellValue('B' . $count, $value['Symbols']);
+                $active_sheet->setCellValue('C' . $count, $value['Spec']);
+                $active_sheet->setCellValue('D' . $count, $value['first1']);
+                $active_sheet->setCellValue('E' . $count, $value['imm1']);
+                $active_sheet->setCellValue('F' . $count, $value['imm2']);
+                $active_sheet->setCellValue('G' . $count, $value['imm3']);
+                $active_sheet->setCellValue('H' . $count, $value['exx1']);
+                $active_sheet->setCellValue('I' . $count, $value['exx2']);
+                $active_sheet->setCellValue('J' . $count, ($value['first1'] + $value['imm1'] + $value['imm2'] + $value['imm3'] - $value['exx1'] -$value['exx2'] ) < 0.000000001 ? 0 : ($value['first1'] + $value['imm1'] + $value['imm2'] + $value['imm3'] - $value['exx1'] -$value['exx2'] ) );
                 $count = $count + 1;
             }
             else
             {
                 $dem++;
                 $active_sheet->setCellValue('A' . $count, $dem);
-                $active_sheet->setCellValue('B' . $count, $value->Symbols);
-                $active_sheet->setCellValue('C' . $count, $value->Spec);
-                $active_sheet->setCellValue('D' . $count, $value->first);
-                $active_sheet->setCellValue('E' . $count, $value->im1);
-                $active_sheet->setCellValue('F' . $count, $value->im2);
-                $active_sheet->setCellValue('G' . $count, $value->im3);
-                $active_sheet->setCellValue('H' . $count, $value->ex1);
-                $active_sheet->setCellValue('I' . $count, $value->ex2);
-                $active_sheet->setCellValue('J' . $count, ($value->first + $value->im1 + $value->im2 + $value->im3 - $value->ex1 -$value->ex2 ) < 0.000000001 ? 0 : ($value->first + $value->im1 + $value->im2 + $value->im3 - $value->ex1 -$value->ex2 ) );
+                $active_sheet->setCellValue('B' . $count, $value['Symbols']);
+                $active_sheet->setCellValue('C' . $count, $value['Spec']);
+                $active_sheet->setCellValue('D' . $count, $value['first']);
+                $active_sheet->setCellValue('E' . $count, $value['im1']);
+                $active_sheet->setCellValue('F' . $count, $value['im2']);
+                $active_sheet->setCellValue('G' . $count, $value['im3']);
+                $active_sheet->setCellValue('H' . $count, $value['ex1']);
+                $active_sheet->setCellValue('I' . $count, $value['ex2']);
+                $active_sheet->setCellValue('J' . $count, ($value['first'] + $value['im1'] + $value['im2'] + $value['im3'] - $value['ex1'] -$value['ex2'] ) < 0.000000001 ? 0 : ($value['first'] + $value['im1'] + $value['im2'] + $value['im3'] - $value['ex1'] -$value['ex2'] ) );
                 $count = $count + 1;
             }
             
