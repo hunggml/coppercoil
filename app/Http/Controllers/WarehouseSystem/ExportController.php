@@ -53,11 +53,26 @@ class ExportController extends Controller
 
     public function export_add(Request $request)
     {
-        $data     = $this->export->export_add($request);
+        // dd($request);
+        if($request->Materials_ID)
+        {
+            $data     = $this->export->export_add($request);
+        }
+        else
+        {
+            $quan = $request->Quantity_pro;
+            // dd('run');
+            foreach($request->Materials_pro as $key => $value)
+            {
+                
+                $request->Materials_ID = $value;
+                $request->Quantity = $quan[$key];
+                $data     = $this->export->export_add($request);
+            }
+        }
+        
 
-        return response()->json([
-            'data'	  => $data
-        ]); 
+        return redirect()->back()->with('success',__('Success')); 
     }
 
     public function cancel(Request $request)

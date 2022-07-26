@@ -1,30 +1,24 @@
 <?php
 
-namespace App\Models\WarehouseSystem;
+namespace App\Models\MasterData;
 
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 
-class ProductReport extends Model
+class MasterQC extends Model
 {
 	const CREATED_AT      = 'Time_Created';
 	const UPDATED_AT      = 'Time_Updated';
 	
-	protected $table      = 'Product_Report';
+	protected $table      = 'Master_QC';
 	protected $primaryKey = 'ID';
   protected function serializeDate(DateTimeInterface $date)
   {
     return $date->format('Y-m-d H:i:s');
   }
 	protected $fillable   = [
-  	'Order_ID'
-    ,'Machine_ID'
-    ,'Product_ID'
-  	,'Materials_Stock_ID'
-    ,'Quantity'
-    ,'OK'
-    ,'NG'
-    ,'Status'
+  	'Name'
+    ,'Type'
   	,'Note'
   	,'Time_Created'
   	,'User_Created'
@@ -43,16 +37,10 @@ class ProductReport extends Model
     return $this->hasOne('App\Models\User', 'id', 'User_Updated')->whereIsdelete(0);
   }
 
-  public function materials()
+  public function handle()
   {
-    return $this->hasOne('App\Models\MasterData\MasterMaterials', 'ID', 'Materials_Stock_ID')->whereIsdelete(0);
+    return $this->hasMany('App\Models\MasterData\MasterHandleError', 'QC_ID', 'ID')->whereIsdelete(0);
   }
-  public function product()
-  {
-    return $this->hasOne('App\Models\MasterData\MasterProduct', 'ID', 'Product_ID')->whereIsdelete(0);
-  }
-  public function machine()
-  {
-    return $this->hasOne('App\Models\MasterData\MasterMachine', 'ID', 'Machine_ID')->whereIsdelete(0);
-  }
+
+
 }

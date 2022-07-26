@@ -19,6 +19,7 @@ class MasterWarehouseLibraries
 		$data = MasterWarehouse::where('IsDelete', 0)->with([
 			'detail',
 			'detail.inventory',
+			'detail.inventory_mac',
 		])->get();
 		// dd($data);
 

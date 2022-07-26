@@ -6,9 +6,11 @@ use App\Models\WarehouseSystem\CommandImport;
 use App\Models\WarehouseSystem\ImportDetail;
 use Validator;
 use App\Models\MasterData\MasterMaterials;
+use App\Models\MasterData\MasterProduct;
 use App\Models\MasterData\MasterSupplier;
 use App\Models\MasterData\MasterWarehouse;
 use Illuminate\Support\Facades\Auth;
+use App\Models\WarehouseSystem\StockMachine;
 use Carbon\Carbon;
 
 class ImportLibraries
@@ -678,12 +680,24 @@ class ImportLibraries
     }
     public function get_list_stock_in_location($request)
     {
-        return ImportDetail::where('IsDelete',0)
+        $product = MasterProduct::where('IsDelete',0)->where('ID',$request->Product_ID)->first();
+        $arr = [];
+        if($product)
+        {
+                
+                foreach($product->boms as $value)
+                {
+                    array_push($arr,$value->Materials_ID);
+                }
+        }
+        // dd($arr);
+        return StockMachine::where('IsDelete',0)
         ->where('Warehouse_Detail_ID',$request->ware_detail_id)
-        ->where('Inventory','>',0)
+        ->whereIn('Materials_ID',$arr)
+        ->where('Quantity','>',0)
         ->with([
-            'materials',
-            'materials.product'
+                'materials',
+                'materials.product'
         ])
         ->get();
     }

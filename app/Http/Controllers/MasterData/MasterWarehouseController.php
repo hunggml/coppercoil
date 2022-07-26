@@ -103,7 +103,7 @@ class MasterWarehouseController extends Controller
         $data1     = $this->warehouse->get_all_list_warehouse();
         if($request->Format == 1)
         {
-            $data = $data1->where('Area','>',0);
+            $data = $data1->where('Type',null);
             return view(
                 'master_data.warehouses.location.index',
                 [
@@ -114,9 +114,9 @@ class MasterWarehouseController extends Controller
         }
         else if($request->Format == 2)
         {
-            $data = $data1->where('Area',null);
+            $data = $data1->where('Type','machine');
             return view(
-                'master_data.warehouses.location.index',
+                'master_data.warehouses.location.machine',
                 [
                     'warehouses' => $data,
                     'request'    => $request

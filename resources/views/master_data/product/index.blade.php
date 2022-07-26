@@ -118,7 +118,11 @@
 			                			<td>{{$value->Name}}</td>
 			                			<td>{{$value->Symbols}}</td>
 			                			<td>
-			                				{{$value->materials ? $value->materials->Symbols : ''}}
+										@foreach($value->boms as $bom)
+												{{$bom->materials ? $bom->materials->Symbols : ''}}	
+												<br>				
+										@endforeach
+			                				
 			                			</td>
 			                			<td>{{floatval($value->Quantity)}}</td>
 			                			<td>

@@ -65,3 +65,10 @@ Route::post('/import-packing-list', 'Api\ImportMaterialsController@import_packin
 // update location
 Route::get('/get-data-update-location', 'Api\ImportMaterialsController@get_data_update_location');
 Route::post('/update-location', 'Api\ImportMaterialsController@update_location');
+
+
+
+
+
+//api export in system
+Route::post('/list-bom-and-stock', 'Api\ApiSystemController@list_bom_and_stock')->name('api.list_bom_and_stock');

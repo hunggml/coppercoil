@@ -3,7 +3,7 @@
 @section('content')
 
 	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
-	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
+	@include('basic.modal_request_destroy', ['route' => route('masterData.error.destroy')])
 	@endif
 
 	@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
@@ -61,7 +61,7 @@
 		                <table class="table table-bordered text-nowrap w-100" id="tableUnit" width="100%">
 		                	<thead>
 		                		<th>{{__('Name')}} {{ __('Error') }}</th>
-		                		<th>{{__('Symbols')}} {{ __('Error') }}</th>
+								<th>{{__('Handle')}} {{ __('Error') }}</th>
 		                		<th>{{__('Note')}}</th>
 		                		<th>{{__('User Created')}}</th>
 		                		<th>{{__('Time Created')}}</th>
@@ -70,27 +70,40 @@
 		                		<th>{{__('Action')}}</th>
 		                	</thead>
 		                	<tbody>
-		                		<tr>
-                                    <td>Lỗi 1</td>
-                                    <td>L1</td>
-                                    <td></td>
-                                    <td>Admin</td>
-                                    <td>2022-07-16 11:00:43</td>
-                                    <td>Admin</td>
-                                    <td>2022-07-16 11:00:43</td>
-                                    <td>
+		                		@foreach($error as $value)
+			                		<tr>
+			                			<td>{{$value->Name}}</td>
+			                			<td>
+											@foreach($value->handle as $key => $handle)
+												@if($key > 0) 
+													<hr> 
+												@endif
+													{{$handle->Handle}}				
+											@endforeach
+			                			</td>
+			                			<td>{{$value->Note}}</td>
+										<td>
+											{{$value->user_created ? $value->user_created->name : ''}}
+										</td>
+										<td>{{$value->Time_Created}}</td>
+										<td>
+											{{$value->user_updated ? $value->user_updated->name : ''}}
+										</td>
+			                			<td>{{$value->Time_Updated}}</td>
+			                			<td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success" style="width: 80px">
+			                				<a href="{{ route('masterData.error.show', ['ID' => $value->ID])}}" class="btn btn-success" style="width: 80px">
 			                					{{__('Edit')}}
 			                				</a>
 			                				@endif
 			                				@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
-			                				<button id="del-" class="btn btn-danger btn-delete" style="width: 80px">
+			                				<button id="del-{{$value->ID}}" class="btn btn-danger btn-delete" style="width: 80px">
 			                					{{__('Delete')}}
 			                				</button>
 			                				@endif
-			                		</td>
-                                </tr>
+			                			</td>
+			                		</tr>
+		                		@endforeach
 		                	</tbody>
 		                </table>
 	                </div>

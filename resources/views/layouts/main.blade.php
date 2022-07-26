@@ -80,10 +80,8 @@
     <!-- Navbar -->
     @include('layouts.nav-top')
     <!-- /.navbar -->
-
     <!-- Main Sidebar Container -->
     @include('layouts.nav-left')
-
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
@@ -91,7 +89,6 @@
         <div class="container-fluid">
         </div>
       </section>
-
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
@@ -107,14 +104,12 @@
       <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-
     <footer class="main-footer">
       <div class="float-right d-none d-sm-block">
         <!-- <b>Black Clover</b> -->
       </div>
       <strong>{{__('Design By')}} <a href="#">STI</a>.</strong>
     </footer>
-
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->

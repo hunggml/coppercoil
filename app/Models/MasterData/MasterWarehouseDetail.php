@@ -50,7 +50,10 @@ class MasterWarehouseDetail extends Model
   {
     return $this->hasMany('App\Models\WarehouseSystem\ImportDetail', 'Warehouse_Detail_ID', 'ID')->where('Inventory','!=', 0)->whereIsdelete(0);
   }
-
+  public function inventory_mac()
+  {
+    return $this->hasMany('App\Models\WarehouseSystem\StockMachine', 'Warehouse_Detail_ID', 'ID')->where('Quantity','!=', 0)->whereIsdelete(0);
+  }
   public function inventory2()
   {
     return $this->hasMany('App\Models\WarehouseSystem\ImportDetail', 'Warehouse_Detail_ID', 'ID')->whereIsdelete(0);

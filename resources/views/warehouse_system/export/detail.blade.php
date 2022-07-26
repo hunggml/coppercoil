@@ -37,7 +37,6 @@
 					</span>
 					<div class="card-tools">
 						@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
-
 						@endif
 						@if(session()->has('table'))
 							@if(session()->get('table') && count(session()->get('danger')) >0 )
@@ -207,7 +206,39 @@
 </div>
  
 <!-- modal export -->
- 
+<div class="modal fade" id="modalRequestEx" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="title">{{__('Export')}}</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="{{ route('warehousesystem.export.detail.ex') }}" method="get">
+				@csrf
+				<div class="modal-body">
+					<strong style="font-size: 23px">{{__('Do You Want To Export')}}  Box <span id="nameDel" style="color: blue"></span> ?</strong>
+					<input type="text" name="Command_ID" value="{{$command->ID}}" class="form-control hide">
+					<input type="text" name="Pallet_ID" id="Pallet_ID" class="form-control hide">
+					<input type="text" name="Box_ID" id="Box_ID" class="form-control hide">
+					<input type="text" name="Location" id="Location" class="form-control hide">
+					<hr>
+					<div class="">
+						<label  class="mater"> {{__('Quantity')}} {{__('Export')}}</label>
+						<input type="Number" name="Quantity" min='0' class="form-control quan" step="0.01" {{$command->materials ? ($command->materials->Export_Type == 0 ? 'readonly' : '' ) : '' }}>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+					<button type="submit" class="btn btn-danger">{{__('Export')}}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
 @endsection
 @push('scripts')
 <script>
