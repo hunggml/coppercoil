@@ -83,9 +83,9 @@
                                 <th>{{ __('Name') }} {{ __('Supplier') }}</th>
                                 <th>{{ __('Symbols') }} {{ __('Supplier') }}</th>
                                 <th>{{ __('Address') }}</th>
-                                <th>{{ __('Contact') }}</th>
+                                {{-- <th>{{ __('Contact') }}</th> --}}
                                 <th>{{ __('Phone') }}</th>
-                                <th>{{ __('Tax Code') }}</th>
+                                {{-- <th>{{ __('Tax Code') }}</th> --}}
                                 <th>{{ __('Note') }}</th>
                                 <th>{{ __('User Created') }}</th>
                                 <th>{{ __('Time Created') }}</th>
@@ -100,9 +100,9 @@
                                         <td>{{ $value->Name }}</td>
                                         <td>{{ $value->Symbols }}</td>
                                         <td>{{ $value->Address }}</td>
-                                        <td>{{ $value->Contact }}</td>
+                                        {{-- <td>{{ $value->Contact }}</td> --}}
                                         <td>{{ $value->Phone }}</td>
-                                        <td>{{ $value->Tax_Code }}</td>
+                                        {{-- <td>{{ $value->Tax_Code }}</td> --}}
                                         <td>{{ $value->Note }}</td>
                                         <td>
                                             {{ $value->user_created ? $value->user_created->name : '' }}
