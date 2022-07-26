@@ -29,6 +29,9 @@
 				                </button>
 		                	@endif
 		                @endif
+                        <button type="button" class="btn btn-warning">
+				                	{{__('Xuất Báo Cáo Kiểm Kê Dưới Dạng Excel')}} 
+				        </button>
                 	</div>
                 </div>
                 <div class="card-body">
@@ -79,7 +82,7 @@
 						@endforeach
 					@endif
 	            	</br>
-	                <table class="table table-striped table-hover"  width="100%">
+	                <table class="table table-bordered text-nowrap "  width="100%">
 	                	<thead>
 	                		<th>{{__('ID')}}</th>
 	                		<th>{{__('Location')}}</th>
@@ -90,6 +93,7 @@
 							<th>{{__('Pallet')}} ( {{__('Box')}}) {{__('Reality')}}</th>
                             <th>{{__('Roll Number')}} {{__('Reality')}}</th>
                             <th>{{__('Quantity')}} {{__('Reality')}}</th>
+                            <th>{{__('Chênh lệch')}}</th>
                             <th>{{__('Action')}}</th>
 	                	</thead>
 	                	<tbody>
@@ -107,6 +111,7 @@
                                 <td>{{$value1->Box_ID}}</td>
                                 <td>1</td>
                                 <td>{{floatval($value1->Quantity)}}</td>
+                                <td>{{floatval($value1->Quantity_System) - floatval($value1->Quantity)}}</td>
                                 <td>
                                     <button class="btn btn-info btn-detail" id="btn-end-{{$value1->ID}}" data-toggle="modal" data-target=".bd-example-modal-lg">
                                         {{__('Detail')}}
@@ -128,6 +133,7 @@
                                 <td></td>
                                 <td>{{count($value->where('Status','<>',0))}}</td>
                                 <td>{{floatval(collect($value)->sum('Quantity'))}}</td>
+                                <td>{{floatval(collect($value)->sum('Quantity_System')) - floatval(collect($value)->sum('Quantity'))}}</td>
                                 <td> 
                                     <button class="btn btn-info btn-detail" id="btn-{{$value1->Pallet_System_ID}}-end" data-toggle="modal" data-target=".bd-example-modal-lg">
                                         {{__('Detail')}}

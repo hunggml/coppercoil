@@ -3,7 +3,6 @@
 	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
 	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
 	@endif
-
 	@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
 	@include('basic.modal_import', ['route' => route('warehousesystem.productivity.import_file')])
 	@include('basic.modal_table_error')
@@ -114,13 +113,45 @@
 							@endforeach
 						@endif
 		            	</br>
-		                 
+						<table class="table table-bordered text-nowrap " width="100%">
+		                	<thead>
+		                		<th>{{__('ID')}}</th>
+		                		<th>{{__('Name')}} {{ __('Order') }}</th>
+								<th>{{__('Machine')}}</th>
+								<th>{{__('Product')}}</th>
+								<th>{{__('Roll Number')}}</th>
+								<th>{{__('OK')}}</th>
+								<th>{{__('NG')}}</th>
+		                		<th>{{__('User Updated')}}</th>
+		                		<th>{{__('Time Updated')}}</th>
+		                	</thead>
+		                	<tbody>
+								<?php $dem = 0 ?>
+		                		@foreach($data as $value)
+								<?php $dem ++ ?>
+									<tr>
+										<td>{{$dem}}</td>
+										<td>{{$value->Order_ID}}</td>
+										<td>{{$value->machine ? $value->machine->Symbols : ''}}</td>
+										<td>{{$value->product ? $value->product->Symbols : ''}}</td>
+										<td>{{floatval($value->Quantity)}}</td>
+										<td>{{floatval($value->OK)}}</td>
+										<td>{{floatval($value->NG)}}</td>
+										<td>
+											{{$value->user_updated ? $value->user_updated->name : ''}}
+										</td>
+										<td>{{$value->Time_Updated}}</td>
+									</tr>
+								@endforeach	
+		                	</tbody>
+		                </table>
+						{{ $data->links() }}
 	                </div>
 	            </div>
 	        </div>
 	    </div>
 	</div>
-
+								
 	<div class="modal fade modal-update" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
@@ -191,6 +222,7 @@
 			</div>
 		</div>
 	</div>
+								
 @endsection
 @push('scripts')
 	<script> 

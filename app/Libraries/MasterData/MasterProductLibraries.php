@@ -199,54 +199,61 @@ class MasterProductLibraries
         $data = $this->read_file($request);
         $im = [];
         $err = [];
-		
+		$user_created = Auth::user()->id;
+		$user_updated = Auth::user()->id;
+		// dd($data);
         foreach($data as $key => $value)
         {
-            if($key>0)
+            if($key >1)
             {
-				if($value[2] != ''  && $value[1])
+				if($value[3] != '')
 				{
-					$sym = explode('|',$value[2]);
-					// dd($sym);
-					if(count($sym) > 1)
-					{
-
-						$mater = MasterMaterials::where('IsDelete',0)
-						->where('Symbols',$sym[0])
-						->where('Spec',$sym[1])
-						->first();
-						$unit = MasterUnit::where('IsDelete',0)
-						->where('Symbols',$value[4])
-						->first();
-						// dd($mater,$unit,$value[4]);
-						if($mater && $unit)
+					    $sym = $value[3];
+						$pro = MasterProduct::where('IsDelete',0)->where('Symbols',$value[3])->first();
+						if($pro)
 						{
-							$pro = MasterProduct::where('IsDelete',0)->where('Symbols',$value[1])->first();
-							if($pro)
-							{
-								MasterProduct::where('ID',$pro->ID)->update([
-									'Materials_ID'=>$mater->ID,
-									'Quantity'=>$value[3],
-									'Unit_ID'=>$unit->ID
-								]);
-							}
-							else
-							{
-								MasterProduct::create([
-									'Name'=>$value[0],
-									'Symbols'=>$value[1],
-									'Materials_ID'=>$mater->ID,
-									'Quantity'=>$value[3],
-									'Unit_ID'=>$unit->ID
-								]);	
-							}
+							
 						}
 						else
 						{
-							$err1 = 'Dòng '.($key+1).' Có mã NVL , Đơn vị tính không tồn tại';
-							array_push($err,$err1);
+							$pro = MasterProduct::create([
+								'Name'=>$value[4],
+								'Symbols'=>$value[3],
+								'User_Created'	=> $user_created,
+								'User_Updated'	=> $user_updated,
+								'IsDelete'=>0
+							]);	
 						}
-					}
+						MasterBOM::where('Product_BOM_ID',$pro->ID)->update(['IsDelete'=>1]);
+						$mater = MasterMaterials::where('IsDelete',0)
+						->where('Symbols',$value[5])
+						->first();
+						if($mater)
+						{
+							MasterBOM::create([
+								'Product_BOM_ID'=>$pro->ID,
+								'Materials_ID'=>$mater->ID,
+								'Quantity_Materials'=>$value[7],
+								'User_Created'	=> $user_created,
+								'User_Updated'	=> $user_updated,
+								'IsDelete'=>0
+							]);
+						}
+						$mater1 = MasterMaterials::where('IsDelete',0)
+						->where('Symbols',$value[9])
+						->first();
+						if($mater1)
+						{
+							MasterBOM::create([
+								'Product_BOM_ID'=>$pro->ID,
+								'Materials_ID' =>$mater1->ID,
+								'Quantity_Materials'=>$value[11],
+								'User_Created'	=> $user_created,
+								'User_Updated'	=> $user_updated,
+								'IsDelete'=>0
+							]);
+						}
+							
 				}
 			}
         }

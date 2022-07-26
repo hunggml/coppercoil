@@ -2,9 +2,9 @@
 
 @section('content')
 
-	@if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
+	<!-- @if(Auth::user()->checkRole('delete_master') || Auth::user()->level == 9999)
 	@include('basic.modal_request_destroy', ['route' => route('masterData.unit.destroy')])
-	@endif
+	@endif -->
 
 	@if(Auth::user()->checkRole('import_master') || Auth::user()->level == 9999)
 	@include('basic.modal_import', ['route' => route('warehousesystem.import.import_file')])
@@ -119,10 +119,10 @@
 											{{__('Detail')}}
                                            	</a>
 											@if($value->Status == 0)
-											<a href="{{route('warehousesystem.inventory.success',['Command_ID'=>$value->ID])}}" class="btn btn-success">
+											<a href="#" class="btn btn-success" btn-handle" data-toggle="modal" data-target="#modalRequestTa">
                                             {{__('Success')}}
 											</a>
-										   	<a href="{{route('warehousesystem.inventory.cancel',['Command_ID'=>$value->ID])}}" class="btn btn-danger btn-cancel">
+										   	<a href="#" class="btn btn-danger btn-cancel" btn-handle" data-toggle="modal" data-target="#modalRequestDel">
                                             {{__('Cancel')}}
 											</a>
 											@endif
@@ -208,6 +208,55 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="modalRequestDel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">{{__('Hủy')}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="#" method="get">
+        @csrf
+        <div class="modal-body">
+          <strong style="font-size: 23px">{{__('Bạn Có Muốn Hủy ')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+          <input type="text" name="ID" id="idDel" class="form-control hide">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+          <button type="submit" class="btn btn-danger">{{__('Hủy')}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalRequestTa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">{{__('Hoàn Thành')}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="3" method="get">
+        @csrf
+        <div class="modal-body">
+          <strong style="font-size: 23px">{{__('Bạn Có Muốn Hoàn Thành Lệnh Kiểm Kê')}} <span style="color:RED">(Khi hoàn thành lệnh kiểm kê thì dữ liệu hệ thống sẽ Update thành dữ liệu sau khi kiểm kê) </span><span id="nameDel" style="color: blue"></span> ?</strong>
+          <input type="text" name="ID" id="idDel" class="form-control hide">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+          <button type="submit" class="btn btn-success">{{__('Hoàn Thành')}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 @push('scripts')
 	<script>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Libraries\WarehouseSystem\ExportLibraries;
 use App\Libraries\MasterData\MasterMaterialsLibraries;
+use App\Libraries\MasterData\MasterSupplierLibraries;
 use App\Libraries\MasterData\MasterWarehouseLibraries;
 use App\Libraries\WarehouseSystem\ProductReportLibaries;
 use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
@@ -20,7 +21,8 @@ class ReportController extends Controller
         NxtLibraries $NxtLibraries,
         MasterMaterialsLibraries $MasterMaterialsLibraries,
         MasterWarehouseLibraries $MasterWarehouseLibraries,
-        ReportMaterials  $ReportMaterials
+        ReportMaterials  $ReportMaterials,
+        MasterSupplierLibraries $MasterSupplierLibraries
 	)
     {
 		$this->middleware('auth');
@@ -28,6 +30,7 @@ class ReportController extends Controller
         $this->materials = $MasterMaterialsLibraries;
         $this->warehouse = $MasterWarehouseLibraries;
         $this->export = $ReportMaterials;
+        $this->supplier = $MasterSupplierLibraries; 
 	}
     
     public function index(Request $request)
@@ -35,11 +38,13 @@ class ReportController extends Controller
         $data = $this->report->get_list_entry($request);
         $list_materials = $this->materials->get_all_list_materials($request);
         $list_warehouse    = $this->warehouse->get_all_list_warehouse();
+        $list_supplier = $this->supplier->get_all_list_supplier($request);
         return view('warehouse_system.report.index',
         [
             'data'=>$data,
             'list_materials'=>$list_materials, 
             'list_warehouse'=>$list_warehouse,
+            'list_supplier' => $list_supplier,
             'request'=>$request
         ]); 
     }

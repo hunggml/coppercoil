@@ -170,6 +170,7 @@ class MasterProductController extends Controller
 
     public function import_file(Request $request)
     {
+        set_time_limit(6000000);
         $data  = $this->product->import_file($request);
         // dd($data);
     	if(count($data)  == 0)

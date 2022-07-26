@@ -52,6 +52,19 @@
 										@endforeach
 		                        	</select>
 	                      		</div>
+								<div class="form-group col-md-2">
+		                        	<label>{{__('Choose')}} {{__('Supplier')}}</label>
+		                        	<select class="custom-select select2" name="Supplier">
+		                          		<option value="">
+		                          			{{__('Choose')}} {{__('Supplier')}}
+		                          		</option>
+										@foreach($list_supplier as $value)
+										<option value="{{$value->ID}}" {{$request->Supplier == $value->ID ? 'selected' : '' }}>
+		                          			{{$value->Name}}
+		                          		</option>
+										@endforeach
+		                        	</select>
+	                      		</div>
                                 <div class="form-group col-md-2">
 		                        	<label>{{__('Choose')}} {{__('Warehouse')}}</label>
 		                        	<select class="custom-select select2" name="Warehouse">
@@ -76,11 +89,11 @@
 		                          		</option>
 		                        	</select>
 	                      		</div>
-	                      		<div class="form-group col-md-2">
+	                      		<div class="form-group col-md-1">
 		                        	<label>{{ __('From') }}</label>
 		                        	<input type="date" value="{{$request->from}}" class="form-control datetime"  name="from">
 	                      		</div>
-                                <div class="form-group col-md-2">
+                                <div class="form-group col-md-1">
 		                        	<label>{{ __('To') }}</label>
 		                        	<input type="date" value="{{$request->to}}" class="form-control datetime"  name="to">
 	                      		</div>
@@ -94,6 +107,7 @@
 		                	<thead>
 		                		<th>{{__('ID')}}</th>
 		                		<th>{{__('Materials')}}</th>
+								<th>{{__('Supplier')}}</th>
 								<th>{{__('Spec')}}</th>
 								<th>{{__('First')}}</th>
 								<th>{{__('Import')}}</th>
@@ -110,28 +124,30 @@
 								@if(!$request->Type)
                                 <tr>
                                     <td>{{$dem}}</td>
-                                    <td>{{$value->Symbols}}</td>
-                                    <td>{{$value->Spec}}</td>
-                                    <td>{{$value->first1}}</td>
-                                    <td>{{$value->imm1}}</td>
-                                    <td>{{$value->imm2}}</td>
-                                    <td>{{$value->imm3}}</td>
-                                    <td>{{$value->exx1}}</td>
-                                    <td>{{$value->exx2}}</td>
-                                    <td>{{($value->first1 + $value->imm1 + $value->imm2 + $value->imm3 - $value->exx1 -$value->exx2 ) < 0.000000001 ? 0 : ($value->first1 + $value->imm1 + $value->imm2 + $value->imm3 - $value->exx1 -$value->exx2 ) }}</td>
+                                    <td>{{$value['Symbols']}}</td>
+									<td>{{$value['supplier'] ? $value['supplier']->Name : ''}}</td>
+                                    <td>{{$value['Spec']}}</td>
+                                    <td>{{$value['first1']}}</td>
+                                    <td>{{$value['imm1']}}</td>
+                                    <td>{{$value['imm2']}}</td>
+                                    <td>{{$value['imm3']}}</td>
+                                    <td>{{$value['exx1']}}</td>
+                                    <td>{{$value['exx2']}}</td>
+                                    <td>{{($value['first1'] + $value['imm1'] + $value['imm2'] + $value['imm3'] - $value['exx1'] -$value['exx2'] ) < 0.000000001 ? 0 : ($value['first1'] + $value['imm1'] + $value['imm2'] + $value['imm3'] - $value['exx1'] -$value['exx2'] ) }}</td>
                                 </tr>
 								@else
 								<tr>
                                     <td>{{$dem}}</td>
-                                    <td>{{$value->Symbols}}</td>
-                                    <td>{{$value->Spec}}</td>
-                                    <td>{{$value->first}}</td>
-                                    <td>{{$value->im1}}</td>
-                                    <td>{{$value->im2}}</td>
-                                    <td>{{$value->im3}}</td>
-                                    <td>{{$value->ex1}}</td>
-                                    <td>{{$value->ex2}}</td>
-                                    <td>{{($value->first + $value->im1 + $value->im2 + $value->im3 - $value->ex1 -$value->ex2 ) < 0.000000001 ? 0 : ($value->first + $value->im1 + $value->im2 + $value->im3 - $value->ex1 -$value->ex2 ) }}</td>
+                                    <td>{{$value['Symbols']}}</td>
+									<td>{{$value['supplier'] ? $value['supplier']->Name : ''}}</td>
+                                    <td>{{$value['Spec']}}</td>
+                                    <td>{{$value['first']}}</td>
+                                    <td>{{$value['im1']}}</td>
+                                    <td>{{$value['im2']}}</td>
+                                    <td>{{$value['im3']}}</td>
+                                    <td>{{$value['ex1']}}</td>
+                                    <td>{{$value['ex2']}}</td>
+                                    <td>{{($value['first'] + $value['im1'] + $value['im2'] + $value['im3'] - $value['ex1'] -$value['ex2'] ) < 0.000000001 ? 0 : ($value['first'] + $value['im1'] + $value['im2'] + $value['im3'] - $value['ex1'] -$value['ex2'] ) }}</td>
                                 </tr>
 								@endif
                                 @endforeach

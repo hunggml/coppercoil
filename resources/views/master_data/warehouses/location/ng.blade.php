@@ -74,14 +74,29 @@
 	                      		</div>
 	                      		<div class="col-md-2" style="margin-top: 33px">
 	                      			<button type="submit" class="btn btn-info">{{__('Filter')}}</button>
+									<a href="#" class="btn btn-success btn-handle" data-toggle="modal" data-target="#modalRequestTa">
+			                			{{__('Tái Sử Dụng')}}
+									</a>
+									<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+										{{__('Hủy')}}
+									</a>
 	                      		</div>
                       		</div>
-
 	                	</form>
 		                @include('basic.alert')
 		            	</br>
+						<p>Tổng Số Lượng NG : <span style="color:red">60 ( Kg )</span></p>
+						<p>Tổng Số Lượng đã xử Lý : <span style="color:red">20 ( Kg )</span></p>
 		                <table class="table table-bordered text-nowrap w-100" id="tableUnit" width="100%">
 		                	<thead>
+								<th>
+                                    <div class="form-group pro1 col-2 style="text-align:center;">
+										<div class="icheck-primary d-inline " >
+										<input type="checkbox"  id="checkboxPrimary" class="checkAllStock" >
+										<label for="checkboxPrimary">  Chọn Hết </label>
+										</div>
+                                    </div>
+                                </th>
                                 <th>{{__('Location')}}</th>
 		                		<th>{{__('Box_ID')}}</th>
                                 <th>{{__('Materials')}}</th>
@@ -94,10 +109,21 @@
 		                		<th>{{__('Time Created')}}</th>
 		                		<th>{{__('User Updated')}}</th>
 		                		<th>{{__('Time Updated')}}</th>
-		                		<th>{{__('Action')}}</th>
+		                		<th>{{__('Action')}}
+								
+								</th>
+
 		                	</thead>
 		                	<tbody>
 		                		<tr>
+									<td>
+                                        <div class="form-group col-1" style=" text-align:center;padding-top: 2.5%;" >
+                                            <div class="icheck-primary d-inline" >
+                                                <input type="checkbox" value=""  id="checkboxPrimaryQC"  >
+                                                <label for="checkboxPrimaryQC" ></label>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>NG-01</td>
                                     <td>242022002</td>
                                     <td>99M-1PEWN0023</td>
@@ -112,13 +138,120 @@
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success btn-handle" style="width: 80px" data-toggle="modal" data-target=".modal-handle">
-			                					{{__('Handle')}}
+			                				<a href="#" class="btn btn-success btn-handle"data-toggle="modal" data-target="#modalRequestTa">
+			                					{{__('Tái Sử Dụng')}}
+			                				</a>
+											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+			                					{{__('Hủy')}}
+			                				</a>
+			                				@endif
+			                		</td>
+                                </tr>
+								<tr>
+									<td>
+                                        <div class="form-group col-1" style=" text-align:center;padding-top: 2.5%;" >
+                                            <div class="icheck-primary d-inline" >
+                                                <input type="checkbox" value=""  id="checkboxPrimaryQC"  >
+                                                <label for="checkboxPrimaryQC" ></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>NG-01</td>
+                                    <td>242022002</td>
+                                    <td>99M-1PEWN0023</td>
+                                    <td>L1</td>
+                                    <td>May1</td>
+                                    <td>10</td>
+                                    <td>0</td>
+                                    <td>Lỗi 1 Phát Sinh ngày 18/07</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>
+			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
+			                				<a href="#" class="btn btn-success btn-handle">
+			                					{{__('Tái Sử Dụng')}}
+			                				</a>
+											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+			                					{{__('Hủy')}}
+			                				</a>
+			                				@endif
+			                		</td>
+                                </tr>
+								<tr>
+									<td>
+                                        <div class="form-group col-1" style=" text-align:center;padding-top: 2.5%;" >
+                                            <div class="icheck-primary d-inline" >
+                                                <input type="checkbox" value=""  id="checkboxPrimaryQC"  >
+                                                <label for="checkboxPrimaryQC" ></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>NG-01</td>
+                                    <td>242022002</td>
+                                    <td>99M-1PEWN0023</td>
+                                    <td>L1</td>
+                                    <td>May1</td>
+                                    <td>10</td>
+                                    <td>0</td>
+                                    <td>Lỗi 1 Phát Sinh ngày 18/07</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>
+			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
+			                				<a href="#" class="btn btn-success btn-handle">
+			                					{{__('Tái Sử Dụng')}}
+			                				</a>
+											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+			                					{{__('Hủy')}}
+			                				</a>
+			                				@endif
+			                		</td>
+                                </tr>
+								<tr>
+									<td>
+                                        <div class="form-group col-1" style=" text-align:center;padding-top: 2.5%;" >
+                                            <div class="icheck-primary d-inline" >
+                                                <input type="checkbox" value=""  id="checkboxPrimaryQC"  >
+                                                <label for="checkboxPrimaryQC" ></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>NG-01</td>
+                                    <td>242022002</td>
+                                    <td>99M-1PEWN0023</td>
+                                    <td>L1</td>
+                                    <td>May1</td>
+                                    <td>10</td>
+                                    <td>0</td>
+                                    <td>Lỗi 1 Phát Sinh ngày 18/07</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>Admin</td>
+                                    <td>2022-07-16 11:00:43</td>
+                                    <td>
+			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
+			                				<a href="#" class="btn btn-success btn-handle">
+			                					{{__('Tái Sử Dụng')}}
+			                				</a>
+											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+			                					{{__('Hủy')}}
 			                				</a>
 			                				@endif
 			                		</td>
                                 </tr>
                                 <tr>
+									<td>
+                                        <div class="form-group col-1" style=" text-align:center;padding-top: 2.5%;" >
+                                            <div class="icheck-primary d-inline" >
+                                                <input type="checkbox" value=""  id="checkboxPrimaryQC"  >
+                                                <label for="checkboxPrimaryQC" ></label>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>NG-01</td>
                                     <td>242022002</td>
                                     <td>99M-1PEWN0023</td>
@@ -217,40 +350,55 @@
 		</div>
 	</div>
 	<!-- modal handle -->
-	<div class="modal fade modal-handle" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">{{ __('Handle') }} {{ __('NG') }}</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group col-12">
-						<label>{{ __('Quantity') }}</label>
-						<input type="Number" value="" class="form-control"  name="Quantity" placeholder="{{__('Enter')}} {{__('Quantity')}}">
-					</div>
-					<div class="form-group col-12">
-		                <label>{{__('Choose')}} {{__('Handle')}}</label>
-		                <select class="custom-select select2" name="Handle">
-		                    <option value="">
-		                        {{__('Choose')}} {{__('Handle')}}
-		                    </option>
-		                </select>
-	                </div>
-					<div class="form-group col-12">
-						<label>{{ __('Note') }}</label>
-						<input type="Text" value="" class="form-control"  name="Note" placeholder="{{__('Enter')}} {{__('Note')}}">
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-					<button type="button" class="btn btn-add hide float-right btn-warning ">{{__('Export')}}</button>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="modal fade" id="modalRequestDel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">{{__('Delete')}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="#" method="get">
+        @csrf
+        <div class="modal-body">
+          <strong style="font-size: 23px">{{__('Bạn Có Muốn Hủy ')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+          <input type="text" name="ID" id="idDel" class="form-control hide">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+          <button type="submit" class="btn btn-danger">{{__('Hủy')}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalRequestTa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">{{__('Delete')}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="3" method="get">
+        @csrf
+        <div class="modal-body">
+          <strong style="font-size: 23px">{{__('Bạn Có Muốn Tái Sử Dụng')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+          <input type="text" name="ID" id="idDel" class="form-control hide">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+          <button type="submit" class="btn btn-success">{{__('Tái Sử Dụng')}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+	
 @endsection
 @push('scripts')
 	<script>
