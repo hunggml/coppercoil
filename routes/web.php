@@ -65,6 +65,15 @@ Route::group(['middleware' => 'language'], function () {
 			Route::get('/export_file', 'MasterData\MasterMaterialsController@export_file')->name('masterData.materials.export_file')->middleware(['role:create_master', 'role:export_master']);
 		});
 
+		// Machine
+		Route::prefix('/setting-machine')->group(function () {
+			Route::get('/', 'MasterData\MasterMachineController@index')->name('masterData.machine');
+			Route::get('/show', 'MasterData\MasterMachineController@show')->name('masterData.machine.show')->middleware(['role:create_master', 'role:update_master']);
+			Route::post('/filter', 'MasterData\MasterMachineController@filter')->name('masterData.machine.filter');
+			Route::post('/add-or-update', 'MasterData\MasterMachineController@add_or_update')->name('masterData.machine.addOrUpdate')->middleware(['role:create_master', 'role:update_master']);
+			Route::get('/destroy', 'MasterData\MasterMachineController@destroy')->name('masterData.machine.destroy')->middleware('role:delete_master');
+		});
+
 		// Group Materials
 		Route::prefix('/setting-group-materials')->group(function () {
 			Route::get('/', 'MasterData\MasterGroupMaterialsController@index')->name('masterData.groupMaterials');

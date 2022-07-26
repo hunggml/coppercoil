@@ -1,4 +1,10 @@
 {
     "/js/app.js": "/js/app.js",
+<<<<<<< HEAD
+    "/css/app.css": "/css/app.css",
+    "/js/master-data/supplier.js": "/js/master-data/supplier.js",
+    "/js/master-data/unit.js": "/js/master-data/unit.js"
+=======
     "/css/app.css": "/css/app.css"
+>>>>>>> 274228bed8db5b814257caff74b174db846e20f8
 }
