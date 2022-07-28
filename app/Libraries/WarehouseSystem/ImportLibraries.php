@@ -11,6 +11,7 @@ use App\Models\MasterData\MasterSupplier;
 use App\Models\MasterData\MasterWarehouse;
 use Illuminate\Support\Facades\Auth;
 use App\Models\WarehouseSystem\StockMachine;
+use App\Models\WarehouseSystem\StockNG;
 use Carbon\Carbon;
 
 class ImportLibraries
@@ -690,7 +691,7 @@ class ImportLibraries
                     array_push($arr,$value->Materials_ID);
                 }
         }
-        // dd($arr);
+        // dd($request,$arr);
         return StockMachine::where('IsDelete',0)
         ->where('Warehouse_Detail_ID',$request->ware_detail_id)
         ->whereIn('Materials_ID',$arr)
@@ -701,6 +702,112 @@ class ImportLibraries
         ])
         ->get();
     }
-
+    public function add_box_ng_to_warehouse($request)
+    {
+        if($request->Type == 1)
+        {
+            $check = StockMachine::where('IsDelete',0)->where('Quantity','>',0)->where('Box_ID',$request->Box_ID)->first();
+            if($check)
+            {
+                StockMachine::where('ID',$check->ID)
+                ->Update([
+                    'IsDelete'     => 1,
+                ]);
+                StockMachine::create([
+                    'Machine_ID'         => $check->Machine_ID,
+                    'Warehouse_Detail_ID'=> $check->Warehouse_Detail_ID,
+                    'Product_ID'         => $check->Product_ID,
+                    'Materials_ID'       => $check->Materials_ID,
+                    'Supplier_ID'        => $check->Supplier_ID,
+                    'Box_ID'             => $check->Box_ID,
+                    'Quantity'           => $check->Quantity - $request->Quantity,
+                    'Use'                => $check->Use,
+                    'NG'                 => $check->NG + $request->Quantity,
+                    'User_Created'       => Auth::user()->id,
+                    'User_Updated'       => Auth::user()->id,
+                    'IsDelete'           => 0
+                ]);
+                $check_in_ng = StockNG::where('IsDelete',0)->where('Box_ID',$request->Box_ID)->first();
+                if($check_in_ng)
+                {
+                    StockNG::where('ID',$check_in_ng->ID)
+                    ->Update([
+                        'Quantity'     => $check_in_ng->Quantity + $request->Quantity,
+                        'User_Updated'       => Auth::user()->id,
+                    ]);
+                }
+                else
+                {
+                    StockNG::create([
+                        'Warehouse_Detail_ID'=> $check->Warehouse_Detail_ID,
+                        'Product_ID'         => $check->Product_ID,
+                        'Materials_ID'       => $check->Materials_ID,
+                        'Supplier_ID'        => $check->Supplier_ID,
+                        'Box_ID'             => $check->Box_ID,
+                        'Quantity'           => $request->Quantity,
+                        'User_Created'       => Auth::user()->id,
+                        'User_Updated'       => Auth::user()->id,
+                        'IsDelete'           => 0
+                    ]);
+                }
+                return (object)[
+                    'status' => true,
+                    'data'	 => ''
+                ];
+            }
+            else
+            {
+                return (object)[
+                    'status' => false,
+                    'data'	 => __('Box no longer exists in stock')
+                ];
+            }
+        }
+        else
+        {
+            $check = ImportDetail::where('IsDelete',0)->where('Inventory','>',0)->where('Box_ID',$request->Box_ID)->first();
+            if($check)
+            {
+                ImportDetail::where('ID',$check->ID)
+                ->Update([
+                    'Inventory'     =>  $check->Inventory - $request->Quantity,
+                ]);
+                $check_in_ng = StockNG::where('IsDelete',0)->where('Box_ID',$request->Box_ID)->first();
+                if($check_in_ng)
+                {
+                    StockNG::where('ID',$check_in_ng->ID)
+                    ->Update([
+                        'Quantity'     => $check_in_ng->Quantity + $request->Quantity,
+                        'User_Updated'       => Auth::user()->id,
+                    ]);
+                }
+                else
+                {
+                    StockNG::create([
+                        'Warehouse_Detail_ID'=> $check->Warehouse_Detail_ID,
+                        'Product_ID'         => $check->Product_ID,
+                        'Materials_ID'       => $check->Materials_ID,
+                        'Supplier_ID'        => $check->Supplier_ID,
+                        'Box_ID'             => $check->Box_ID,
+                        'Quantity'           => $request->Quantity,
+                        'User_Created'       => Auth::user()->id,
+                        'User_Updated'       => Auth::user()->id,
+                        'IsDelete'           => 0
+                    ]);
+                }
+                return (object)[
+                    'status' => true,
+                    'data'	 => ''
+                ];
+            }
+            else
+            {
+                return (object)[
+                    'status' => false,
+                    'data'	 => __('Box no longer exists in stock')
+                ];
+            }
+        }
+    }
     
 }      

@@ -288,12 +288,13 @@ class ImportMaterialsController extends Controller
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
 				->where('ID', $data->Warehouse_Detail_ID)
 				->first();
-
-			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
-				return response()->json([
-					'success' => false,
-					'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
-				], 400);
+			if ($old_location->Area && $location->Area) {
+				if ($old_location->Area != $location->Area) {
+					return response()->json([
+						'success' => false,
+						'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
+					], 400);
+				}
 			}
 
 			$arr1 = [
@@ -383,13 +384,13 @@ class ImportMaterialsController extends Controller
 			$old_location = MasterWarehouseDetail::where('IsDelete', 0)
 				->where('ID', $data[0]->Warehouse_Detail_ID)
 				->first();
-
-			// từ chi tiết vị trí -> lấy được kho -> so sánh type của kho ( cùng type là cùng kho)
-			if ($old_location->Warehouse_ID != $location->Warehouse_ID) {
-				return response()->json([
-					'success' => false,
-					'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
-				], 400);
+			if ($old_location->Area && $location->Area) {
+				if ($old_location->Area != $location->Area) {
+					return response()->json([
+						'success' => false,
+						'data' => ['message' => __('Location') . ' ' . __("Not in the current inventory")]
+					], 400);
+				}
 			}
 
 			foreach ($data as $value1) {

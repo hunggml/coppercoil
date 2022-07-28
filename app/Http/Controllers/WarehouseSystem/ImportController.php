@@ -228,5 +228,17 @@ class ImportController extends Controller
             'data'    => $data
         ]);
     }
- 
+
+    public function box_ng_add(Request $request)
+    {
+        $data = $this->command->add_box_ng_to_warehouse($request);
+        if($data->status)
+        {
+            return redirect()->back()->with('success',__('Success')); 
+        }
+        else
+        {
+            return redirect()->back()->with('danger',$data->data); 
+        }
+    }
 }

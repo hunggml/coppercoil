@@ -116,6 +116,7 @@ class ExportLibraries
         if ($data->go && $data->to) {
             if ($data->to->Accept == 0) {
                 if ($data->to->Email) {
+                    // dd('run');
                     $this->send_mail->send_mail($data->to->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
                 }
             } else {
@@ -248,9 +249,9 @@ class ExportLibraries
             $Go = $data->go ? $data->go->Symbols : '';
             $To = $data->to ? $data->to->Symbols : '';
             if ($data->go && $data->to) {
-                if ($data->go->Accept == 0) {
-                    if ($data->go->Email) {
-                        $this->send_mail->send_mail($data->go->Email, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
+                if ($data->to->Accept == 0) {
+                    if ($data->to->Email2) {
+                        $this->send_mail->send_mail($data->to->Email2, $num, $mater, $Go, $To, $data->Quantity, $data->Count);
                     }
                 } else {
 
@@ -373,7 +374,7 @@ class ExportLibraries
                                             'Supplier_ID'      => $data1->Supplier_ID,
                                             'Quantity'         => $request->Quantity,
                                             'Warehouse_Detail_ID' => $warehouse->ID,
-                                            'Machine_ID'       => $warehouse->Machine_ID,
+                                            'Machine_ID'          => $warehouse->Machine_ID,
                                             'User_Created'     => Auth::user()->id,
                                             'User_Updated'     => Auth::user()->id,
                                             'IsDelete'         => 0
@@ -387,7 +388,6 @@ class ExportLibraries
                             }
                         } else {
                             $quan1 = floatval(collect($command->detail->where('Status', 1))->sum('Quantity'));
-                            // dd($quan1,$data->Quantity);
                             if ($quan1 < $data->export->Quantity) {
                                 ExportDetail::where('IsDelete', 0)
                                     ->where('ID', $data->ID)
@@ -410,15 +410,15 @@ class ExportLibraries
                                         if($warehouse)
                                         {
                                             $arr = [
-                                                'Materials_ID'     => $data1->Materials_ID,
-                                                'Box_ID'           => $data1->Box_ID,
-                                                'Supplier_ID'      => $data1->Supplier_ID,
-                                                'Quantity'         => $request->Quantity,
+                                                'Materials_ID'        => $data1->Materials_ID,
+                                                'Box_ID'              => $data1->Box_ID,
+                                                'Supplier_ID'         => $data1->Supplier_ID,
+                                                'Quantity'            => $request->Quantity,
                                                 'Warehouse_Detail_ID' => $warehouse->ID,
-                                                'Machine_ID'       => $warehouse->Machine_ID,
-                                                'User_Created'     => Auth::user()->id,
-                                                'User_Updated'     => Auth::user()->id,
-                                                'IsDelete'         => 0
+                                                'Machine_ID'          => $warehouse->Machine_ID,
+                                                'User_Created'        => Auth::user()->id,
+                                                'User_Updated'        => Auth::user()->id,
+                                                'IsDelete'            => 0
                                             ];
                                             StockMachine::create($arr);
                                         }

@@ -195,7 +195,7 @@
 								</option>
 								@foreach($product as $value)
 									<option value="{{$value->ID}}" >
-										{{$value->Name}}
+										{{$value->Symbols}}
 									</option>
 								@endforeach        
 							</select>
@@ -339,6 +339,7 @@
 				},
 				success: function(data) 
 				{
+					console.log(data.data)
 					if(data.success)
 					{
 						$('.err').hide()
@@ -347,13 +348,9 @@
 						$.each(data.data , function (index,value){
 							if(value.materials)
 							{
-								if(value.materials.product)
-								{
 									a = a + `
-									<option value="`+value.Box_ID+`" class="`+value.Quantity+`__-`+value.materials.Symbols+`__-`+value.materials.product.Name+`__-`+value.materials.product.Quantity+`">`+value.Box_ID+`</option>
+									<option value="`+value.Box_ID+`" class="`+value.Quantity+`__-`+value.materials.Symbols+`__-">`+value.Box_ID+`</option>
 									`
-								}
-								
 							}
 							
 						})

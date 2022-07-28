@@ -39,6 +39,7 @@ class MasterWarehouseDetail extends Model
     ,'Email'
     ,'Email2'
   	,'Note'
+    ,'Type'
   	,'Time_Created'
   	,'User_Created'
   	,'Time_Updated'

@@ -52,6 +52,7 @@ class TransferLibraries
                     'Warehouse_Detail_ID'   => $request->To,
                     'Quantity'              => $ex->Quantity,
                     'Inventory'             => $ex->Quantity,
+                    'Supplier_ID'           => $ex->Supplier_ID,
                     'Status'                => 1,
                     'Type'                  => 6,
                     'Time_Import'           => Carbon::now(),
@@ -189,6 +190,7 @@ class TransferLibraries
                     'Export_ID'             => '',
                     'Pallet_ID'             =>  '',
                     'Box_ID'                =>  $data->Box_ID,
+                    'Supplier_ID'           =>  $data->Supplier_ID,
                     'Materials_ID'          =>    $data->Materials_ID,
                     'Warehouse_Detail_ID'   => $data->Warehouse_Detail_ID,
                     'Quantity'              =>  $data->Quantity,
@@ -212,6 +214,7 @@ class TransferLibraries
                     'Case_No'             => $data->Case_No,
                     'Lot_No'              => $data->Lot_No,
                     'Time_Import'         => $data->Time_Import,
+                    'Supplier_ID'         =>  $data->Supplier_ID,
                     'Pallet_ID'           => '',
                     'Quantity'            => $data->Quantity,
                     'Inventory'           => $data->Quantity,
@@ -258,6 +261,7 @@ class TransferLibraries
                         'Box_ID'    =>  $value1->Box_ID,
                         'Pallet_ID' =>  $value1->Pallet_ID,
                         'Materials_ID' =>    $value1->Materials_ID,
+                        'Supplier_ID'   =>  $value1->Supplier_ID,
                         'Warehouse_Detail_ID' => $value1->Warehouse_Detail_ID,
                         'Quantity'  =>  $value1->Quantity,
                         'Status'    =>  1,
@@ -281,6 +285,7 @@ class TransferLibraries
                         'Pallet_ID'           => $value1->Pallet_ID,
                         'Case_No'             => $value1->Case_No,
                         'Lot_No'              => $value1->Lot_No,
+                        'Supplier_ID'         => $value1->Supplier_ID,
                         'Time_Import'         => $value1->Time_Import,
                         'Quantity'            => $value1->Quantity,
                         'Inventory'           => $value1->Quantity,
@@ -404,22 +409,21 @@ class TransferLibraries
                 ->get();
             // dd($data1);
             foreach ($data1 as $value2) {
-                if ($value2->Type == 0) {
-                    $value2->Type = 4;
+                if ($value2->Type == 0 ) {
+                    $value2->Type  = 4;
                     $value2->Count = 1;
                 }
                 if ($value2->Type == 2) {
-                    $value2->Type = 5;
+                    $value2->Type =  5;
                     $value2->Count = 1;
                 }
                 if ($value2->Type == 1) {
-                    $value2->Type = 7;
+                    $value2->Type =  7;
                     $value2->Count = 1;
                 }
                 array_push($arr, $value2);
             }
         }
-        // dd($arr);
         return $arr;
     }
 }

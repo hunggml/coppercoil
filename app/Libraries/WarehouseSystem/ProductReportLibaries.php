@@ -232,8 +232,17 @@ class ProductReportLibaries
         {
             StockMachine::where('ID',$check_pro->ID)
             ->Update([
-                'Quantity'=>$check_pro->Quantity + $total,
+                'IsDelete'         => 1,
                 'User_Updated'     => Auth::user()->id,
+            ]);
+            StockMachine::create([
+                'Machine_ID'            =>$check_pro->Machine_ID,
+                'Warehouse_Detail_ID'   =>$check_pro->Warehouse_Detail_ID,
+                'Product_ID'            => $check_pro->Product_ID,
+                'Quantity'              => $check_pro->Quantity + $total,
+                'User_Created'     => Auth::user()->id,
+                'User_Updated'     => Auth::user()->id,
+                'IsDelete'         => 0
             ]);
         }
         else
@@ -256,14 +265,27 @@ class ProductReportLibaries
             {
                 StockMachine::where('ID',$check->ID)
                 ->Update([
-                    'Quantity'=>$check->Quantity - $use[$key],
-                    'User_Updated'     => Auth::user()->id,
+                    'IsDelete'     => 1,
                 ]);
+                StockMachine::create([
+                    'Machine_ID'         => $check->Machine_ID,
+                    'Warehouse_Detail_ID'=> $check->Warehouse_Detail_ID,
+                    'Product_ID'         => $check->Product_ID,
+                    'Materials_ID'       => $check->Materials_ID,
+                    'Supplier_ID'        => $check->Supplier_ID,
+                    'Box_ID'             => $check->Box_ID,
+                    'Quantity'           => $check->Quantity - $use[$key],
+                    'Use'                => $check->Use + $use[$key],
+                    'NG'                 => $check->NG,
+                    'User_Created'       => Auth::user()->id,
+                    'User_Updated'       => Auth::user()->id,
+                    'IsDelete'           => 0
+                ]);
+                
             }
         }
         
     }
-
     public function calculate($request)
     {
         $data = StockMachine::where('IsDelete',0)->WhereIn('Box_ID',$request->Box_ID)->get();

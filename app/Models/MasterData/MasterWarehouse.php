@@ -17,7 +17,7 @@ class MasterWarehouse extends Model
     return $date->format('Y-m-d H:i:s');
   }
   protected $fillable   = [
-    'Name', 'Symbols', 'Quantity_Rows', 'Quantity_Columns', 'MAC', 'Quantity_Unit', 'Unit_ID', 'Quantity_Packing', 'Packing_ID', 'Group_Materials_ID', 'Floor','Area', 'Note', 'Accept', 'Email', 'Email2', 'Time_Created', 'User_Created', 'Time_Updated', 'User_Updated', 'IsDelete'
+    'Name', 'Symbols', 'Quantity_Rows', 'Quantity_Columns', 'MAC', 'Quantity_Unit', 'Unit_ID', 'Quantity_Packing', 'Packing_ID', 'Group_Materials_ID', 'Floor','Area', 'Note', 'Accept', 'Email', 'Email2','Type', 'Time_Created', 'User_Created', 'Time_Updated', 'User_Updated', 'IsDelete'
   ];
 
   public function user_created()

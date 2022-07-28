@@ -57,9 +57,17 @@ class ExportMaterials extends Model
   }
   public function go()
   {
-    return $this->hasOne('App\Models\MasterData\MasterArea', 'ID', 'Go')->whereIsdelete(0);
+    return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail', 'Area', 'Go')->whereIsdelete(0);
   }
   public function to()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail', 'Area', 'To')->whereIsdelete(0);
+  }
+  public function go_area()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterArea', 'ID', 'Go')->whereIsdelete(0);
+  }
+  public function to_area()
   {
     return $this->hasOne('App\Models\MasterData\MasterArea', 'ID', 'To')->whereIsdelete(0);
   }

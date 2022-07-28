@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Libraries\MasterData\MasterWarehouseLibraries;
 use App\Libraries\MasterData\MasterWarehouseDetailLibraries;
 use App\Libraries\MasterData\MasterUnitLibraries;
+use App\Libraries\MasterData\MasterErrorLibraries;
+use App\Libraries\MasterData\MasterMachineLibraries;
 use App\Libraries\MasterData\MasterGroupMaterialsLibraries;
 use App\Libraries\WarehouseSystem\ExportLibraries;
 
@@ -21,7 +23,9 @@ class MasterWarehouseController extends Controller
         MasterWarehouseDetailLibraries $masterWarehouseDetailLibraries,
         MasterUnitLibraries $masterUnitLibraries,
         MasterGroupMaterialsLibraries $masterGroupMaterialsLibraries,
-        ExportLibraries $ExportLibraries
+        ExportLibraries $ExportLibraries,
+        MasterMachineLibraries $MasterMachineLibraries,
+        MasterErrorLibraries $MasterErrorLibraries
 
     ) {
         $this->middleware('auth');
@@ -29,7 +33,9 @@ class MasterWarehouseController extends Controller
         $this->warehouse_detail = $masterWarehouseDetailLibraries;
         $this->unit             = $masterUnitLibraries;
         $this->group            = $masterGroupMaterialsLibraries;
-        $this->export = $ExportLibraries;
+        $this->export           = $ExportLibraries;
+        $this->machine          = $MasterMachineLibraries;
+        $this->error            = $MasterErrorLibraries;
     }
 
     public function index(Request $request)
@@ -101,6 +107,9 @@ class MasterWarehouseController extends Controller
     public function location(Request $request)
     {
         $data1     = $this->warehouse->get_all_list_warehouse();
+        $area     = $this->warehouse->get_area();
+        $machine    = $this->machine->get_all_list_machine();
+        $error 	= $this->error->get_all_list_error();
         if($request->Format == 1)
         {
             $data = $data1->where('Type',null);
@@ -125,8 +134,14 @@ class MasterWarehouseController extends Controller
         }
         else if($request->Format == 3)
         {
+
+
             return view(
-                'master_data.warehouses.location.ng'
+                'master_data.warehouses.location.ng',
+                [
+                    'error'=>$error,
+                    'request'=>$request
+                ]
             );
         }
         

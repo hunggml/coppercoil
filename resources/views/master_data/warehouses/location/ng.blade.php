@@ -93,7 +93,7 @@
                                     <div class="form-group pro1 col-2 style="text-align:center;">
 										<div class="icheck-primary d-inline " >
 										<input type="checkbox"  id="checkboxPrimary" class="checkAllStock" >
-										<label for="checkboxPrimary">  Chọn Hết </label>
+										<label for="checkboxPrimary">Chọn Hết</label>
 										</div>
                                     </div>
                                 </th>
@@ -110,9 +110,7 @@
 		                		<th>{{__('User Updated')}}</th>
 		                		<th>{{__('Time Updated')}}</th>
 		                		<th>{{__('Action')}}
-								
 								</th>
-
 		                	</thead>
 		                	<tbody>
 		                		<tr>
@@ -202,12 +200,12 @@
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success btn-handle">
-			                					{{__('Tái Sử Dụng')}}
-			                				</a>
-											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
-			                					{{__('Hủy')}}
-			                				</a>
+												<a href="#" class="btn btn-success btn-handle">
+													{{__('Tái Sử Dụng')}}
+												</a>
+												<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+													{{__('Hủy')}}
+												</a>
 			                				@endif
 			                		</td>
                                 </tr>
@@ -234,12 +232,12 @@
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success btn-handle">
-			                					{{__('Tái Sử Dụng')}}
-			                				</a>
-											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
-			                					{{__('Hủy')}}
-			                				</a>
+												<a href="#" class="btn btn-success btn-handle">
+													{{__('Tái Sử Dụng')}}
+												</a>
+												<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+													{{__('Hủy')}}
+												</a>
 			                				@endif
 			                		</td>
                                 </tr>
@@ -265,7 +263,7 @@
                                     <td>Admin</td>
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
-											  
+
 			                		</td>
                                 </tr>
 		                	</tbody>
@@ -286,12 +284,14 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
+				<form action="{{route('warehousesystem.box_ng.add')}}" method="post">
+				@csrf
 				<div class="modal-body">
                     <div class="form-group col-12">
-		                <label>{{__('Choose')}} {{__('Type')}}</label>
-		                <select class="custom-select select2 type" name="Symbols">
+		                <label>{{__('Choose')}} {{__('Type')}} {{__('To')}}</label>
+		                <select class="custom-select select2 type" name="Type">
 		                    <option value="">
-		                        {{__('Choose')}} {{__('Type')}}
+		                        {{__('Choose')}} {{__('Type')}} {{__('To')}}
 		                    </option>
                             <option value="1">
 		                        {{__('Machine')}}
@@ -301,36 +301,21 @@
 		                    </option>
 		                </select>
 	                </div>
-                    <div class="form-group col-12 hide mac">
-		                <label>{{__('Choose')}} {{__('Machine')}}</label>
-		                <select class="custom-select select2" name="Machine_ID">
-		                    <option value="">
-		                        {{__('Choose')}} {{__('Machine')}}
-		                    </option>
-		                </select>
-	                </div>
-                    <div class="form-group col-12 hide loc">
-		                <label>{{__('Choose')}} {{__('Location')}}</label>
-		                <select class="custom-select select2" name="Location">
-		                    <option value="">
-		                        {{__('Choose')}} {{__('Location')}}
-		                    </option>
-		                </select>
-	                </div>
 					<div class="form-group col-12">
-		                <label>{{__('Choose')}} {{__('Box_ID')}}</label>
-		                <select class="custom-select select2" name="Box_ID">
-		                    <option value="">
-		                        {{__('Choose')}} {{__('Box_ID')}}
-		                    </option>
-		                </select>
-	                </div>
+						<label>{{ __('Box_ID') }}</label>
+						<input type="Number" value="" class="form-control"  name="Box_ID" placeholder="{{__('Enter')}} {{__('Box_ID')}}">
+					</div>
 					<div class="form-group col-12">
 		                <label>{{__('Choose')}} {{__('Error')}}</label>
 		                <select class="custom-select select2" name="Error">
 		                    <option value="">
 		                        {{__('Choose')}} {{__('Error')}}
 		                    </option>
+							@foreach($error as $value)
+								<option value="{{$value->ID}}" >
+									{{$value->Name}}
+								</option>
+							@endforeach
 		                </select>
 	                </div>
 					<div class="form-group col-12">
@@ -344,12 +329,14 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-					<button type="button" class="btn btn-add hide float-right btn-warning ">{{__('Export')}}</button>
+					<button type="submit" class="btn btn-add float-right btn-warning ">{{__('Export')}}</button>
 				</div>
+				</form>
 			</div>
 		</div>
 	</div>
-	<!-- modal handle -->
+<!-- modal handle -->
+
 <div class="modal fade" id="modalRequestDel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -374,7 +361,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="modalRequestTa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -398,7 +384,7 @@
     </div>
   </div>
 </div>
-	
+
 @endsection
 @push('scripts')
 	<script>

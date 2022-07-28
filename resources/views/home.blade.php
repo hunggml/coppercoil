@@ -88,19 +88,25 @@
 		                		<tr>
                           <td>1</td>
                           <td>Đồng Chính</td>
-                          <td style="background:#b3e6ff">1000</td>
-                          <td style="background:#b3e6ff">1000</td>
-                          <td style="background:#ffffcc">200</td>
+                          <td style="background:#b3e6ff">
+                            <p>1000</p> 
+                            <p>[ 1000Kg ]</p> 
+                          </td>
+                          <td style="background:#b3e6ff">
+                            <p>1000</p> 
+                            <p>[ 1000Kg ]</p> 
+                          </td>
+                          <td style="background:#ffffcc">200 [ 200Kg ]</td>
                           <td style="">X</td>
                           <td style="">X</td>
-                          <td style="">800</td>
+                          <td style="">800 [ 800Kg ]</td>
                         </tr>
                         <tr>
                           <td rowspan="2">2</td>
                           <td>Coil SM</td>
                           <td>X</td>
-                          <td style="background:#ffffcc">100</td>
-                          <td style="background:#ffb3b3">90</td>
+                          <td style="background:#ffffcc">100 [ 100Kg ]</td>
+                          <td style="background:#ffb3b3">90 [ 99Kg ]</td>
                           <td style="">X</td>
                           <td style="">X</td>
                           <td>10</td>
@@ -109,11 +115,11 @@
                           <!-- <td>2</td> -->
                           <td>Máy Sản Xuất Kho SM</td>
                           <td>X</td>
-                          <td style="background:#ffb3b3">90</td>
+                          <td style="background:#ffb3b3">90 [ 99Kg ]</td>
                           <td>X</td>
-                          <td>50</td>
-                          <td>20</td>
-                          <td>20</td>
+                          <td>3 [ 50 Kg ]</td>
+                          <td>2 [ 20 Kg ]</td>
+                          <td>3 [ 20 Kg ]</td>
                         </tr>
                         <tr>
                           <td  rowspan="2">3</td>

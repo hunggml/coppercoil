@@ -20,6 +20,7 @@ class MasterMachine extends Model
   	'Name'
   	,'Symbols'
   	,'Note'
+    ,'Area'
   	,'Time_Created'
   	,'User_Created'
   	,'Time_Updated'
@@ -40,5 +41,8 @@ class MasterMachine extends Model
   {
     return $this->hasOne('App\Models\MasterData\MasterWarehouseDetail',  'Machine_ID','ID')->whereIsdelete(0);
   }
-
+  public function area()
+  {
+    return $this->hasOne('App\Models\MasterData\MasterArea',  'ID','Area');
+  }
 }

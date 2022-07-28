@@ -166,8 +166,8 @@
 								<td>{{$value->Type == 0 ? __('Software') : ($value->Type == 1 ? __('PDA') : __('System')  ) }}</td>
 								<td>{{$value->Type == 0 ? __('PM') : ($value->Type == 1 ? __('PDA') : __('HT')  ) }}-{{date_format(date_create($value->Time_Created),"YmdHis")}}</td>
 								<td>{{$value->materials ? $value->materials->Symbols : ''}}</td>
-								<td>{{$value->go ? $value->go->Name : '' }}</td>
-								<td>{{$value->to ? $value->to->Name : ($value->machine ? $value->machine->Name : '--' ) }}</td>
+								<td>{{$value->go_area ? $value->go_area->Name : '' }}</td>
+								<td>{{$value->to_area ? $value->to_area->Name : ($value->machine ? $value->machine->Name : '--' ) }}</td>
 								<td id="com_{{$value->ID}}">{{$value->Count ? $value->Count : floatval($value->Quantity) }}</td>
 								<?php $a = $value->Count ? $value->Count : $value->Quantity; ?>
 								<?php $b = $value->Count ? (count($value->detail->where('Status',1))) : floatval(collect($value->detail->where('Status',1))->sum('Quantity')); ?>
@@ -292,12 +292,12 @@
 								</div>
 								<div class="to-machine hide col-4">
 									<label>{{__('Choose')}} {{__('Machine')}}  {{__('To')}}</label>
-									<select class="custom-select ware tomachine select2" name="Machine_ID">
+									<select class="custom-select ware tomachine" name="Machine_ID">
 										<option value="">
 										{{__('Choose')}} {{__('Machine')}}
 										</option>
 										@foreach($machine as $value)
-										<option value="{{$value->ID}}">
+										<option value="{{$value->ID}}" class="cls cls-{{$value->Area}} hide">
 										{{$value->Name}}
 										</option>
 										@endforeach
@@ -406,6 +406,7 @@
             language: __languages.table,
             scrollX: '100%',
             scrollY: '100%',
+			ordering: false,
             dom: '<"bottom"><"clear">',
         });
 		$(document).on('click', '.btn-delete', function()
@@ -434,7 +435,6 @@
 			$('#modalRequestAC').modal();
 			$('#nameDel').text(name);
 			$('#ID1').val(id.split('-')[1]);
-			
 		});
 		$('.choose-to').on('input',function(){
 			let a = $('.choosetype').val()
@@ -464,8 +464,12 @@
 		})
 		$(document).on('change', '.ware', function()
 		{
+			$('.cls').hide()
 			let id = $('.ware').val();
 			$('.new').remove();
+			$('.cls-'+id).show()
+			// $(".tomachine").addClass("select2");
+			// $('.select2').select2()
 			$.ajax({
 				type: "GET",
 				url: "{{route('masterData.warehouses.get_list_materials_in_warehouse')}}",
@@ -500,7 +504,7 @@
 							$('.warehouse').append(`
 								<div class="new col-12">
 									<hr>
-									<div class="row new2">
+									<div class="row new2 hide">
 										<div class="product col-6 mater1">
 											<label>{{__('Choose')}} {{__('Product')}} </label>
 											<select class="custom-select  product1 select2" name="Materials">
@@ -523,7 +527,7 @@
 											</button>
 										</div>
 									</div>
-									<hr>
+									
 									<div class="">
 											<div class="mater mater1">
 											<label>{{__('Choose')}} {{__('Materials')}} </label>
@@ -724,38 +728,6 @@
                 }
             });
 		});
-		// $('.btn-add').on('click',function(){
-			
-		// 	let a = $('.ware').val()
-		// 	let b = $('.mater2').val()
-		// 	let c = $('#idCan7').val()
-		// 	let d = $('.towarehouse').val()
-		// 	let f = $('.tomachine').val()
-		// 	let e = $('#idCan77').val()
-		// 	console.log(a,b,c,d,e)
-		// 	$.ajax({
-		// 		type: "get",
-		// 		url: "{{route('warehousesystem.export.add')}}",
-		// 		data: { 
-		// 			'_token' : $('meta[name="csrf-token"]').attr('content'),
-		// 			Go : a,
-		// 			Materials_ID :b,
-		// 			Quantity : c,
-		// 			Count : e,
-		// 			To  : d,
-		// 			Machine_ID  : f,
-		// 		},
-		// 		success: function(data) 
-		// 		{
-		// 			if(data.data)
-		// 			{
-		// 				location.reload();
-		// 			}
-		// 		},
-		// 		error: function() {
-		// 		}
-		// 	});
-		// })
 		$('.btn-Transfer').on('click',function(){
 			let id = $(this).attr('id')
 			$('.transfer-box').remove()

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use DateTimeInterface;
 use Auth;
+use Session;
 
 class User extends Authenticatable implements JWTSubject
 {

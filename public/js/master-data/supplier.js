@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -220,10 +220,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
-/***/ "./resources/js/master-data/unit.js":
-/*!******************************************!*\
-  !*** ./resources/js/master-data/unit.js ***!
-  \******************************************/
+/***/ "./resources/js/master-data/supplier.js":
+/*!**********************************************!*\
+  !*** ./resources/js/master-data/supplier.js ***!
+  \**********************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -236,11 +236,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 $('.select2').select2();
 
-var route = "".concat(window.location.origin, "/api/settings/unit");
-var route_show = "".concat(window.location.origin, "/setting/setting-unit/show"); // var route_his = `${window.location.origin}/api/settings/unit/history`;
+var route = "".concat(window.location.origin, "/api/settings/supplier");
+var route_show = "".concat(window.location.origin, "/setting/setting-supplier/show"); // var route_his = `${window.location.origin}/api/settings/unit/history`;
 // var route_return = `${window.location.origin}/setting/setting-unit/return`;
 
-var table = $('.table-unit').DataTable((_$$DataTable = {
+var table = $('.table-supplier').DataTable((_$$DataTable = {
   scrollX: true,
   searching: false,
   ordering: false,
@@ -278,15 +278,17 @@ var table = $('.table-unit').DataTable((_$$DataTable = {
   defaultContent: '',
   title: Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Symbols')
 }, {
-  data: 'Type',
-  title: Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Type'),
-  render: function render(data) {
-    if (data == 1) {
-      return Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Unit');
-    } else {
-      return Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Parking');
-    }
-  }
+  data: 'Address',
+  defaultContent: '',
+  title: Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Address')
+}, {
+  data: 'Contact',
+  defaultContent: '',
+  title: Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Contact')
+}, {
+  data: 'Phone',
+  defaultContent: '',
+  title: Object(_lang__WEBPACK_IMPORTED_MODULE_0__["default"])('Phone')
 }, {
   data: 'Note',
   defaultContent: '',
@@ -432,14 +434,14 @@ $(document).on('click', '.btn-delete', function () {
 
 /***/ }),
 
-/***/ 1:
-/*!************************************************!*\
-  !*** multi ./resources/js/master-data/unit.js ***!
-  \************************************************/
+/***/ 2:
+/*!****************************************************!*\
+  !*** multi ./resources/js/master-data/supplier.js ***!
+  \****************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! F:\laravel\STI\coppercoil\Coppercoil\resources\js\master-data\unit.js */"./resources/js/master-data/unit.js");
+module.exports = __webpack_require__(/*! F:\laravel\STI\coppercoil\Coppercoil\resources\js\master-data\supplier.js */"./resources/js/master-data/supplier.js");
 
 
 /***/ })

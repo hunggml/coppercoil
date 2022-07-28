@@ -5,27 +5,29 @@ namespace App\Models\WarehouseSystem;
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 
-class StockMachine extends Model
+class StockNG extends Model
 {
 	const CREATED_AT      = 'Time_Created';
 	const UPDATED_AT      = 'Time_Updated';
 	
-	protected $table      = 'Stock_Machine';
+	protected $table      = 'Stock_NG';
 	protected $primaryKey = 'ID';
   protected function serializeDate(DateTimeInterface $date)
   {
     return $date->format('Y-m-d H:i:s');
   }
 	protected $fillable   = [
-  	'Machine_ID'
-    ,'Warehouse_Detail_ID'
+    'Warehouse_Detail_ID'
   	,'Product_ID'
     ,'Materials_ID'
     ,'Box_ID'
     ,'Supplier_ID'
     ,'Quantity'
-    ,'Use'
-    ,'NG'
+    ,'Reuse'
+    ,'Cancel'
+    ,'Format'
+    ,'Type'
+    ,'Go'
     ,'Note'
   	,'Time_Created'
   	,'User_Created'
