@@ -87,7 +87,7 @@
 		            	</br>
 						<p>Tổng Số Lượng NG : <span style="color:red">60 ( Kg )</span></p>
 						<p>Tổng Số Lượng đã xử Lý : <span style="color:red">20 ( Kg )</span></p>
-		                <table class="table table-bordered text-nowrap w-100" id="tableUnit" width="100%">
+		                <table class="table table-bordered text-nowrap" id="tableUnit" width="100%">
 		                	<thead>
 								<th>
                                     <div class="form-group pro1 col-2 style="text-align:center;">
@@ -136,12 +136,12 @@
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success btn-handle"data-toggle="modal" data-target="#modalRequestTa">
-			                					{{__('Tái Sử Dụng')}}
-			                				</a>
-											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
-			                					{{__('Hủy')}}
-			                				</a>
+												<a href="#" class="btn btn-success btn-handle"data-toggle="modal" data-target="#modalRequestTa">
+													{{__('Tái Sử Dụng')}}
+												</a>
+												<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+													{{__('Hủy')}}
+												</a>
 			                				@endif
 			                		</td>
                                 </tr>
@@ -168,12 +168,12 @@
                                     <td>2022-07-16 11:00:43</td>
                                     <td>
 			                				@if(Auth::user()->checkRole('update_master') || Auth::user()->level == 9999)
-			                				<a href="#" class="btn btn-success btn-handle">
-			                					{{__('Tái Sử Dụng')}}
-			                				</a>
-											<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
-			                					{{__('Hủy')}}
-			                				</a>
+												<a href="#" class="btn btn-success btn-handle">
+													{{__('Tái Sử Dụng')}}
+												</a>
+												<a href="#" class="btn btn-danger btn-handle"data-toggle="modal" data-target="#modalRequestDel">
+													{{__('Hủy')}}
+												</a>
 			                				@endif
 			                		</td>
                                 </tr>
@@ -274,7 +274,6 @@
 	    </div>
 	</div>
 
-    <!-- modal import -->
     <div class="modal fade  bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-xl">
 			<div class="modal-content">
@@ -335,55 +334,52 @@
 			</div>
 		</div>
 	</div>
-<!-- modal handle -->
-
-<div class="modal fade" id="modalRequestDel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="title">{{__('Delete')}}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form action="#" method="get">
-        @csrf
-        <div class="modal-body">
-          <strong style="font-size: 23px">{{__('Bạn Có Muốn Hủy ')}} <span id="nameDel" style="color: blue"></span> ?</strong>
-          <input type="text" name="ID" id="idDel" class="form-control hide">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-          <button type="submit" class="btn btn-danger">{{__('Hủy')}}</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="modalRequestTa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="title">{{__('Delete')}}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form action="3" method="get">
-        @csrf
-        <div class="modal-body">
-          <strong style="font-size: 23px">{{__('Bạn Có Muốn Tái Sử Dụng')}} <span id="nameDel" style="color: blue"></span> ?</strong>
-          <input type="text" name="ID" id="idDel" class="form-control hide">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
-          <button type="submit" class="btn btn-success">{{__('Tái Sử Dụng')}}</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+	<div class="modal fade" id="modalRequestDel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="title">{{__('Delete')}}</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form action="#" method="get">
+					@csrf
+					<div class="modal-body">
+						<strong style="font-size: 23px">{{__('Bạn Có Muốn Hủy ')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+						<input type="text" name="ID"  class="form-control">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+						<button type="submit" class="btn btn-danger">{{__('Hủy')}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modalRequestTa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="title">{{__('Delete')}}</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form action="#" method="get">
+					@csrf
+					<div class="modal-body">
+						<strong style="font-size: 23px">{{__('Bạn Có Muốn Tái Sử Dụng')}} <span id="nameDel" style="color: blue"></span> ?</strong>
+						<input type="text" name="ID" class="form-control hide">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Close')}}</button>
+						<button type="submit" class="btn btn-success">{{__('Tái Sử Dụng')}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
 @endsection
 @push('scripts')
